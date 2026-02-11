@@ -1,64 +1,59 @@
-# StageOps IoT Gateway
+# StageOps Web App
 
-Service intermédiaire chargé de collecter et transmettre l’état des équipements techniques vers l’API StageOps.
+Interface desktop destinée au Régisseur Général.
 
-## Objectif
-
-Permettre la remontée automatique d’informations terrain :
-
-- état matériel
-- connectivité
-- monitoring
-- télémétrie
-
-## Rôle dans l’architecture
-
-Équipement → Gateway → API StageOps
-
-Le gateway agit comme un pont entre les dispositifs techniques et le backend.
+Cette application fournit une vue globale du projet technique et permet la supervision centralisée des opérations scéniques.
 
 ## Fonctionnalités
 
-- Collecte d’état équipement
-- Transmission vers API
-- Normalisation des données
-- Gestion de la connectivité intermittente
+- Dashboard global
+- Gestion des projets
+- Visualisation du parc matériel
+- Monitoring temps réel
+- Planification technique
+- Visualisation 3D simplifiée de la scène
 
 ## Architecture
 
 src/
-  adapters/
-  transport/
-  config/
-  client-api/
+  components/
+  modules/
+    dashboard/
+    projects/
+    equipment/
+    monitoring/
+    scene-visualization/
+  services/
+  store/
+  router/
 
 ## Stack technique
 
-- Node.js
-- Communication HTTP / MQTT
-- Architecture orientée événement
+- React ou Vue.js
+- API StageOps Backend
+- Architecture SPA
+- Visualisation 3D WebGL
 
 ## Installation
 
 git clone <repo>
-cd StageOps-iot-gateway
+cd stageops-web-app
 npm install
 
-Créer `.env`
+Configurer l’URL API.
 
-API_URL=
-DEVICE_ID=
+### Lancement
 
-Lancer :
+npm run dev
 
-npm start
+Application disponible sur :
+http://localhost:3000
 
-## Cas d’usage
+## Objectif produit
 
-- monitoring rack son
-- suivi projecteurs connectés
-- supervision technique
+Offrir un centre de contrôle technique centralisé pour la supervision scénique.
 
-## Statut
+## Licence
 
-Prototype expérimental.
+Projet académique.
+
