@@ -7,6 +7,7 @@ import { getCategoryLabel, getCategoryIcon, formatRelativeTime } from '../lib/ut
 import { Plus, Filter, Download, QrCode } from 'lucide-react';
 import { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '../lib/types';
 import { EquipmentDetailModal } from '../components/EquipmentDetailModal';
+import { AddEquipmentModal } from '../components/AddEquipmentModal';
 
 export function Equipment() {
   const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment);
@@ -14,6 +15,7 @@ export function Equipment() {
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all');
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   
   const filteredEquipment = equipmentList.filter(eq => {
     const matchesSearch = eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,7 +44,7 @@ export function Equipment() {
             <Download size={18} />
             Exporter
           </Button>
-          <Button variant="primary">
+          <Button variant="primary" onClick={() => setShowAddModal(true)}>
             <Plus size={18} />
             Ajouter équipement
           </Button>
@@ -208,6 +210,17 @@ export function Equipment() {
               prev.map((eq) => (eq.id === updated.id ? updated : eq))
             );
             setSelectedEquipment(null);
+          }}
+        />
+      )}
+
+      {/* Modal ajout équipement */}
+      {showAddModal && (
+        <AddEquipmentModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={(newEquipment) => {
+            setEquipmentList((prev) => [newEquipment, ...prev]);
+            setShowAddModal(false);
           }}
         />
       )}
