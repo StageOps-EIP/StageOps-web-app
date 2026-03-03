@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { Button } from '../components/design-system/Button';
 import { SearchInput } from '../components/design-system/Input';
 import { Badge, CategoryChip } from '../components/design-system/Badge';
-import { mockEquipment } from '../lib/mockData';
+import { mockEquipment as initialEquipment } from '../lib/mockData';
 import { getCategoryLabel, getCategoryIcon, formatRelativeTime } from '../lib/utils';
 import { Plus, Filter, Download, QrCode } from 'lucide-react';
-import { EquipmentCategory, EquipmentStatus } from '../lib/types';
+import { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '../lib/types';
+import { EquipmentDetailModal } from '../components/EquipmentDetailModal';
 
 export function Equipment() {
+  const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all');
+  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType | null>(null);
   
-  const filteredEquipment = mockEquipment.filter(eq => {
+  const filteredEquipment = equipmentList.filter(eq => {
     const matchesSearch = eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          eq.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          eq.qrCode.toLowerCase().includes(searchQuery.toLowerCase());
@@ -28,7 +31,7 @@ export function Equipment() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#f5f5f7] mb-2">Inventaire</h1>
-          <p className="text-[#a1a1aa]">{mockEquipment.length} équipements au total</p>
+          <p className="text-[#a1a1aa]">{equipmentList.length} équipements au total</p>
         </div>
         <div className="flex gap-3">
           <Button variant="secondary">
@@ -171,7 +174,7 @@ export function Equipment() {
                     </p>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedEquipment(eq)}>
                       Détails
                     </Button>
                   </td>
@@ -193,6 +196,20 @@ export function Equipment() {
             Réinitialiser les filtres
           </Button>
         </div>
+      )}
+
+      {/* Modal détail équipement */}
+      {selectedEquipment && (
+        <EquipmentDetailModal
+          equipment={selectedEquipment}
+          onClose={() => setSelectedEquipment(null)}
+          onSave={(updated) => {
+            setEquipmentList((prev) =>
+              prev.map((eq) => (eq.id === updated.id ? updated : eq))
+            );
+            setSelectedEquipment(null);
+          }}
+        />
       )}
     </div>
   );
