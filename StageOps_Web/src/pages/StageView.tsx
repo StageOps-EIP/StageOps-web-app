@@ -3,8 +3,8 @@ import { Card } from '../components/design-system/Card';
 import { Button } from '../components/design-system/Button';
 import { SearchInput } from '../components/design-system/Input';
 import { Badge, CategoryChip } from '../components/design-system/Badge';
-import { mockEquipment } from '../lib/mockData';
-import { getCategoryLabel, getCategoryIcon, formatDateTime } from '../lib/utils';
+import { mockEquipment, mockEvents } from '../lib/mockData';
+import { getCategoryLabel, getCategoryIcon, formatDateTime, formatTime } from '../lib/utils';
 import { 
   Eye, 
   Layers as LayersIcon, 
@@ -15,18 +15,39 @@ import {
   AlertCircle,
   User,
   MapPin,
-  Clock
+  Clock,
+  Calendar,
+  ChevronDown,
 } from 'lucide-react';
 import { Equipment, EquipmentCategory } from '../lib/types';
 
 const categories: EquipmentCategory[] = ['sound', 'light', 'video', 'set', 'safety', 'rigging'];
 
+const eventStatusColors: Record<string, string> = {
+  planning: '#71717a',
+  setup: '#f59e0b',
+  running: '#22c55e',
+  strike: '#3b82f6',
+  completed: '#a1a1aa',
+};
+const eventStatusLabels: Record<string, string> = {
+  planning: 'Planification',
+  setup: 'Installation',
+  running: 'En cours',
+  strike: 'Démontage',
+  completed: 'Terminé',
+};
+
 export function StageView() {
+  const [selectedEventId, setSelectedEventId] = useState(mockEvents[0].id);
+  const [showEventPicker, setShowEventPicker] = useState(false);
   const [selectedLayers, setSelectedLayers] = useState<EquipmentCategory[]>(categories);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'front' | 'top' | '3d'>('3d');
-  
+
+  const selectedEvent = mockEvents.find((e) => e.id === selectedEventId) ?? mockEvents[0];
+
   const toggleLayer = (category: EquipmentCategory) => {
     setSelectedLayers(prev =>
       prev.includes(category)
@@ -34,8 +55,13 @@ export function StageView() {
         : [...prev, category]
     );
   };
-  
-  const filteredEquipment = mockEquipment.filter(eq => 
+
+  // Only equipment assigned to the selected event
+  const eventEquipment = mockEquipment.filter((eq) =>
+    selectedEvent.equipmentIds.includes(eq.id)
+  );
+
+  const filteredEquipment = eventEquipment.filter(eq => 
     selectedLayers.includes(eq.category) &&
     (eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
      eq.location.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -45,6 +71,64 @@ export function StageView() {
     <div className="h-screen flex overflow-hidden">
       {/* Left Sidebar - Layers & Filters */}
       <div className="w-80 bg-[#131316] border-r border-[#27272e] flex flex-col overflow-hidden">
+
+        {/* Event selector */}
+        <div className="p-4 border-b border-[#27272e] relative">
+          <p className="text-[10px] text-[#71717a] uppercase tracking-wider mb-2">Événement</p>
+          <button
+            onClick={() => setShowEventPicker((v) => !v)}
+            className="w-full flex items-center gap-3 p-3 bg-[#1c1c21] border border-[#27272e] rounded-xl hover:border-cyan-400/30 transition-colors text-left"
+          >
+            <div
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: eventStatusColors[selectedEvent.status] }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-[#f5f5f7] truncate">{selectedEvent.title}</p>
+              <p className="text-xs text-[#71717a]">
+                {formatTime(selectedEvent.startDate)} · {selectedEvent.stage}
+              </p>
+            </div>
+            <ChevronDown
+              size={14}
+              className={`text-[#71717a] shrink-0 transition-transform ${showEventPicker ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {/* Dropdown */}
+          {showEventPicker && (
+            <div className="absolute left-4 right-4 top-full mt-1 z-20 bg-[#1c1c21] border border-[#27272e] rounded-xl shadow-2xl shadow-black/50 overflow-hidden">
+              {mockEvents.map((evt) => (
+                <button
+                  key={evt.id}
+                  onClick={() => {
+                    setSelectedEventId(evt.id);
+                    setSelectedEquipment(null);
+                    setShowEventPicker(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#27272e] transition-colors ${
+                    evt.id === selectedEventId ? 'bg-cyan-400/10' : ''
+                  }`}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: eventStatusColors[evt.status] }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#f5f5f7] truncate">{evt.title}</p>
+                    <p className="text-xs text-[#71717a]">
+                      {eventStatusLabels[evt.status]} · {evt.venue}
+                    </p>
+                  </div>
+                  {evt.id === selectedEventId && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="p-6 border-b border-[#27272e]">
           <h2 className="text-xl font-semibold text-[#f5f5f7] mb-4">Vue Scène</h2>
           <SearchInput
@@ -62,7 +146,7 @@ export function StageView() {
           </div>
           <div className="space-y-2">
             {categories.map((category) => {
-              const count = mockEquipment.filter(eq => eq.category === category).length;
+              const count = eventEquipment.filter(eq => eq.category === category).length;
               const isActive = selectedLayers.includes(category);
               
               return (
