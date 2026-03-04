@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { StageView } from './pages/StageView';
 import { Equipment } from './pages/Equipment';
@@ -7,6 +8,7 @@ import { Events } from './pages/Events';
 import { Incidents } from './pages/Incidents';
 import { Team } from './pages/Team';
 import { Settings } from './pages/Settings';
+import { Profile } from './pages/Profile';
 import { MobileHome } from './pages/mobile/MobileHome';
 import { MobileScan } from './pages/mobile/MobileScan';
 import { MobileIncidentForm } from './pages/mobile/MobileIncidentForm';
@@ -19,6 +21,10 @@ export const router = createBrowserRouter([
     Component: Login,
   },
   {
+    path: '/register',
+    Component: Register,
+  },
+  {
     path: '/',
     Component: DesktopLayout,
     children: [
@@ -29,6 +35,7 @@ export const router = createBrowserRouter([
       { path: 'incidents', Component: Incidents },
       { path: 'team', Component: Team },
       { path: 'settings', Component: Settings },
+      { path: 'profile', Component: Profile },
     ],
   },
   {
@@ -36,10 +43,10 @@ export const router = createBrowserRouter([
     Component: MobileLayout,
     children: [
       { index: true, Component: MobileHome },
-      { path: 'stage', Component: MobileHome }, // Placeholder
+      { path: 'stage', Component: MobileHome },
       { path: 'scan', Component: MobileScan },
-      { path: 'equipment', Component: MobileHome }, // Placeholder
-      { path: 'incidents', Component: MobileHome }, // Placeholder
+      { path: 'equipment', Component: MobileHome },
+      { path: 'incidents', Component: MobileHome },
       { path: 'incidents/new', Component: MobileIncidentForm },
     ],
   },
