@@ -1,5 +1,20 @@
 import { getStatusColor, getStatusLabel } from '../../lib/utils';
 import { EquipmentStatus } from '../../lib/types';
+import { Volume2, Lightbulb, Monitor, Layers, Shield, Wrench, Package } from 'lucide-react';
+import type { ReactNode } from 'react';
+
+export function CategoryIcon({ category, size = 14 }: { category: string; size?: number }) {
+  const props = { size, className: 'flex-shrink-0' };
+  switch (category) {
+    case 'sound':   return <Volume2 {...props} />;
+    case 'light':   return <Lightbulb {...props} />;
+    case 'video':   return <Monitor {...props} />;
+    case 'set':     return <Layers {...props} />;
+    case 'safety':  return <Shield {...props} />;
+    case 'rigging': return <Wrench {...props} />;
+    default:        return <Package {...props} />;
+  }
+}
 
 interface BadgeProps {
   status: EquipmentStatus;
@@ -37,7 +52,7 @@ export function Badge({ status, size = 'md', showLabel = true }: BadgeProps) {
 interface CategoryChipProps {
   category: string;
   label?: string;
-  icon?: string;
+  icon?: ReactNode;
   onRemove?: () => void;
 }
 

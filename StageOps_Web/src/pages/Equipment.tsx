@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button } from '../components/design-system/Button';
 import { SearchInput } from '../components/design-system/Input';
-import { Badge, CategoryChip } from '../components/design-system/Badge';
+import { Badge, CategoryChip, CategoryIcon } from '../components/design-system/Badge';
 import { mockEquipment as initialEquipment } from '../lib/mockData';
-import { getCategoryLabel, getCategoryIcon, formatRelativeTime } from '../lib/utils';
+import { getCategoryLabel, formatRelativeTime } from '../lib/utils';
 import { Plus, Filter, Download, QrCode } from 'lucide-react';
 import { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '../lib/types';
 import { EquipmentDetailModal } from '../components/EquipmentDetailModal';
@@ -148,7 +148,7 @@ export function Equipment() {
                     <CategoryChip
                       category={eq.category}
                       label={getCategoryLabel(eq.category)}
-                      icon={getCategoryIcon(eq.category)}
+                      icon={<CategoryIcon category={eq.category} />}
                     />
                   </td>
                   <td className="px-6 py-4">

@@ -74,14 +74,14 @@ export function getCategoryLabel(category: string): string {
 
 export function getCategoryIcon(category: string): string {
   const icons: Record<string, string> = {
-    sound: '🔊',
-    light: '💡',
-    video: '📺',
-    set: '🎭',
-    safety: '🦺',
-    rigging: '⚙️',
+    sound: 'SPK',
+    light: 'LUM',
+    video: 'VID',
+    set: 'SCN',
+    safety: 'SEC',
+    rigging: 'GRE',
   };
-  return icons[category] || '📦';
+  return icons[category] || 'EQP';
 }
 
 export function formatRelativeTime(date: Date): string {

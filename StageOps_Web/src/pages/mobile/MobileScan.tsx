@@ -130,13 +130,13 @@ export function MobileScan() {
                   Changer le statut
                 </p>
                 <button className="w-full py-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-500 font-medium hover:bg-green-500/20 transition-colors active:scale-95">
-                  ✓ Marquer OK
+                  Marquer OK
                 </button>
                 <button className="w-full py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-500 font-medium hover:bg-amber-500/20 transition-colors active:scale-95">
-                  ⚠ À vérifier
+                  À vérifier
                 </button>
                 <button className="w-full py-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 font-medium hover:bg-red-500/20 transition-colors active:scale-95">
-                  ✕ Passer en HS
+                  Passer en HS
                 </button>
               </div>
             </Card>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from './design-system/Button';
-import { Badge } from './design-system/Badge';
-import { getStatusColor, getStatusLabel, getCategoryLabel, getCategoryIcon, formatRelativeTime, formatDateTime } from '../lib/utils';
+import { Badge, CategoryIcon } from './design-system/Badge';
+import { getStatusColor, getStatusLabel, getCategoryLabel, formatRelativeTime, formatDateTime } from '../lib/utils';
 import type { Equipment, EquipmentStatus } from '../lib/types';
 import {
   X,
@@ -95,8 +95,8 @@ export function EquipmentDetailModal({
 
           {/* Nom & catégorie */}
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-[#1c1c21] rounded-xl text-2xl">
-              {getCategoryIcon(equipment.category)}
+            <div className="p-3 bg-[#1c1c21] rounded-xl flex items-center justify-center text-cyan-400">
+              <CategoryIcon category={equipment.category} size={24} />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-[#f5f5f7]">{equipment.name}</h3>

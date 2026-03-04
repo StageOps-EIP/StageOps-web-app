@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from './design-system/Button';
+import { CategoryIcon } from './design-system/Badge';
 import type { Equipment, EquipmentStatus, EquipmentCategory } from '../lib/types';
-import { getStatusColor, getCategoryIcon, getCategoryLabel } from '../lib/utils';
+import { getStatusColor, getCategoryLabel } from '../lib/utils';
 import {
   X,
   MapPin,
@@ -178,7 +179,7 @@ export function AddEquipmentModal({
                         }
                   }
                 >
-                  <span>{getCategoryIcon(opt.value)}</span>
+                  <CategoryIcon category={opt.value} size={13} />
                   <span>{opt.label}</span>
                 </button>
               ))}
