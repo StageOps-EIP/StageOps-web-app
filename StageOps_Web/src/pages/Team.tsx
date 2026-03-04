@@ -4,6 +4,7 @@ import { Button } from '../components/design-system/Button';
 import { mockTeamMembers } from '../lib/mockData';
 import { getCategoryLabel } from '../lib/utils';
 import type { TeamMember } from '../lib/types';
+import { EditMemberModal } from '../components/EditMemberModal';
 import {
   Users,
   Mail,
@@ -38,20 +39,22 @@ const permissionLabels: Record<string, string> = {
 };
 
 export function Team() {
+  const [teamList, setTeamList] = useState<TeamMember[]>(mockTeamMembers);
   const [search, setSearch] = useState('');
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
 
   const filtered = search
-    ? mockTeamMembers.filter(
+    ? teamList.filter(
         (m) =>
           m.name.toLowerCase().includes(search.toLowerCase()) ||
           m.role.toLowerCase().includes(search.toLowerCase())
       )
-    : mockTeamMembers;
+    : teamList;
 
   // Group by role
-  const roles = [...new Set(mockTeamMembers.map((m) => m.role))];
+  const roles = [...new Set(teamList.map((m) => m.role))];
 
   return (
     <div className="p-8 space-y-6">
@@ -60,7 +63,7 @@ export function Team() {
         <div>
           <h1 className="text-3xl text-[#f5f5f7] mb-2">Équipe & Rôles</h1>
           <p className="text-[#a1a1aa]">
-            {mockTeamMembers.length} membres · {roles.length} rôles
+            {teamList.length} membres · {roles.length} rôles
           </p>
         </div>
         <Button variant="primary" onClick={() => setShowNewForm(true)}>
@@ -84,10 +87,10 @@ export function Team() {
       <div className="grid grid-cols-[1fr_400px] gap-6">
         {/* Team grid */}
         <div className="space-y-6">
-          {/* Role summary */}
+          {/* role summary */}
           <div className="flex gap-3 flex-wrap">
             {roles.map((role) => {
-              const count = mockTeamMembers.filter((m) => m.role === role).length;
+              const count = teamList.filter((m) => m.role === role).length;
               const color = roleColors[role] || '#71717a';
               return (
                 <div
@@ -177,6 +180,7 @@ export function Team() {
             <MemberDetail
               member={selectedMember}
               onClose={() => setSelectedMember(null)}
+              onEdit={() => setEditingMember(selectedMember)}
             />
           ) : (
             <Card className="flex flex-col items-center justify-center py-16">
@@ -191,6 +195,19 @@ export function Team() {
 
       {/* New member modal */}
       {showNewForm && <NewMemberModal onClose={() => setShowNewForm(false)} />}
+
+      {/* Edit member modal */}
+      {editingMember && (
+        <EditMemberModal
+          member={editingMember}
+          onClose={() => setEditingMember(null)}
+          onSave={(updated) => {
+            setTeamList((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+            setSelectedMember(updated);
+            setEditingMember(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -198,9 +215,11 @@ export function Team() {
 function MemberDetail({
   member,
   onClose,
+  onEdit,
 }: {
   member: TeamMember;
   onClose: () => void;
+  onEdit: () => void;
 }) {
   const color = roleColors[member.role] || '#71717a';
 
@@ -275,7 +294,7 @@ function MemberDetail({
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
-          <Button variant="secondary" className="flex-1">
+          <Button variant="secondary" className="flex-1" onClick={onEdit}>
             <Edit3 size={14} />
             Modifier
           </Button>
