@@ -6,7 +6,8 @@ import {
   AlertCircle, 
   Users, 
   Settings,
-  Layers
+  Layers,
+  UserCircle,
 } from 'lucide-react';
 
 const navigation = [
@@ -61,7 +62,18 @@ export function Sidebar() {
       </nav>
       
       {/* Sync status */}
-      <div className="p-4 border-t border-[#27272e]">
+      <div className="p-4 border-t border-[#27272e] space-y-2">
+        <Link
+          to="/profile"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+            location.pathname === '/profile'
+              ? 'bg-cyan-400/10 text-cyan-400'
+              : 'text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-[#1c1c21]'
+          }`}
+        >
+          <UserCircle size={20} />
+          <span>Jean Moreau</span>
+        </Link>
         <div className="flex items-center gap-2 px-4 py-2 bg-[#1c1c21] rounded-lg">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span className="text-xs text-[#a1a1aa]">Synchronisé il y a 5s</span>
