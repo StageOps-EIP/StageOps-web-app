@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 import { Button } from '../components/design-system/Button';
 import { Input } from '../components/design-system/Input';
 import { Layers, Mail, Lock } from 'lucide-react';
@@ -77,10 +77,10 @@ export function Login() {
           
           <div className="mt-6 pt-6 border-t border-[#27272e] text-center">
             <p className="text-sm text-[#71717a]">
-              Besoin d'un accès ?{' '}
-              <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                Contacter l'administrateur
-              </button>
+              Pas encore de compte ?{' '}
+              <Link to="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                Créer un compte
+              </Link>
             </p>
           </div>
         </div>
