@@ -14,7 +14,7 @@ import {
   AppearanceSettings,
   SecuritySettings,
   ExportSettings,
-} from './settings';
+} from './settings/index';
 
 type SettingsSection = 'general' | 'notifications' | 'appearance' | 'security' | 'export';
 

@@ -2,21 +2,31 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
 import { Input } from '@/components/design-system/Input';
+import { useAuth } from '@/contexts/AuthContext';
 import { Layers, Mail, Lock } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const handleLogin = (e: React.FormEvent) => {
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login — stores a placeholder token so ProtectedRoute lets through.
-    // In production: call POST /api/auth/login, store the JWT returned.
-    localStorage.setItem('stageops-token', 'mock-token');
-    const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
-    navigate(from, { replace: true });
+    setError('');
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -63,6 +73,12 @@ export function Login() {
               icon={<Lock size={18} />}
               required
             />
+
+            {error && (
+              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                {error}
+              </p>
+            )}
             
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-[#a1a1aa] cursor-pointer">
@@ -74,8 +90,8 @@ export function Login() {
               </button>
             </div>
             
-            <Button type="submit" variant="primary" size="lg" fullWidth className="mt-6">
-              Se connecter
+            <Button type="submit" variant="primary" size="lg" fullWidth className="mt-6" disabled={isLoading}>
+              {isLoading ? 'Connexion…' : 'Se connecter'}
             </Button>
           </form>
           

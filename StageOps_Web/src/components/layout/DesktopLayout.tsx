@@ -1,8 +1,14 @@
-import { Outlet } from 'react-router';
+import { Outlet, Navigate } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { Toaster } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function DesktopLayout() {
+  const { token, isLoading } = useAuth();
+
+  if (isLoading) return null;
+  if (!token) return <Navigate to="/login" replace />;
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />

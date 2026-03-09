@@ -12,6 +12,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { useTheme } from '@/lib/use-theme';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [
   { name: 'Tableau de bord', href: '/', icon: LayoutDashboard },
@@ -26,6 +27,7 @@ const navigation = [
 export function Sidebar() {
   const location = useLocation();
   const { theme, toggle } = useTheme();
+  const { user } = useAuth();
   
   return (
     <aside aria-label="Navigation principale" className="w-64 h-screen bg-theme-base border-r border-theme-border flex flex-col">
@@ -85,7 +87,7 @@ export function Sidebar() {
           }`}
         >
           <UserCircle size={20} />
-          <span>Jean Moreau</span>
+          <span>{user?.email ?? '—'}</span>
         </Link>
         <div className="flex items-center gap-2 px-4 py-2 bg-theme-elevated rounded-lg">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

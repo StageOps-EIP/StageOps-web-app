@@ -1,44 +1,40 @@
 import { useState } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Button } from '@/components/design-system/Button';
-import { mockTeamMembers } from '@/lib/mockData';
-import { mockEvents } from '@/lib/mockData';
-import { PERMISSION_LABELS } from '@/lib/constants';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Mail,
-  Phone,
   Shield,
-  Edit3,
-  Save,
-  X,
   Calendar,
-  ChevronRight,
   LogOut,
   Bell,
   Key,
+  ChevronRight,
 } from 'lucide-react';
 
-// Simulated current user (Jean Moreau - Régisseur Plateau / admin)
-const currentUser = mockTeamMembers[3];
-const roleColor = '#22c55e';
+const ROLE_LABELS: Record<string, string> = {
+  rg: 'Régisseur Général',
+  lumiere: 'Régisseur Lumière',
+  son: 'Régisseur Son',
+  plateau: 'Régisseur Plateau',
+};
+
+const ROLE_COLOR = '#22c55e';
 
 export function Profile() {
   usePageTitle('Profil');
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUser.name);
-  const [phone, setPhone] = useState(currentUser.phone ?? '');
-  const [email, setEmail] = useState(currentUser.email);
+  const { user, logout } = useAuth();
+  const [isEditing] = useState(false);
 
-  const assignedEvents = mockEvents.filter((e) =>
-    e.teamMembers.includes(currentUser.id)
-  );
-
-  function handleSave() {
-    // In production: PATCH /api/profile
-    setIsEditing(false);
+  function handleLogout() {
+    logout();
+    navigate('/login');
   }
+
+  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : '';
+  const initials = user?.email.slice(0, 2).toUpperCase() ?? '??';
 
   return (
     <div className="p-8 space-y-6 max-w-5xl">
@@ -59,107 +55,45 @@ export function Profile() {
                 {/* Avatar */}
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold"
-                  style={{ backgroundColor: `${roleColor}20`, color: roleColor }}
+                  style={{ backgroundColor: `${ROLE_COLOR}20`, color: ROLE_COLOR }}
                 >
-                  {currentUser.name.split(' ').map((n) => n[0]).join('')}
+                  {initials}
                 </div>
                 <div>
-                  {isEditing ? (
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      aria-label="Nom complet"
-                      className="bg-theme-elevated border border-theme-border rounded-xl px-3 py-1.5 text-lg font-semibold text-content-primary focus:outline-none focus:border-cyan-400/50 w-full"
-                    />
-                  ) : (
-                    <h2 className="text-xl font-semibold text-content-primary">{name}</h2>
-                  )}
-                  <p className="text-sm mt-0.5" style={{ color: roleColor }}>
-                    {currentUser.role}
+                  <h2 className="text-xl font-semibold text-content-primary">{user?.email ?? '—'}</h2>
+                  <p className="text-sm mt-0.5" style={{ color: ROLE_COLOR }}>
+                    {roleLabel}
                   </p>
                 </div>
               </div>
-              {isEditing ? (
-                <div className="flex gap-2">
-                  <Button variant="primary" size="sm" onClick={handleSave}>
-                    <Save size={14} /> Sauvegarder
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
-                    <X size={14} />
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
-                  <Edit3 size={14} /> Modifier
-                </Button>
-              )}
             </div>
 
             {/* Contact fields */}
             <div className="space-y-3">
               <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-theme-elevated rounded-xl">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Mail size={12} className="text-content-subtle" />
-                    <p className="text-[10px] text-content-subtle uppercase tracking-wider">Email</p>
-                  </div>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      aria-label="Email"
-                      className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
-                    />
-                  ) : (
-                    <p className="text-sm text-content-primary">{email}</p>
-                  )}
+              <div className="p-4 bg-theme-elevated rounded-xl">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Mail size={12} className="text-content-subtle" />
+                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Email</p>
                 </div>
-                <div className="p-4 bg-theme-elevated rounded-xl">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Phone size={12} className="text-content-subtle" />
-                    <p className="text-[10px] text-content-subtle uppercase tracking-wider">Téléphone</p>
-                  </div>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="—"
-                      aria-label="Téléphone"
-                      className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
-                    />
-                  ) : (
-                    <p className="text-sm text-content-primary">{phone || '—'}</p>
-                  )}
-                </div>
+                <p className="text-sm text-content-primary">{user?.email ?? '—'}</p>
               </div>
             </div>
           </div>
 
-          {/* Permissions */}
+          {/* Role */}
           <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-content-subtle" />
-              <p className="text-xs text-content-subtle uppercase tracking-wider">Permissions</p>
+              <p className="text-xs text-content-subtle uppercase tracking-wider">Rôle</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {currentUser.permissions.map((perm) => (
-                <span
-                  key={perm}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                    perm === 'admin'
-                      ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                      : 'bg-theme-elevated text-content-muted border border-theme-border'
-                  }`}
-                >
-                  {PERMISSION_LABELS[perm] || perm}
-                </span>
-              ))}
+              <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
+                {roleLabel || '—'}
+              </span>
             </div>
             <p className="text-xs text-content-subtle">
-              Les permissions sont gérées par l'administrateur du système.
+              Les rôles sont gérés par l'administrateur du système.
             </p>
           </div>
 
@@ -171,29 +105,7 @@ export function Profile() {
                 Événements assignés
               </p>
             </div>
-            <div className="space-y-2">
-              {assignedEvents.length === 0 && (
-                <p className="text-sm text-content-subtle">Aucun événement assigné.</p>
-              )}
-              {assignedEvents.map((evt) => (
-                <Link
-                  key={evt.id}
-                  to="/stage"
-                  className="flex items-center gap-4 p-4 bg-theme-elevated border border-theme-border rounded-xl hover:border-cyan-400/30 transition-colors group"
-                >
-                  <div className="p-2 bg-cyan-400/10 rounded-lg shrink-0">
-                    <Calendar size={16} className="text-cyan-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-content-primary truncate">{evt.title}</p>
-                    <p className="text-xs text-content-subtle">
-                      {evt.venue} · {evt.stage}
-                    </p>
-                  </div>
-                  <ChevronRight size={14} className="text-content-subtle group-hover:text-cyan-400 transition-colors shrink-0" />
-                </Link>
-              ))}
-            </div>
+            <p className="text-sm text-content-subtle">Aucun événement assigné.</p>
           </div>
         </div>
 
@@ -256,7 +168,7 @@ export function Profile() {
           <Button
             variant="danger"
             fullWidth
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
           >
             <LogOut size={16} />
             Se déconnecter

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
-
+import { useAuth } from '@/contexts/AuthContext';
 import { Layers, Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const roleOptions = [
@@ -18,6 +18,7 @@ const roleOptions = [
 
 export function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState({
     firstName: '',
@@ -29,6 +30,7 @@ export function Register() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Partial<typeof form & { general: string }>>({});
+  const [isLoading, setIsLoading] = useState(false);;
 
   function set(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -60,9 +62,21 @@ export function Register() {
     if (validateStep1()) setStep(2);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (validateStep2()) navigate('/');
+    if (!validateStep2()) return;
+    setIsLoading(true);
+    try {
+      await register(form.email, form.password);
+      navigate('/');
+    } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        general: err instanceof Error ? err.message : 'Erreur lors de la création du compte',
+      }));
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -290,9 +304,15 @@ export function Register() {
                 )}
               </div>
 
-              <Button type="submit" variant="primary" size="lg" fullWidth className="mt-2">
+              {errors.general && (
+                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                  {errors.general}
+                </p>
+              )}
+
+              <Button type="submit" variant="primary" size="lg" fullWidth className="mt-2" disabled={isLoading}>
                 <CheckCircle2 size={18} />
-                Créer mon compte
+                {isLoading ? 'Création…' : 'Créer mon compte'}
               </Button>
             </form>
           )}
