@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/design-system/Button';
 import { mockEquipment } from '@/lib/mockData';
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '@/lib/utils';
 import type { Incident } from '@/lib/types';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   CheckCircle2,
   Wrench,
@@ -23,11 +25,18 @@ export function IncidentDetailModal({
   incident: Incident;
   onClose: () => void;
 }) {
+  const trapRef = useFocusTrap(true);
   const sevColor = getSeverityColor(incident.severity);
   const statusCol = statusLabels[incident.status];
   const eq = incident.equipmentId
     ? mockEquipment.find((e) => e.id === incident.equipmentId)
     : null;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
     <div
@@ -36,7 +45,13 @@ export function IncidentDetailModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto">
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="incident-modal-title"
+        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
           <div className="flex items-center gap-3">
@@ -44,9 +59,10 @@ export function IncidentDetailModal({
               className="w-2 h-8 rounded-full"
               style={{ backgroundColor: sevColor }}
             />
-            <h2 className="text-lg text-content-primary">Détail de l'incident</h2>
+            <h2 id="incident-modal-title" className="text-lg text-content-primary">Détail de l'incident</h2>
           </div>
           <button
+            aria-label="Fermer"
             onClick={onClose}
             className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >

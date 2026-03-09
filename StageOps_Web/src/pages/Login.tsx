@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate, useLocation, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
 import { Input } from '@/components/design-system/Input';
 import { Layers, Mail, Lock } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in production would authenticate
-    navigate('/');
+    // Mock login — stores a placeholder token so ProtectedRoute lets through.
+    // In production: call POST /api/auth/login, store the JWT returned.
+    localStorage.setItem('stageops-token', 'mock-token');
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
+    navigate(from, { replace: true });
   };
   
   return (

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/design-system/Button';
 import { CategoryIcon } from '@/components/design-system/Badge';
 import { getStatusColor, getCategoryLabel, formatRelativeTime, formatDateTime } from '@/lib/utils';
 import type { Equipment, EquipmentStatus } from '@/lib/types';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   X,
   MapPin,
@@ -38,8 +39,15 @@ export function EquipmentDetailModal({
   const [editedResponsible, setEditedResponsible] = useState(equipment.responsiblePerson ?? '');
   const [editedNotes, setEditedNotes] = useState(equipment.notes ?? '');
   const [isSaved, setIsSaved] = useState(false);
+  const trapRef = useFocusTrap(true);
 
   const statusColor = getStatusColor(editedStatus);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
   const hasChanges =
     editedStatus !== equipment.status ||
     editedLocation !== equipment.location ||
@@ -69,7 +77,13 @@ export function EquipmentDetailModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto">
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="equipment-detail-title"
+        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+      >
 
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
@@ -79,11 +93,12 @@ export function EquipmentDetailModal({
               style={{ backgroundColor: statusColor }}
             />
             <div>
-              <h2 className="text-lg font-semibold text-content-primary">Détail équipement</h2>
+              <h2 id="equipment-detail-title" className="text-lg font-semibold text-content-primary">Détail équipement</h2>
               <p className="text-xs text-content-subtle">{equipment.qrCode}</p>
             </div>
           </div>
           <button
+            aria-label="Fermer"
             onClick={onClose}
             className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >
@@ -155,6 +170,7 @@ export function EquipmentDetailModal({
                   type="text"
                   value={editedLocation}
                   onChange={(e) => setEditedLocation(e.target.value)}
+                  aria-label="Emplacement"
                   className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
@@ -170,6 +186,7 @@ export function EquipmentDetailModal({
                   value={editedZone}
                   onChange={(e) => setEditedZone(e.target.value)}
                   placeholder="—"
+                  aria-label="Zone"
                   className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
@@ -185,6 +202,7 @@ export function EquipmentDetailModal({
                   value={editedResponsible}
                   onChange={(e) => setEditedResponsible(e.target.value)}
                   placeholder="—"
+                  aria-label="Responsable"
                   className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
@@ -228,6 +246,7 @@ export function EquipmentDetailModal({
                 onChange={(e) => setEditedNotes(e.target.value)}
                 placeholder="Ajouter une note sur cet équipement..."
                 rows={3}
+                aria-label="Notes"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 resize-none transition-colors"
               />
               <FileText size={14} className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none" />

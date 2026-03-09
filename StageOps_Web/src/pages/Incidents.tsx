@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card } from "../components/design-system/Card";
 import { Button } from "../components/design-system/Button";
 import { mockIncidents, mockEquipment } from "../lib/mockData";
@@ -63,6 +64,7 @@ const allIncidents: Incident[] = [
 ];
 
 export function Incidents() {
+  usePageTitle('Incidents');
   const [viewMode, setViewMode] = useState<"kanban" | "list">(
     "kanban",
   );

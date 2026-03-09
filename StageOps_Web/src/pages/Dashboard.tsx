@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card, CardHeader } from '@/components/design-system/Card';
 import { Badge } from '@/components/design-system/Badge';
 import { Button } from '@/components/design-system/Button';
@@ -7,6 +8,7 @@ import { formatTime, formatRelativeTime } from '@/lib/utils';
 import { useNavigate } from 'react-router';
 
 export function Dashboard() {
+  usePageTitle('Tableau de bord');
   const navigate = useNavigate();
   const todayEvent = mockEvents[0];
   const hsEquipment = mockEquipment.filter(eq => eq.status === 'hs');

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/design-system/Button';
 import { CategoryIcon } from '@/components/design-system/Badge';
 import type { Equipment, EquipmentStatus, EquipmentCategory } from '@/lib/types';
 import { getStatusColor } from '@/lib/utils';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   X,
   MapPin,
@@ -71,8 +72,15 @@ export function AddEquipmentModal({
 }) {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+  const trapRef = useFocusTrap(true);
 
   const statusColor = getStatusColor(form.status);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -112,7 +120,13 @@ export function AddEquipmentModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto">
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-equipment-title"
+        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+      >
 
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
@@ -122,11 +136,12 @@ export function AddEquipmentModal({
               style={{ backgroundColor: statusColor }}
             />
             <div>
-              <h2 className="text-lg font-semibold text-content-primary">Ajouter un équipement</h2>
+              <h2 id="add-equipment-title" className="text-lg font-semibold text-content-primary">Ajouter un équipement</h2>
               <p className="text-xs text-content-subtle">Nouvel équipement dans l'inventaire</p>
             </div>
           </div>
           <button
+            aria-label="Fermer"
             onClick={onClose}
             className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >
@@ -138,8 +153,9 @@ export function AddEquipmentModal({
 
           {/* Nom */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Nom de l'équipement *</p>
+            <label htmlFor="equipment-name" className="text-xs text-content-subtle uppercase tracking-wider mb-3 block">Nom de l'équipement *</label>
             <input
+              id="equipment-name"
               type="text"
               value={form.name}
               onChange={(e) => set('name', e.target.value)}
@@ -228,10 +244,12 @@ export function AddEquipmentModal({
                   <p className="text-[10px] text-content-subtle uppercase tracking-wider">Emplacement *</p>
                 </div>
                 <input
+                  id="equipment-location"
                   type="text"
                   value={form.location}
                   onChange={(e) => set('location', e.target.value)}
                   placeholder="Ex : Régie Son"
+                  aria-label="Emplacement"
                   className={`w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b focus:outline-none pb-0.5 transition-colors ${
                     errors.location ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400'
                   }`}
@@ -251,6 +269,7 @@ export function AddEquipmentModal({
                   value={form.zone}
                   onChange={(e) => set('zone', e.target.value)}
                   placeholder="Ex : FOH, Jardin…"
+                  aria-label="Zone"
                   className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
@@ -267,6 +286,7 @@ export function AddEquipmentModal({
                 value={form.responsiblePerson}
                 onChange={(e) => set('responsiblePerson', e.target.value)}
                 placeholder="Nom du responsable"
+                aria-label="Nom du responsable"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
               />
             </div>
@@ -282,6 +302,7 @@ export function AddEquipmentModal({
                 value={form.qrCode}
                 onChange={(e) => set('qrCode', e.target.value)}
                 placeholder="Généré automatiquement si vide"
+                aria-label="Code QR"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
               />
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Button } from '@/components/design-system/Button';
 import { SearchInput } from '@/components/design-system/Input';
 import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Badge';
@@ -10,6 +11,7 @@ import { EquipmentDetailModal } from '@/components/equipment/EquipmentDetailModa
 import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal';
 
 export function Equipment() {
+  usePageTitle('Inventaire');
   const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all');
@@ -55,6 +57,7 @@ export function Equipment() {
       <div className="flex items-center gap-4 mb-6">
         <div className="flex-1 max-w-md">
           <SearchInput
+            aria-label="Rechercher par nom, QR code ou emplacement"
             placeholder="Rechercher par nom, QR code, emplacement..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -65,6 +68,7 @@ export function Equipment() {
           <Filter size={18} className="text-content-subtle" />
           <div className="relative">
             <select
+              aria-label="Filtrer par catégorie"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value as EquipmentCategory | 'all')}
               className="px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9"
@@ -82,6 +86,7 @@ export function Equipment() {
           
           <div className="relative">
             <select
+              aria-label="Filtrer par statut"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as EquipmentStatus | 'all')}
               className="px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9"
@@ -99,7 +104,7 @@ export function Equipment() {
       
       {/* Results count */}
       <div className="mb-4">
-        <p className="text-sm text-content-muted">
+        <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-content-muted">
           {filteredEquipment.length} équipement{filteredEquipment.length !== 1 ? 's' : ''} trouvé{filteredEquipment.length !== 1 ? 's' : ''}
         </p>
       </div>

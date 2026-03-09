@@ -28,7 +28,7 @@ export function Sidebar() {
   const { theme, toggle } = useTheme();
   
   return (
-    <div className="w-64 h-screen bg-theme-base border-r border-theme-border flex flex-col">
+    <aside aria-label="Navigation principale" className="w-64 h-screen bg-theme-base border-r border-theme-border flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-theme-border">
         <div className="flex items-center gap-3">
@@ -43,7 +43,7 @@ export function Sidebar() {
       </div>
       
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav aria-label="Navigation principale" className="flex-1 p-4 space-y-1">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           const Icon = item.icon;
@@ -52,6 +52,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               to={item.href}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? 'bg-cyan-400/10 text-cyan-400 shadow-lg shadow-cyan-400/5'
@@ -69,6 +70,7 @@ export function Sidebar() {
       <div className="p-4 border-t border-theme-border space-y-2">
         <button
           onClick={toggle}
+          aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
           className="flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-sm font-medium transition-all duration-200 text-content-muted hover:text-content-primary hover:bg-theme-elevated"
         >
           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -90,6 +92,6 @@ export function Sidebar() {
           <span className="text-xs text-content-muted">Synchronisé il y a 5s</span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card } from '@/components/design-system/Card';
 import { Button } from '@/components/design-system/Button';
 import { mockEvents } from '@/lib/mockData';
@@ -95,6 +96,7 @@ function getConflicts(): { a: Event; b: Event }[] {
 }
 
 export function Events() {
+  usePageTitle('Événements');
   const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)); // Feb 2026
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);

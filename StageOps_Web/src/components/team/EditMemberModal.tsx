@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/design-system/Button';
 import type { TeamMember } from '@/lib/types';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   X,
   User,
@@ -58,8 +59,15 @@ export function EditMemberModal({
   const [role, setRole] = useState(member.role);
   const [permissions, setPermissions] = useState<string[]>(member.permissions);
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const trapRef = useFocusTrap(true);
 
   const roleColor = roleColors[role] || '#71717a';
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   function togglePermission(key: string) {
     setPermissions((prev) =>
@@ -93,7 +101,13 @@ export function EditMemberModal({
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-lg bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto">
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-member-title"
+        className="w-full max-w-lg bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+      >
 
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
@@ -103,11 +117,12 @@ export function EditMemberModal({
               style={{ backgroundColor: roleColor }}
             />
             <div>
-              <h2 className="text-lg font-semibold text-content-primary">Modifier le membre</h2>
+              <h2 id="edit-member-title" className="text-lg font-semibold text-content-primary">Modifier le membre</h2>
               <p className="text-xs text-content-subtle">{member.name}</p>
             </div>
           </div>
           <button
+            aria-label="Fermer"
             onClick={onClose}
             className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >
@@ -137,6 +152,7 @@ export function EditMemberModal({
                 value={name}
                 onChange={(e) => { setName(e.target.value); if (errors.name) setErrors((p) => ({ ...p, name: undefined })); }}
                 placeholder="Prénom Nom"
+                aria-label="Nom complet"
                 className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
                   errors.name ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400/50'
                 }`}
@@ -153,6 +169,7 @@ export function EditMemberModal({
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
+                aria-label="Rôle"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors [color-scheme:dark]"
               >
                 {roleOptions.map((r) => (
@@ -173,6 +190,7 @@ export function EditMemberModal({
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: undefined })); }}
                   placeholder="email@theatre.fr"
+                  aria-label="Email"
                   className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
                     errors.email ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400/50'
                   }`}
@@ -186,6 +204,7 @@ export function EditMemberModal({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+33 6 00 00 00 00"
+                  aria-label="Téléphone"
                   className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
                 />
               </div>

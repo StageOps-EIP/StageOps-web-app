@@ -41,8 +41,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = 'Input';
 
-type SearchInputProps = Omit<InputProps, 'icon'>;
+interface SearchInputProps extends Omit<InputProps, 'icon'> {
+  'aria-label'?: string;
+}
 
-export function SearchInput(props: SearchInputProps) {
-  return <Input icon={<Search size={18} />} {...props} />;
+export function SearchInput({ 'aria-label': ariaLabel, ...props }: SearchInputProps) {
+  return (
+    <Input
+      icon={<Search size={18} />}
+      aria-label={ariaLabel ?? 'Rechercher'}
+      {...props}
+    />
+  );
 }

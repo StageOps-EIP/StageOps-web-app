@@ -1,12 +1,12 @@
-import { useState } from 'react';
 import { Card, CardHeader } from '@/components/design-system/Card';
 import { Button } from '@/components/design-system/Button';
-import { Check, Monitor, Smartphone } from 'lucide-react';
+import { Check, Monitor, Sun } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTheme } from '@/lib/use-theme';
 import { SettingRow } from './shared';
 
 export function AppearanceSettings() {
-  const [theme, setTheme] = useState<'dark' | 'auto'>('dark');
+  const { theme, toggle } = useTheme();
 
   return (
     <Card>
@@ -16,15 +16,17 @@ export function AppearanceSettings() {
           <div className="flex gap-2">
             {[
               { key: 'dark' as const, label: 'Sombre', icon: Monitor },
-              { key: 'auto' as const, label: 'Auto', icon: Smartphone },
+              { key: 'light' as const, label: 'Clair', icon: Sun },
             ].map((t) => {
               const Icon = t.icon;
+              const isActive = theme === t.key;
               return (
                 <button
                   key={t.key}
-                  onClick={() => setTheme(t.key)}
+                  onClick={() => { if (!isActive) toggle(); }}
+                  aria-pressed={isActive}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs transition-all ${
-                    theme === t.key
+                    isActive
                       ? 'bg-cyan-400/15 text-cyan-400 border border-cyan-400/30'
                       : 'bg-theme-elevated text-content-muted border border-theme-border hover:border-theme-border-hover'
                   }`}

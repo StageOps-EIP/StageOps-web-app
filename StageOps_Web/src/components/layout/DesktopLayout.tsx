@@ -6,7 +6,7 @@ export function DesktopLayout() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto h-full">
+      <main id="main-content" aria-label="Contenu principal" className="flex-1 overflow-y-auto h-full">
         <Outlet />
       </main>
       <Toaster

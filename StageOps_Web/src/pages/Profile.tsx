@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useNavigate, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
 import { mockTeamMembers } from '@/lib/mockData';
@@ -23,6 +24,7 @@ const currentUser = mockTeamMembers[3];
 const roleColor = '#22c55e';
 
 export function Profile() {
+  usePageTitle('Profil');
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(currentUser.name);
@@ -66,6 +68,7 @@ export function Profile() {
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      aria-label="Nom complet"
                       className="bg-theme-elevated border border-theme-border rounded-xl px-3 py-1.5 text-lg font-semibold text-content-primary focus:outline-none focus:border-cyan-400/50 w-full"
                     />
                   ) : (
@@ -106,6 +109,7 @@ export function Profile() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      aria-label="Email"
                       className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                     />
                   ) : (
@@ -123,6 +127,7 @@ export function Profile() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="—"
+                      aria-label="Téléphone"
                       className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                     />
                   ) : (

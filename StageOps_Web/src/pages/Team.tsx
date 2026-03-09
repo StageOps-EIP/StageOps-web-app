@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card, CardHeader } from '@/components/design-system/Card';
 import { Button } from '@/components/design-system/Button';
 import { mockTeamMembers } from '@/lib/mockData';
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export function Team() {
+  usePageTitle('Équipe');
   const [teamList, setTeamList] = useState<TeamMember[]>(mockTeamMembers);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -56,6 +58,7 @@ export function Team() {
           placeholder="Rechercher un membre ou un rôle..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Rechercher un membre ou un rôle"
           className="w-full bg-theme-base border border-theme-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
         />
       </div>
@@ -224,6 +227,7 @@ function MemberDetail({
             </div>
           </div>
           <button
+            aria-label="Fermer le détail"
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >
@@ -274,11 +278,11 @@ function MemberDetail({
             <Edit3 size={14} />
             Modifier
           </Button>
-          <Button variant="ghost">
+          <Button variant="ghost" aria-label="Envoyer un email">
             <Mail size={14} />
           </Button>
           {member.phone && (
-            <Button variant="ghost">
+            <Button variant="ghost" aria-label="Appeler">
               <Phone size={14} />
             </Button>
           )}
@@ -291,29 +295,34 @@ function MemberDetail({
 function NewMemberModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-lg relative">
+      <div role="dialog" aria-modal="true" aria-labelledby="new-member-title" className="w-full max-w-lg">
+      <Card className="relative">
         <button
+          aria-label="Fermer"
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
         >
           <X size={16} />
         </button>
-        <h2 className="text-xl text-content-primary mb-6">Ajouter un membre</h2>
+        <h2 id="new-member-title" className="text-xl text-content-primary mb-6">Ajouter un membre</h2>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-content-muted mb-1.5">Nom complet</label>
+              <label htmlFor="new-member-name" className="block text-sm text-content-muted mb-1.5">Nom complet</label>
               <input
+                id="new-member-name"
                 type="text"
                 placeholder="Prénom Nom"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
               />
             </div>
             <div>
-              <label className="block text-sm text-content-muted mb-1.5">Rôle</label>
+              <label htmlFor="new-member-role" className="block text-sm text-content-muted mb-1.5">Rôle</label>
               <div className="relative">
-                <select className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
+                <select
+                  id="new-member-role"
+                  className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
                   <option>Régisseur Son</option>
                   <option>Régisseur Lumière</option>
                   <option>Régisseur Vidéo</option>
@@ -327,16 +336,18 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-content-muted mb-1.5">Email</label>
+            <label htmlFor="new-member-email" className="block text-sm text-content-muted mb-1.5">Email</label>
             <input
+              id="new-member-email"
               type="email"
               placeholder="nom@theatre.fr"
               className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
             />
           </div>
           <div>
-            <label className="block text-sm text-content-muted mb-1.5">Téléphone</label>
+            <label htmlFor="new-member-phone" className="block text-sm text-content-muted mb-1.5">Téléphone</label>
             <input
+              id="new-member-phone"
               type="tel"
               placeholder="+33 6 00 00 00 00"
               className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
@@ -367,6 +378,7 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

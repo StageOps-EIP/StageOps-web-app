@@ -2,13 +2,17 @@ import { useNavigate } from 'react-router';
 import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider';
 import { EditorCanvas } from '@/components/scene-editor/EditorCanvas';
 import { Pencil } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function StageView() {
+  usePageTitle('Vue Scène');
   const navigate = useNavigate();
 
   return (
     <SceneEditorProvider>
       <div className="relative h-full w-full overflow-hidden" style={{ minHeight: 0 }}>
+        {/* Titre de page accessible — visuellement masqué */}
+        <h1 className="sr-only">Vue Scène</h1>
         {/* Canvas 3D — prend tout l'espace disponible */}
         <div className="absolute inset-0">
           <EditorCanvas readOnly />

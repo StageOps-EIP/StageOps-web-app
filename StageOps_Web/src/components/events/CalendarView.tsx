@@ -45,12 +45,14 @@ export function CalendarView({
           </h2>
           <div className="flex items-center gap-2">
             <button
+              aria-label="Mois précédent"
               onClick={onPrevMonth}
               className="p-2 rounded-lg hover:bg-theme-elevated text-content-muted hover:text-content-primary transition-colors"
             >
               <ChevronLeft size={20} />
             </button>
             <button
+              aria-label="Mois suivant"
               onClick={onNextMonth}
               className="p-2 rounded-lg hover:bg-theme-elevated text-content-muted hover:text-content-primary transition-colors"
             >

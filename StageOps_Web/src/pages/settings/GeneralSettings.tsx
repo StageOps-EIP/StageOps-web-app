@@ -13,6 +13,7 @@ export function GeneralSettings() {
           <input
             type="text"
             defaultValue="Théâtre National"
+            aria-label="Nom du lieu"
             className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 w-56"
           />
         </SettingRow>
@@ -26,20 +27,26 @@ export function GeneralSettings() {
           </div>
         </SettingRow>
         <SettingRow label="Langue" description="Langue de l'interface">
-          <select className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
+          <select
+            aria-label="Langue de l'interface"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
             <option>Français</option>
             <option>English</option>
           </select>
         </SettingRow>
         <SettingRow label="Fuseau horaire">
-          <select className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
+          <select
+            aria-label="Fuseau horaire"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
             <option>Europe/Paris (CET)</option>
             <option>Europe/London (GMT)</option>
             <option>America/New_York (EST)</option>
           </select>
         </SettingRow>
         <SettingRow label="Convention scénique" description="Vocabulaire utilisé pour les côtés du plateau">
-          <select className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
+          <select
+            aria-label="Convention scénique"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
             <option>Cour / Jardin (FR)</option>
             <option>Stage Left / Stage Right (EN)</option>
             <option>Prompt / OP (UK)</option>

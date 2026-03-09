@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   Settings as SettingsIcon,
   Bell,
@@ -26,6 +27,7 @@ const sections: { key: SettingsSection; label: string; icon: typeof SettingsIcon
 ];
 
 export function Settings() {
+  usePageTitle('Paramètres');
   const [activeSection, setActiveSection] = useState<SettingsSection>('general');
 
   return (
