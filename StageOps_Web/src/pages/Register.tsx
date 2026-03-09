@@ -52,6 +52,9 @@ export function Register() {
     const e: Partial<typeof form> = {};
     if (!form.password) e.password = 'Requis';
     else if (form.password.length < 8) e.password = '8 caractères minimum';
+    else if (!/[A-Z]/.test(form.password)) e.password = 'Au moins une majuscule requise';
+    else if (!/[0-9]/.test(form.password)) e.password = 'Au moins un chiffre requis';
+    else if (!/[^a-zA-Z0-9]/.test(form.password)) e.password = 'Au moins un caractère spécial requis';
     if (form.password !== form.confirmPassword) e.confirmPassword = 'Les mots de passe ne correspondent pas';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -259,7 +262,7 @@ export function Register() {
                     type="password"
                     value={form.password}
                     onChange={(e) => set('password', e.target.value)}
-                    placeholder="8 caractères minimum"
+                    placeholder="8 car. min, 1 maj, 1 chiffre, 1 spécial"
                     className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
                       errors.password ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
