@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { SceneEditor } from './pages/SceneEditor';
 import { Dashboard } from './pages/Dashboard';
 import { StageView } from './pages/StageView';
 import { Equipment } from './pages/Equipment';
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       { path: 'settings', Component: Settings },
       { path: 'profile', Component: Profile },
     ],
+  },
+  {
+    path: '/editor',
+    Component: SceneEditor,
   },
   {
     path: '/mobile',

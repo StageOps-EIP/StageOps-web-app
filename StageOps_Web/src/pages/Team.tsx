@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Card, CardHeader } from '../components/design-system/Card';
-import { Button } from '../components/design-system/Button';
-import { mockTeamMembers } from '../lib/mockData';
-import { getCategoryLabel } from '../lib/utils';
-import type { TeamMember } from '../lib/types';
-import { EditMemberModal } from '../components/EditMemberModal';
+import { Card, CardHeader } from '@/components/design-system/Card';
+import { Button } from '@/components/design-system/Button';
+import { mockTeamMembers } from '@/lib/mockData';
+
+import type { TeamMember } from '@/lib/types';
+import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants';
+import { useTeamFilter } from '@/hooks/useTeamFilter';
+import { EditMemberModal } from '@/components/team/EditMemberModal';
 import {
   Users,
   Mail,
@@ -15,43 +17,17 @@ import {
   X,
   Edit3,
   ChevronRight,
+  ChevronDown,
   UserCircle,
 } from 'lucide-react';
 
-const roleColors: Record<string, string> = {
-  'Régisseur Son': '#3b82f6',
-  'Régisseur Lumière': '#f59e0b',
-  'Régisseur Vidéo': '#a855f7',
-  'Régisseur Plateau': '#22c55e',
-  'Responsable Sécurité': '#ef4444',
-};
-
-const permissionLabels: Record<string, string> = {
-  sound: 'Son',
-  light: 'Lumière',
-  video: 'Vidéo',
-  set: 'Plateau',
-  safety: 'Sécurité',
-  rigging: 'Accroche',
-  incidents: 'Incidents',
-  equipment: 'Équipements',
-  admin: 'Administration',
-};
-
 export function Team() {
   const [teamList, setTeamList] = useState<TeamMember[]>(mockTeamMembers);
-  const [search, setSearch] = useState('');
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
 
-  const filtered = search
-    ? teamList.filter(
-        (m) =>
-          m.name.toLowerCase().includes(search.toLowerCase()) ||
-          m.role.toLowerCase().includes(search.toLowerCase())
-      )
-    : teamList;
+  const { search, setSearch, filtered } = useTeamFilter(teamList);
 
   // Group by role
   const roles = [...new Set(teamList.map((m) => m.role))];
@@ -61,8 +37,8 @@ export function Team() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-[#f5f5f7] mb-2">Équipe & Rôles</h1>
-          <p className="text-[#a1a1aa]">
+          <h1 className="text-3xl text-content-primary mb-2">Équipe & Rôles</h1>
+          <p className="text-content-muted">
             {teamList.length} membres · {roles.length} rôles
           </p>
         </div>
@@ -74,13 +50,13 @@ export function Team() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle" />
         <input
           type="text"
           placeholder="Rechercher un membre ou un rôle..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-[#131316] border border-[#27272e] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50"
+          className="w-full bg-theme-base border border-theme-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
         />
       </div>
 
@@ -91,7 +67,7 @@ export function Team() {
           <div className="flex gap-3 flex-wrap">
             {roles.map((role) => {
               const count = teamList.filter((m) => m.role === role).length;
-              const color = roleColors[role] || '#71717a';
+              const color = ROLE_COLORS[role] || '#71717a';
               return (
                 <div
                   key={role}
@@ -105,8 +81,8 @@ export function Team() {
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: color }}
                   />
-                  <span className="text-sm text-[#f5f5f7]">{role}</span>
-                  <span className="text-xs text-[#71717a]">({count})</span>
+                  <span className="text-sm text-content-primary">{role}</span>
+                  <span className="text-xs text-content-subtle">({count})</span>
                 </div>
               );
             })}
@@ -120,7 +96,7 @@ export function Team() {
             />
             <div className="space-y-2">
               {filtered.map((member) => {
-                const color = roleColors[member.role] || '#71717a';
+                const color = ROLE_COLORS[member.role] || '#71717a';
                 const isSelected = selectedMember?.id === member.id;
 
                 return (
@@ -130,7 +106,7 @@ export function Team() {
                     className={`w-full text-left flex items-center gap-4 p-4 rounded-xl transition-all ${
                       isSelected
                         ? 'bg-cyan-400/10 border border-cyan-400/20'
-                        : 'hover:bg-[#1c1c21] border border-transparent'
+                        : 'hover:bg-theme-elevated border border-transparent'
                     }`}
                   >
                     {/* Avatar */}
@@ -147,8 +123,8 @@ export function Team() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[#f5f5f7]">{member.name}</p>
-                      <p className="text-xs text-[#71717a]">{member.role}</p>
+                      <p className="text-sm text-content-primary">{member.name}</p>
+                      <p className="text-xs text-content-subtle">{member.role}</p>
                     </div>
 
                     {/* Permissions badges */}
@@ -160,12 +136,12 @@ export function Team() {
                       )}
                     </div>
 
-                    <ChevronRight size={14} className="text-[#71717a] shrink-0" />
+                    <ChevronRight size={14} className="text-content-subtle shrink-0" />
                   </button>
                 );
               })}
               {filtered.length === 0 && (
-                <div className="flex flex-col items-center py-12 text-[#71717a]">
+                <div className="flex flex-col items-center py-12 text-content-subtle">
                   <Users size={32} className="mb-3 opacity-30" />
                   <p className="text-sm">Aucun membre trouvé</p>
                 </div>
@@ -185,7 +161,7 @@ export function Team() {
           ) : (
             <Card className="flex flex-col items-center justify-center py-16">
               <UserCircle size={48} className="text-[#27272e] mb-4" />
-              <p className="text-sm text-[#71717a]">
+              <p className="text-sm text-content-subtle">
                 Sélectionnez un membre pour voir ses détails
               </p>
             </Card>
@@ -221,7 +197,7 @@ function MemberDetail({
   onClose: () => void;
   onEdit: () => void;
 }) {
-  const color = roleColors[member.role] || '#71717a';
+  const color = ROLE_COLORS[member.role] || '#71717a';
 
   return (
     <Card className="sticky top-8">
@@ -241,7 +217,7 @@ function MemberDetail({
               </span>
             </div>
             <div>
-              <h3 className="text-lg text-[#f5f5f7]">{member.name}</h3>
+              <h3 className="text-lg text-content-primary">{member.name}</h3>
               <p className="text-sm" style={{ color }}>
                 {member.role}
               </p>
@@ -249,7 +225,7 @@ function MemberDetail({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[#27272e] text-[#71717a] hover:text-[#f5f5f7] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
           >
             <X size={16} />
           </button>
@@ -257,22 +233,22 @@ function MemberDetail({
 
         {/* Contact */}
         <div className="space-y-2">
-          <p className="text-xs text-[#71717a] uppercase tracking-wider">Contact</p>
-          <div className="flex items-center gap-2 p-3 bg-[#1c1c21] rounded-xl">
-            <Mail size={14} className="text-[#a1a1aa]" />
-            <span className="text-sm text-[#f5f5f7]">{member.email}</span>
+          <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
+          <div className="flex items-center gap-2 p-3 bg-theme-elevated rounded-xl">
+            <Mail size={14} className="text-content-muted" />
+            <span className="text-sm text-content-primary">{member.email}</span>
           </div>
           {member.phone && (
-            <div className="flex items-center gap-2 p-3 bg-[#1c1c21] rounded-xl">
-              <Phone size={14} className="text-[#a1a1aa]" />
-              <span className="text-sm text-[#f5f5f7]">{member.phone}</span>
+            <div className="flex items-center gap-2 p-3 bg-theme-elevated rounded-xl">
+              <Phone size={14} className="text-content-muted" />
+              <span className="text-sm text-content-primary">{member.phone}</span>
             </div>
           )}
         </div>
 
         {/* Permissions */}
         <div className="space-y-2">
-          <p className="text-xs text-[#71717a] uppercase tracking-wider flex items-center gap-1">
+          <p className="text-xs text-content-subtle uppercase tracking-wider flex items-center gap-1">
             <Shield size={12} />
             Permissions
           </p>
@@ -283,10 +259,10 @@ function MemberDetail({
                 className={`px-2.5 py-1 rounded-lg text-xs ${
                   perm === 'admin'
                     ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                    : 'bg-[#1c1c21] text-[#a1a1aa] border border-[#27272e]'
+                    : 'bg-theme-elevated text-content-muted border border-theme-border'
                 }`}
               >
-                {permissionLabels[perm] || perm}
+                {PERMISSION_LABELS[perm] || perm}
               </span>
             ))}
           </div>
@@ -318,58 +294,61 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
       <Card className="w-full max-w-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-[#27272e] text-[#71717a] hover:text-[#f5f5f7] transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
         >
           <X size={16} />
         </button>
-        <h2 className="text-xl text-[#f5f5f7] mb-6">Ajouter un membre</h2>
+        <h2 className="text-xl text-content-primary mb-6">Ajouter un membre</h2>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-[#a1a1aa] mb-1.5">Nom complet</label>
+              <label className="block text-sm text-content-muted mb-1.5">Nom complet</label>
               <input
                 type="text"
                 placeholder="Prénom Nom"
-                className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#a1a1aa] mb-1.5">Rôle</label>
-              <select className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
-                <option>Régisseur Son</option>
-                <option>Régisseur Lumière</option>
-                <option>Régisseur Vidéo</option>
-                <option>Régisseur Plateau</option>
-                <option>Responsable Sécurité</option>
-                <option>Machiniste</option>
-                <option>Cintrier</option>
-              </select>
+              <label className="block text-sm text-content-muted mb-1.5">Rôle</label>
+              <div className="relative">
+                <select className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
+                  <option>Régisseur Son</option>
+                  <option>Régisseur Lumière</option>
+                  <option>Régisseur Vidéo</option>
+                  <option>Régisseur Plateau</option>
+                  <option>Responsable Sécurité</option>
+                  <option>Machiniste</option>
+                  <option>Cintrier</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
+              </div>
             </div>
           </div>
           <div>
-            <label className="block text-sm text-[#a1a1aa] mb-1.5">Email</label>
+            <label className="block text-sm text-content-muted mb-1.5">Email</label>
             <input
               type="email"
               placeholder="nom@theatre.fr"
-              className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50"
+              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#a1a1aa] mb-1.5">Téléphone</label>
+            <label className="block text-sm text-content-muted mb-1.5">Téléphone</label>
             <input
               type="tel"
               placeholder="+33 6 00 00 00 00"
-              className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50"
+              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#a1a1aa] mb-1.5">Permissions</label>
+            <label className="block text-sm text-content-muted mb-1.5">Permissions</label>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(permissionLabels).map(([key, label]) => (
+              {Object.entries(PERMISSION_LABELS).map(([key, label]) => (
                 <label
                   key={key}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1c1c21] border border-[#27272e] rounded-lg text-xs text-[#a1a1aa] cursor-pointer hover:border-cyan-400/30 transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-elevated border border-theme-border rounded-lg text-xs text-content-muted cursor-pointer hover:border-cyan-400/30 transition-colors"
                 >
                   <input type="checkbox" className="accent-cyan-400" />
                   {label}

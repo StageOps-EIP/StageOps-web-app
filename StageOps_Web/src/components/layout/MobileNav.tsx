@@ -19,7 +19,7 @@ export function MobileNav() {
   const location = useLocation();
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#131316] border-t border-[#27272e] safe-area-bottom z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-theme-base border-t border-theme-border safe-area-bottom z-50">
       <div className="flex items-center justify-around px-2 py-2">
         {mobileNavigation.map((item) => {
           const isActive = location.pathname === item.href;
@@ -32,7 +32,7 @@ export function MobileNav() {
               className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 min-w-[64px] ${
                 isActive
                   ? 'text-cyan-400'
-                  : 'text-[#71717a]'
+                  : 'text-content-subtle'
               }`}
             >
               <Icon size={24} />

@@ -1,4 +1,5 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react';
+import type { ButtonHTMLAttributes} from 'react';
+import { forwardRef } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -8,12 +9,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', fullWidth = false, className = '', children, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0b]';
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-void';
     
     const variants = {
       primary: 'bg-cyan-400 text-black hover:bg-cyan-300 active:bg-cyan-500',
-      secondary: 'bg-[#27272e] text-[#f5f5f7] hover:bg-[#35353e] border border-[#35353e]',
-      ghost: 'text-[#f5f5f7] hover:bg-[#1c1c21] active:bg-[#27272e]',
+      secondary: 'bg-transparent text-content-primary hover:bg-white/5 border border-theme-border-hover hover:border-theme-border-strong',
+      ghost: 'text-content-primary hover:bg-theme-elevated active:bg-theme-border',
       danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
     };
     

@@ -1,8 +1,8 @@
-import { MobileHeader } from '../../components/layout/MobileHeader';
-import { Card } from '../../components/design-system/Card';
-import { mockEquipment, mockEvents, mockIncidents } from '../../lib/mockData';
+import { MobileHeader } from '@/components/layout/MobileHeader';
+import { Card } from '@/components/design-system/Card';
+import { mockEquipment, mockEvents, mockIncidents } from '@/lib/mockData';
 import { AlertCircle, Clock, CheckCircle2, QrCode, Calendar, Users } from 'lucide-react';
-import { formatTime } from '../../lib/utils';
+import { formatTime } from '@/lib/utils';
 import { useNavigate } from 'react-router';
 
 export function MobileHome() {

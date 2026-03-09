@@ -6,7 +6,7 @@ export function MobileLayout() {
   const hideNav = location.pathname.includes('/incidents/new');
   
   return (
-    <div className="min-h-screen bg-[#0a0a0b]">
+    <div className="min-h-screen bg-theme-void">
       <Outlet />
       {!hideNav && <MobileNav />}
     </div>

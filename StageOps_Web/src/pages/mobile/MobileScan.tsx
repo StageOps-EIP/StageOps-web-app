@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { MobileHeader } from '../../components/layout/MobileHeader';
-import { Card } from '../../components/design-system/Card';
-import { Button } from '../../components/design-system/Button';
-import { Badge } from '../../components/design-system/Badge';
-import { mockEquipment } from '../../lib/mockData';
+import { MobileHeader } from '@/components/layout/MobileHeader';
+import { Card } from '@/components/design-system/Card';
+import { Button } from '@/components/design-system/Button';
+import { Badge } from '@/components/design-system/Badge';
+import { mockEquipment } from '@/lib/mockData';
 import { QrCode, Camera, AlertCircle, MapPin, User, Clock } from 'lucide-react';
-import { formatDateTime } from '../../lib/utils';
+import { formatDateTime } from '@/lib/utils';
 
 export function MobileScan() {
   const [scannedEquipment, setScannedEquipment] = useState(mockEquipment[1]); // Mock scan result

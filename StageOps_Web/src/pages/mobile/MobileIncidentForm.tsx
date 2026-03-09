@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { MobileHeader } from '../../components/layout/MobileHeader';
-import { Card } from '../../components/design-system/Card';
-import { Button } from '../../components/design-system/Button';
-import { Input } from '../../components/design-system/Input';
+import { MobileHeader } from '@/components/layout/MobileHeader';
+import { Card } from '@/components/design-system/Card';
+import { Button } from '@/components/design-system/Button';
+import { Input } from '@/components/design-system/Input';
 import { Camera, AlertCircle, Check } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
@@ -73,16 +73,18 @@ export function MobileIncidentForm() {
         <Card>
           <h3 className="text-base font-semibold text-[#f5f5f7] mb-4">Gravité</h3>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { value: 'low', label: 'Faible', color: '#22c55e' },
-              { value: 'medium', label: 'Moyenne', color: '#f59e0b' },
-              { value: 'high', label: 'Élevée', color: '#ef4444' },
-              { value: 'critical', label: 'Critique', color: '#dc2626' },
-            ].map((item) => (
+            {(
+              [
+                { value: 'low', label: 'Faible', color: '#22c55e' },
+                { value: 'medium', label: 'Moyenne', color: '#f59e0b' },
+                { value: 'high', label: 'Élevée', color: '#ef4444' },
+                { value: 'critical', label: 'Critique', color: '#dc2626' },
+              ] as { value: typeof severity; label: string; color: string }[]
+            ).map((item) => (
               <button
                 key={item.value}
                 type="button"
-                onClick={() => setSeverity(item.value as any)}
+                onClick={() => setSeverity(item.value)}
                 className={`py-4 rounded-xl font-medium transition-all active:scale-95 ${
                   severity === item.value
                     ? 'border-2'

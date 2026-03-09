@@ -1,5 +1,5 @@
-import { getStatusColor, getStatusLabel } from '../../lib/utils';
-import { EquipmentStatus } from '../../lib/types';
+import { getStatusColor, getStatusLabel } from '@/lib/utils';
+import type { EquipmentStatus } from '@/lib/types';
 import { Volume2, Lightbulb, Monitor, Layers, Shield, Wrench, Package } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -58,13 +58,13 @@ interface CategoryChipProps {
 
 export function CategoryChip({ category, label, icon, onRemove }: CategoryChipProps) {
   return (
-    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1c1c21] border border-[#27272e] rounded-lg text-sm text-[#f5f5f7]">
+    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-theme-elevated border border-theme-border rounded-lg text-sm text-content-primary">
       {icon && <span className="text-base">{icon}</span>}
       <span>{label || category}</span>
       {onRemove && (
         <button
           onClick={onRemove}
-          className="ml-1 text-[#71717a] hover:text-[#f5f5f7] transition-colors"
+          className="ml-1 text-content-subtle hover:text-content-primary transition-colors"
         >
           ×
         </button>

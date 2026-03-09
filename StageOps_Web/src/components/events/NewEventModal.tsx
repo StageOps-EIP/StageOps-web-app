@@ -1,0 +1,85 @@
+import { Card } from '@/components/design-system/Card';
+import { Button } from '@/components/design-system/Button';
+import { X, ChevronDown, CheckCircle2 } from 'lucide-react';
+
+export function NewEventModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
+        >
+          <X size={16} />
+        </button>
+        <h2 className="text-xl text-content-primary mb-6">Nouvel événement</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm text-content-muted mb-1.5">Titre</label>
+            <input
+              type="text"
+              placeholder="Ex: Carmen - Répétition Générale"
+              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-content-muted mb-1.5">Date de début</label>
+              <input
+                type="datetime-local"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-content-muted mb-1.5">Date de fin</label>
+              <input
+                type="datetime-local"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-content-muted mb-1.5">Lieu</label>
+              <input
+                type="text"
+                placeholder="Théâtre National"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-content-muted mb-1.5">Scène</label>
+              <input
+                type="text"
+                placeholder="Grande Salle"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm text-content-muted mb-1.5">Statut</label>
+            <div className="relative">
+              <select className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
+                <option value="planning">Planification</option>
+                <option value="setup">Installation</option>
+                <option value="running">En cours</option>
+                <option value="strike">Démontage</option>
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="secondary" onClick={onClose}>
+              Annuler
+            </Button>
+            <Button variant="primary" onClick={onClose}>
+              <CheckCircle2 size={16} />
+              Créer l'événement
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-import { EquipmentStatus, IncidentSeverity } from './types';
+import type { EquipmentStatus, IncidentSeverity } from './types';
 
 export function getStatusColor(status: EquipmentStatus): string {
   switch (status) {

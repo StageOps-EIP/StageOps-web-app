@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { Button } from '../components/design-system/Button';
-import { Input } from '../components/design-system/Input';
+import { Button } from '@/components/design-system/Button';
+
 import { Layers, Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const roleOptions = [

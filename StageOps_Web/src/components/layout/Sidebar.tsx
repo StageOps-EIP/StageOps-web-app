@@ -8,7 +8,10 @@ import {
   Settings,
   Layers,
   UserCircle,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from '@/lib/use-theme';
 
 const navigation = [
   { name: 'Tableau de bord', href: '/', icon: LayoutDashboard },
@@ -22,18 +25,19 @@ const navigation = [
 
 export function Sidebar() {
   const location = useLocation();
+  const { theme, toggle } = useTheme();
   
   return (
-    <div className="w-64 h-screen bg-[#131316] border-r border-[#27272e] flex flex-col">
+    <div className="w-64 h-screen bg-theme-base border-r border-theme-border flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-[#27272e]">
+      <div className="p-6 border-b border-theme-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center">
             <Layers size={24} className="text-black" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#f5f5f7]">StageOps</h1>
-            <p className="text-xs text-[#71717a]">Régie Technique</p>
+            <h1 className="text-xl font-bold text-content-primary">StageOps</h1>
+            <p className="text-xs text-content-subtle">Régie Technique</p>
           </div>
         </div>
       </div>
@@ -51,7 +55,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? 'bg-cyan-400/10 text-cyan-400 shadow-lg shadow-cyan-400/5'
-                  : 'text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-[#1c1c21]'
+                  : 'text-content-muted hover:text-content-primary hover:bg-theme-elevated'
               }`}
             >
               <Icon size={20} />
@@ -61,22 +65,29 @@ export function Sidebar() {
         })}
       </nav>
       
-      {/* Sync status */}
-      <div className="p-4 border-t border-[#27272e] space-y-2">
+      {/* Footer */}
+      <div className="p-4 border-t border-theme-border space-y-2">
+        <button
+          onClick={toggle}
+          className="flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-sm font-medium transition-all duration-200 text-content-muted hover:text-content-primary hover:bg-theme-elevated"
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+        </button>
         <Link
           to="/profile"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
             location.pathname === '/profile'
               ? 'bg-cyan-400/10 text-cyan-400'
-              : 'text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-[#1c1c21]'
+              : 'text-content-muted hover:text-content-primary hover:bg-theme-elevated'
           }`}
         >
           <UserCircle size={20} />
           <span>Jean Moreau</span>
         </Link>
-        <div className="flex items-center gap-2 px-4 py-2 bg-[#1c1c21] rounded-lg">
+        <div className="flex items-center gap-2 px-4 py-2 bg-theme-elevated rounded-lg">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-xs text-[#a1a1aa]">Synchronisé il y a 5s</span>
+          <span className="text-xs text-content-muted">Synchronisé il y a 5s</span>
         </div>
       </div>
     </div>

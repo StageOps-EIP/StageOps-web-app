@@ -1,0 +1,5 @@
+.env
+.env.*
+.copilot/*
+.github/agents/*.agent.md
+.github/

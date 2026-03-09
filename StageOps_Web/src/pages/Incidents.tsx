@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  Card,
-  CardHeader,
-} from "../components/design-system/Card";
+import { Card } from "../components/design-system/Card";
 import { Button } from "../components/design-system/Button";
 import { mockIncidents, mockEquipment } from "../lib/mockData";
 import {
@@ -10,52 +7,21 @@ import {
   getSeverityLabel,
   formatRelativeTime,
 } from "../lib/utils";
-import { IncidentDetailModal } from "../components/IncidentDetailModal";
+import { IncidentDetailModal } from "../components/incidents/IncidentDetailModal";
 import type { Incident, IncidentStatus } from "../lib/types";
 import {
-  AlertCircle,
-  Clock,
   CheckCircle2,
-  Archive,
   Plus,
   LayoutGrid,
   List,
   ChevronRight,
   Wrench,
-  X,
 } from "lucide-react";
+import { INCIDENT_COLUMNS, SEVERITY_ORDER } from "../lib/constants";
+import { IncidentCard } from "../components/incidents/IncidentCard";
+import { NewIncidentModal } from "../components/incidents/NewIncidentModal";
 
-const columns: {
-  key: IncidentStatus;
-  label: string;
-  icon: typeof AlertCircle;
-  color: string;
-}[] = [
-  {
-    key: "open",
-    label: "Ouvert",
-    icon: AlertCircle,
-    color: "#ef4444",
-  },
-  {
-    key: "in-progress",
-    label: "En cours",
-    icon: Clock,
-    color: "#f59e0b",
-  },
-  {
-    key: "resolved",
-    label: "Résolu",
-    icon: CheckCircle2,
-    color: "#22c55e",
-  },
-  {
-    key: "closed",
-    label: "Clos",
-    icon: Archive,
-    color: "#71717a",
-  },
-];
+const columns = INCIDENT_COLUMNS;
 
 const allIncidents: Incident[] = [
   ...mockIncidents,
@@ -129,23 +95,23 @@ export function Incidents() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-[#f5f5f7] mb-2">
+          <h1 className="text-3xl text-content-primary mb-2">
             Incidents & Maintenance
           </h1>
-          <p className="text-[#a1a1aa]">
+          <p className="text-content-muted">
             {openCount} ouvert{openCount > 1 ? "s" : ""} ·{" "}
             {inProgressCount} en cours · {criticalCount}{" "}
             critique{criticalCount > 1 ? "s" : ""}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-[#1c1c21] rounded-xl p-1 border border-[#27272e]">
+          <div className="flex bg-theme-elevated rounded-xl p-1 border border-theme-border">
             <button
               onClick={() => setViewMode("kanban")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
                 viewMode === "kanban"
                   ? "bg-cyan-400/15 text-cyan-400"
-                  : "text-[#a1a1aa] hover:text-[#f5f5f7]"
+                  : "text-content-muted hover:text-content-primary"
               }`}
             >
               <LayoutGrid size={16} /> Kanban
@@ -155,20 +121,20 @@ export function Incidents() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
                 viewMode === "list"
                   ? "bg-cyan-400/15 text-cyan-400"
-                  : "text-[#a1a1aa] hover:text-[#f5f5f7]"
+                  : "text-content-muted hover:text-content-primary"
               }`}
             >
               <List size={16} /> Liste
             </button>
           </div>
 
-          <div className="flex bg-[#1c1c21] rounded-xl p-1 border border-[#27272e]">
+          <div className="flex bg-theme-elevated rounded-xl p-1 border border-theme-border">
             <button
               onClick={() => setFilterSeverity(null)}
               className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
                 !filterSeverity
                   ? "bg-cyan-400/15 text-cyan-400"
-                  : "text-[#a1a1aa] hover:text-[#f5f5f7]"
+                  : "text-content-muted hover:text-content-primary"
               }`}
             >
               Tous
@@ -186,7 +152,7 @@ export function Incidents() {
                 className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
                   filterSeverity === s
                     ? "bg-cyan-400/15 text-cyan-400"
-                    : "text-[#a1a1aa] hover:text-[#f5f5f7]"
+                    : "text-content-muted hover:text-content-primary"
                 }`}
               >
                 {getSeverityLabel(s)}
@@ -213,7 +179,7 @@ export function Incidents() {
           return (
             <div
               key={col.key}
-              className="flex items-center gap-3 p-4 bg-[#131316] border border-[#27272e] rounded-2xl"
+              className="flex items-center gap-3 p-4 bg-theme-base border border-theme-border rounded-2xl"
             >
               <div
                 className="p-2.5 rounded-xl"
@@ -222,10 +188,10 @@ export function Incidents() {
                 <Icon size={18} style={{ color: col.color }} />
               </div>
               <div>
-                <span className="text-2xl text-[#f5f5f7]">
+                <span className="text-2xl text-content-primary">
                   {count}
                 </span>
-                <p className="text-xs text-[#71717a]">
+                <p className="text-xs text-content-subtle">
                   {col.label}
                 </p>
               </div>
@@ -246,10 +212,10 @@ export function Incidents() {
                     size={16}
                     style={{ color: col.color }}
                   />
-                  <span className="text-sm text-[#f5f5f7]">
+                  <span className="text-sm text-content-primary">
                     {col.label}
                   </span>
-                  <span className="ml-auto text-xs text-[#71717a] bg-[#1c1c21] px-2 py-0.5 rounded-full">
+                  <span className="ml-auto text-xs text-content-subtle bg-theme-elevated px-2 py-0.5 rounded-full">
                     {items.length}
                   </span>
                 </div>
@@ -262,7 +228,7 @@ export function Incidents() {
                     />
                   ))}
                   {items.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-8 text-[#71717a]">
+                    <div className="flex flex-col items-center justify-center py-8 text-content-subtle">
                       <CheckCircle2
                         size={24}
                         className="mb-2 opacity-40"
@@ -280,15 +246,9 @@ export function Incidents() {
           <div className="space-y-1">
             {filtered
               .sort((a, b) => {
-                const order: Record<string, number> = {
-                  critical: 0,
-                  high: 1,
-                  medium: 2,
-                  low: 3,
-                };
                 return (
-                  (order[a.severity] ?? 4) -
-                  (order[b.severity] ?? 4)
+                  (SEVERITY_ORDER[a.severity] ?? 4) -
+                  (SEVERITY_ORDER[b.severity] ?? 4)
                 );
               })
               .map((inc) => {
@@ -305,17 +265,17 @@ export function Incidents() {
                   <button
                     key={inc.id}
                     onClick={() => setSelectedIncident(inc)}
-                    className="w-full text-left flex items-center gap-4 p-4 rounded-xl hover:bg-[#1c1c21] transition-colors"
+                    className="w-full text-left flex items-center gap-4 p-4 rounded-xl hover:bg-theme-elevated transition-colors"
                   >
                     <div
                       className="w-1.5 h-10 rounded-full shrink-0"
                       style={{ backgroundColor: sevColor }}
                     />
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm text-[#f5f5f7] truncate block">
+                      <span className="text-sm text-content-primary truncate block">
                         {inc.title}
                       </span>
-                      <div className="flex items-center gap-3 text-xs text-[#71717a] mt-0.5">
+                      <div className="flex items-center gap-3 text-xs text-content-subtle mt-0.5">
                         <span>
                           {formatRelativeTime(inc.timestamp)}
                         </span>
@@ -347,7 +307,7 @@ export function Incidents() {
                     </span>
                     <ChevronRight
                       size={14}
-                      className="text-[#71717a] shrink-0"
+                      className="text-content-subtle shrink-0"
                     />
                   </button>
                 );
@@ -367,132 +327,6 @@ export function Incidents() {
           onClose={() => setShowNewForm(false)}
         />
       )}
-    </div>
-  );
-}
-
-function IncidentCard({
-  incident,
-  onClick,
-}: {
-  incident: Incident;
-  onClick: () => void;
-}) {
-  const sevColor = getSeverityColor(incident.severity);
-  const eq = incident.equipmentId
-    ? mockEquipment.find((e) => e.id === incident.equipmentId)
-    : null;
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left p-3 bg-[#131316] border border-[#27272e] rounded-xl hover:bg-[#1c1c21] hover:border-[#35353e] transition-all"
-    >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-sm text-[#f5f5f7] line-clamp-2">
-          {incident.title}
-        </span>
-        <span
-          className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0 mt-0.5"
-          style={{
-            backgroundColor: `${sevColor}15`,
-            color: sevColor,
-          }}
-        >
-          {getSeverityLabel(incident.severity)}
-        </span>
-      </div>
-      <p className="text-xs text-[#71717a] line-clamp-2 mb-3">
-        {incident.description}
-      </p>
-      <div className="flex items-center justify-between">
-        {eq && (
-          <span className="text-[10px] text-[#a1a1aa] flex items-center gap-1">
-            <Wrench size={10} /> {eq.name}
-          </span>
-        )}
-        <span className="text-[10px] text-[#71717a] ml-auto">
-          {formatRelativeTime(incident.timestamp)}
-        </span>
-      </div>
-    </button>
-  );
-}
-
-function NewIncidentModal({
-  onClose,
-}: {
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-lg relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-[#27272e] text-[#71717a] hover:text-[#f5f5f7] transition-colors"
-        >
-          <X size={16} />
-        </button>
-        <h2 className="text-xl text-[#f5f5f7] mb-6">
-          Signaler un incident
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm text-[#a1a1aa] mb-1.5">
-              Titre
-            </label>
-            <input
-              type="text"
-              placeholder="Ex: Panne projecteur perche 2"
-              className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-[#a1a1aa] mb-1.5">
-              Description
-            </label>
-            <textarea
-              rows={3}
-              placeholder="Décrivez le problème en détail..."
-              className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder:text-[#71717a] focus:outline-none focus:border-cyan-400/50 resize-none"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#a1a1aa] mb-1.5">
-                Sévérité
-              </label>
-              <select className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
-                <option value="low">Faible</option>
-                <option value="medium">Moyenne</option>
-                <option value="high">Élevée</option>
-                <option value="critical">Critique</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-[#a1a1aa] mb-1.5">
-                Équipement
-              </label>
-              <select className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]">
-                <option value="">Aucun</option>
-                {mockEquipment.map((eq) => (
-                  <option key={eq.id} value={eq.id}>
-                    {eq.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" onClick={onClose}>
-              Annuler
-            </Button>
-            <Button variant="danger" onClick={onClose}>
-              <AlertCircle size={16} /> Signaler l'incident
-            </Button>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

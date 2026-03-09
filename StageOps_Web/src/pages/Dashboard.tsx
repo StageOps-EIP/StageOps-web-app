@@ -1,9 +1,9 @@
 import { AlertCircle, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
-import { Card, CardHeader } from '../components/design-system/Card';
-import { Badge } from '../components/design-system/Badge';
-import { Button } from '../components/design-system/Button';
-import { mockEquipment, mockEvents, mockIncidents } from '../lib/mockData';
-import { formatTime, formatRelativeTime } from '../lib/utils';
+import { Card, CardHeader } from '@/components/design-system/Card';
+import { Badge } from '@/components/design-system/Badge';
+import { Button } from '@/components/design-system/Button';
+import { mockEquipment, mockEvents, mockIncidents } from '@/lib/mockData';
+import { formatTime, formatRelativeTime } from '@/lib/utils';
 import { useNavigate } from 'react-router';
 
 export function Dashboard() {
@@ -19,8 +19,8 @@ export function Dashboard() {
     <div className="p-8 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#f5f5f7] mb-2">Tableau de bord</h1>
-        <p className="text-[#a1a1aa]">Mercredi 11 février 2026</p>
+        <h1 className="text-3xl font-bold text-content-primary mb-2">Tableau de bord</h1>
+        <p className="text-content-muted">Mercredi 11 février 2026</p>
       </div>
       
       {/* Today's Event Banner */}
@@ -31,12 +31,12 @@ export function Dashboard() {
               <span className="px-3 py-1 bg-cyan-400/20 text-cyan-400 rounded-lg text-sm font-medium border border-cyan-400/30">
                 Aujourd'hui
               </span>
-              <span className="text-[#a1a1aa]">
+              <span className="text-content-muted">
                 {formatTime(todayEvent.startDate)} - {formatTime(todayEvent.endDate)}
               </span>
             </div>
-            <h2 className="text-2xl font-semibold text-[#f5f5f7] mb-1">{todayEvent.title}</h2>
-            <p className="text-[#a1a1aa]">{todayEvent.venue} • {todayEvent.stage}</p>
+            <h2 className="text-2xl font-semibold text-content-primary mb-1">{todayEvent.title}</h2>
+            <p className="text-content-muted">{todayEvent.venue} • {todayEvent.stage}</p>
           </div>
           
           {/* Readiness Score */}
@@ -67,7 +67,7 @@ export function Dashboard() {
                 <span className="text-2xl font-bold text-cyan-400">{readinessScore}%</span>
               </div>
             </div>
-            <span className="text-xs text-[#a1a1aa] mt-2">Préparation</span>
+            <span className="text-xs text-content-muted mt-2">Préparation</span>
           </div>
         </div>
         
@@ -90,8 +90,8 @@ export function Dashboard() {
             </div>
             <span className="text-3xl font-bold text-red-500">{hsEquipment.length}</span>
           </div>
-          <p className="text-sm font-medium text-[#f5f5f7]">Équipements HS</p>
-          <p className="text-xs text-[#71717a] mt-1">Nécessite attention</p>
+          <p className="text-sm font-medium text-content-primary">Équipements HS</p>
+          <p className="text-xs text-content-subtle mt-1">Nécessite attention</p>
         </Card>
         
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/10 border-amber-500/20">
@@ -101,8 +101,8 @@ export function Dashboard() {
             </div>
             <span className="text-3xl font-bold text-amber-500">{toCheckEquipment.length}</span>
           </div>
-          <p className="text-sm font-medium text-[#f5f5f7]">À vérifier</p>
-          <p className="text-xs text-[#71717a] mt-1">Avant le show</p>
+          <p className="text-sm font-medium text-content-primary">À vérifier</p>
+          <p className="text-xs text-content-subtle mt-1">Avant le show</p>
         </Card>
         
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/20">
@@ -114,8 +114,8 @@ export function Dashboard() {
               {mockEquipment.filter(eq => eq.status === 'ok').length}
             </span>
           </div>
-          <p className="text-sm font-medium text-[#f5f5f7]">Opérationnels</p>
-          <p className="text-xs text-[#71717a] mt-1">Prêts à l'emploi</p>
+          <p className="text-sm font-medium text-content-primary">Opérationnels</p>
+          <p className="text-xs text-content-subtle mt-1">Prêts à l'emploi</p>
         </Card>
         
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20">
@@ -125,8 +125,8 @@ export function Dashboard() {
             </div>
             <span className="text-3xl font-bold text-purple-500">{openIncidents.length}</span>
           </div>
-          <p className="text-sm font-medium text-[#f5f5f7]">Incidents ouverts</p>
-          <p className="text-xs text-[#71717a] mt-1">En cours</p>
+          <p className="text-sm font-medium text-content-primary">Incidents ouverts</p>
+          <p className="text-xs text-content-subtle mt-1">En cours</p>
         </Card>
       </div>
       
@@ -147,18 +147,18 @@ export function Dashboard() {
             {hsEquipment.map((eq) => (
               <div
                 key={eq.id}
-                className="flex items-center justify-between p-3 bg-[#1c1c21] rounded-xl hover:bg-[#27272e] transition-colors cursor-pointer"
+                className="flex items-center justify-between p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors cursor-pointer"
                 onClick={() => navigate('/equipment')}
               >
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-[#f5f5f7]">{eq.name}</p>
-                  <p className="text-xs text-[#71717a] mt-0.5">{eq.location}</p>
+                  <p className="text-sm font-medium text-content-primary">{eq.name}</p>
+                  <p className="text-xs text-content-subtle mt-0.5">{eq.location}</p>
                 </div>
                 <Badge status={eq.status} size="sm" />
               </div>
             ))}
             {hsEquipment.length === 0 && (
-              <p className="text-sm text-[#71717a] text-center py-8">
+              <p className="text-sm text-content-subtle text-center py-8">
                 Aucun équipement HS actuellement
               </p>
             )}
@@ -180,12 +180,12 @@ export function Dashboard() {
             {openIncidents.slice(0, 3).map((incident) => (
               <div
                 key={incident.id}
-                className="flex items-start gap-3 p-3 bg-[#1c1c21] rounded-xl hover:bg-[#27272e] transition-colors cursor-pointer"
+                className="flex items-start gap-3 p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors cursor-pointer"
                 onClick={() => navigate('/incidents')}
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#f5f5f7] truncate">{incident.title}</p>
-                  <p className="text-xs text-[#71717a] mt-0.5">{formatRelativeTime(incident.timestamp)}</p>
+                  <p className="text-sm font-medium text-content-primary truncate">{incident.title}</p>
+                  <p className="text-xs text-content-subtle mt-0.5">{formatRelativeTime(incident.timestamp)}</p>
                 </div>
                 <span
                   className="px-2 py-1 rounded text-xs font-medium"
@@ -212,14 +212,14 @@ export function Dashboard() {
           {toCheckEquipment.map((eq) => (
             <div
               key={eq.id}
-              className="p-4 bg-[#1c1c21] rounded-xl hover:bg-[#27272e] transition-colors cursor-pointer"
+              className="p-4 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors cursor-pointer"
               onClick={() => navigate('/equipment')}
             >
               <div className="flex items-start justify-between mb-2">
                 <Badge status={eq.status} size="sm" />
               </div>
-              <p className="text-sm font-medium text-[#f5f5f7] mb-1">{eq.name}</p>
-              <p className="text-xs text-[#71717a]">{eq.location}</p>
+              <p className="text-sm font-medium text-content-primary mb-1">{eq.name}</p>
+              <p className="text-xs text-content-subtle">{eq.location}</p>
               {eq.notes && (
                 <p className="text-xs text-amber-500 mt-2 line-clamp-2">{eq.notes}</p>
               )}

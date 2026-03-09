@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { Button } from '../components/design-system/Button';
-import { mockTeamMembers } from '../lib/mockData';
-import { mockEvents } from '../lib/mockData';
+import { Button } from '@/components/design-system/Button';
+import { mockTeamMembers } from '@/lib/mockData';
+import { mockEvents } from '@/lib/mockData';
+import { PERMISSION_LABELS } from '@/lib/constants';
 import {
-  User,
   Mail,
   Phone,
-  Briefcase,
   Shield,
   Edit3,
   Save,
@@ -21,19 +20,6 @@ import {
 
 // Simulated current user (Jean Moreau - Régisseur Plateau / admin)
 const currentUser = mockTeamMembers[3];
-
-const permissionLabels: Record<string, string> = {
-  sound: 'Son',
-  light: 'Lumière',
-  video: 'Vidéo',
-  set: 'Plateau',
-  safety: 'Sécurité',
-  rigging: 'Accroche',
-  incidents: 'Incidents',
-  equipment: 'Équipements',
-  admin: 'Administration',
-};
-
 const roleColor = '#22c55e';
 
 export function Profile() {
@@ -56,8 +42,8 @@ export function Profile() {
     <div className="p-8 space-y-6 max-w-5xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#f5f5f7] mb-2">Mon profil</h1>
-        <p className="text-[#a1a1aa]">Gérez vos informations personnelles et préférences</p>
+        <h1 className="text-3xl font-bold text-content-primary mb-2">Mon profil</h1>
+        <p className="text-content-muted">Gérez vos informations personnelles et préférences</p>
       </div>
 
       <div className="grid grid-cols-[1fr_360px] gap-6">
@@ -65,7 +51,7 @@ export function Profile() {
         <div className="space-y-6">
 
           {/* Identity card */}
-          <div className="bg-[#131316] border border-[#27272e] rounded-2xl p-6 space-y-5">
+          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-5">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 {/* Avatar */}
@@ -80,10 +66,10 @@ export function Profile() {
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="bg-[#1c1c21] border border-[#27272e] rounded-xl px-3 py-1.5 text-lg font-semibold text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50 w-full"
+                      className="bg-theme-elevated border border-theme-border rounded-xl px-3 py-1.5 text-lg font-semibold text-content-primary focus:outline-none focus:border-cyan-400/50 w-full"
                     />
                   ) : (
-                    <h2 className="text-xl font-semibold text-[#f5f5f7]">{name}</h2>
+                    <h2 className="text-xl font-semibold text-content-primary">{name}</h2>
                   )}
                   <p className="text-sm mt-0.5" style={{ color: roleColor }}>
                     {currentUser.role}
@@ -108,28 +94,28 @@ export function Profile() {
 
             {/* Contact fields */}
             <div className="space-y-3">
-              <p className="text-xs text-[#71717a] uppercase tracking-wider">Contact</p>
+              <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-[#1c1c21] rounded-xl">
+                <div className="p-4 bg-theme-elevated rounded-xl">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Mail size={12} className="text-[#71717a]" />
-                    <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Email</p>
+                    <Mail size={12} className="text-content-subtle" />
+                    <p className="text-[10px] text-content-subtle uppercase tracking-wider">Email</p>
                   </div>
                   {isEditing ? (
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-transparent text-sm text-[#f5f5f7] border-b border-[#27272e] focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                      className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                     />
                   ) : (
-                    <p className="text-sm text-[#f5f5f7]">{email}</p>
+                    <p className="text-sm text-content-primary">{email}</p>
                   )}
                 </div>
-                <div className="p-4 bg-[#1c1c21] rounded-xl">
+                <div className="p-4 bg-theme-elevated rounded-xl">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Phone size={12} className="text-[#71717a]" />
-                    <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Téléphone</p>
+                    <Phone size={12} className="text-content-subtle" />
+                    <p className="text-[10px] text-content-subtle uppercase tracking-wider">Téléphone</p>
                   </div>
                   {isEditing ? (
                     <input
@@ -137,10 +123,10 @@ export function Profile() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="—"
-                      className="w-full bg-transparent text-sm text-[#f5f5f7] placeholder-[#35353e] border-b border-[#27272e] focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                      className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
                     />
                   ) : (
-                    <p className="text-sm text-[#f5f5f7]">{phone || '—'}</p>
+                    <p className="text-sm text-content-primary">{phone || '—'}</p>
                   )}
                 </div>
               </div>
@@ -148,10 +134,10 @@ export function Profile() {
           </div>
 
           {/* Permissions */}
-          <div className="bg-[#131316] border border-[#27272e] rounded-2xl p-6 space-y-4">
+          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <Shield size={16} className="text-[#71717a]" />
-              <p className="text-xs text-[#71717a] uppercase tracking-wider">Permissions</p>
+              <Shield size={16} className="text-content-subtle" />
+              <p className="text-xs text-content-subtle uppercase tracking-wider">Permissions</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {currentUser.permissions.map((perm) => (
@@ -160,46 +146,46 @@ export function Profile() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
                     perm === 'admin'
                       ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                      : 'bg-[#1c1c21] text-[#a1a1aa] border border-[#27272e]'
+                      : 'bg-theme-elevated text-content-muted border border-theme-border'
                   }`}
                 >
-                  {permissionLabels[perm] || perm}
+                  {PERMISSION_LABELS[perm] || perm}
                 </span>
               ))}
             </div>
-            <p className="text-xs text-[#71717a]">
+            <p className="text-xs text-content-subtle">
               Les permissions sont gérées par l'administrateur du système.
             </p>
           </div>
 
           {/* Assigned events */}
-          <div className="bg-[#131316] border border-[#27272e] rounded-2xl p-6 space-y-4">
+          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-[#71717a]" />
-              <p className="text-xs text-[#71717a] uppercase tracking-wider">
+              <Calendar size={16} className="text-content-subtle" />
+              <p className="text-xs text-content-subtle uppercase tracking-wider">
                 Événements assignés
               </p>
             </div>
             <div className="space-y-2">
               {assignedEvents.length === 0 && (
-                <p className="text-sm text-[#71717a]">Aucun événement assigné.</p>
+                <p className="text-sm text-content-subtle">Aucun événement assigné.</p>
               )}
               {assignedEvents.map((evt) => (
                 <Link
                   key={evt.id}
                   to="/stage"
-                  className="flex items-center gap-4 p-4 bg-[#1c1c21] border border-[#27272e] rounded-xl hover:border-cyan-400/30 transition-colors group"
+                  className="flex items-center gap-4 p-4 bg-theme-elevated border border-theme-border rounded-xl hover:border-cyan-400/30 transition-colors group"
                 >
                   <div className="p-2 bg-cyan-400/10 rounded-lg shrink-0">
                     <Calendar size={16} className="text-cyan-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#f5f5f7] truncate">{evt.title}</p>
-                    <p className="text-xs text-[#71717a]">
+                    <p className="text-sm font-medium text-content-primary truncate">{evt.title}</p>
+                    <p className="text-xs text-content-subtle">
                       {evt.venue} · {evt.stage}
                     </p>
                   </div>
-                  <ChevronRight size={14} className="text-[#71717a] group-hover:text-cyan-400 transition-colors shrink-0" />
+                  <ChevronRight size={14} className="text-content-subtle group-hover:text-cyan-400 transition-colors shrink-0" />
                 </Link>
               ))}
             </div>
@@ -209,42 +195,42 @@ export function Profile() {
         {/* Right column */}
         <div className="space-y-4">
           {/* Security */}
-          <div className="bg-[#131316] border border-[#27272e] rounded-2xl p-5 space-y-3">
+          <div className="bg-theme-base border border-theme-border rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <Key size={14} className="text-[#71717a]" />
-              <p className="text-xs text-[#71717a] uppercase tracking-wider">Sécurité</p>
+              <Key size={14} className="text-content-subtle" />
+              <p className="text-xs text-content-subtle uppercase tracking-wider">Sécurité</p>
             </div>
-            <button className="w-full flex items-center justify-between p-3 bg-[#1c1c21] rounded-xl hover:bg-[#27272e] transition-colors group">
+            <button className="w-full flex items-center justify-between p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors group">
               <div>
-                <p className="text-sm text-[#f5f5f7] text-left">Changer le mot de passe</p>
-                <p className="text-xs text-[#71717a]">Dernière modification : il y a 30 jours</p>
+                <p className="text-sm text-content-primary text-left">Changer le mot de passe</p>
+                <p className="text-xs text-content-subtle">Dernière modification : il y a 30 jours</p>
               </div>
-              <ChevronRight size={14} className="text-[#71717a] group-hover:text-[#f5f5f7] transition-colors" />
+              <ChevronRight size={14} className="text-content-subtle group-hover:text-content-primary transition-colors" />
             </button>
-            <button className="w-full flex items-center justify-between p-3 bg-[#1c1c21] rounded-xl hover:bg-[#27272e] transition-colors group">
+            <button className="w-full flex items-center justify-between p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors group">
               <div>
-                <p className="text-sm text-[#f5f5f7] text-left">Authentification à deux facteurs</p>
-                <p className="text-xs text-[#71717a]">Non activée</p>
+                <p className="text-sm text-content-primary text-left">Authentification à deux facteurs</p>
+                <p className="text-xs text-content-subtle">Non activée</p>
               </div>
-              <ChevronRight size={14} className="text-[#71717a] group-hover:text-[#f5f5f7] transition-colors" />
+              <ChevronRight size={14} className="text-content-subtle group-hover:text-content-primary transition-colors" />
             </button>
           </div>
 
           {/* Notifications */}
-          <div className="bg-[#131316] border border-[#27272e] rounded-2xl p-5 space-y-3">
+          <div className="bg-theme-base border border-theme-border rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <Bell size={14} className="text-[#71717a]" />
-              <p className="text-xs text-[#71717a] uppercase tracking-wider">Notifications</p>
+              <Bell size={14} className="text-content-subtle" />
+              <p className="text-xs text-content-subtle uppercase tracking-wider">Notifications</p>
             </div>
             {[
               { label: 'Nouveaux incidents', sub: 'Alertes en temps réel', on: true },
               { label: 'Rappels d\'événements', sub: '1h avant chaque représentation', on: true },
               { label: 'Mises à jour équipements', sub: 'Changements de statut', on: false },
             ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between p-3 bg-[#1c1c21] rounded-xl">
+              <div key={item.label} className="flex items-center justify-between p-3 bg-theme-elevated rounded-xl">
                 <div>
-                  <p className="text-sm text-[#f5f5f7]">{item.label}</p>
-                  <p className="text-xs text-[#71717a]">{item.sub}</p>
+                  <p className="text-sm text-content-primary">{item.label}</p>
+                  <p className="text-xs text-content-subtle">{item.sub}</p>
                 </div>
                 <div
                   className={`w-10 h-5 rounded-full relative transition-colors ${

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface CardProps {
   children: ReactNode;
@@ -8,12 +8,11 @@ interface CardProps {
 }
 
 export function Card({ children, className = '', hover = false, onClick }: CardProps) {
-  const hoverClass = hover ? 'hover:bg-[#1c1c21] cursor-pointer transition-colors duration-200' : '';
-  const clickableClass = onClick ? 'cursor-pointer' : '';
-  
+  const hoverClass = hover ? 'hover:bg-white/3 cursor-pointer transition-colors duration-200' : '';
+
   return (
     <div
-      className={`bg-[#131316] border border-[#27272e] rounded-2xl p-6 ${hoverClass} ${clickableClass} ${className}`}
+      className={`bg-theme-base border border-theme-border rounded-2xl p-6 ${hoverClass} ${onClick ? 'cursor-pointer hover:border-theme-border-hover transition-all duration-200' : ''} ${className}`}
       onClick={onClick}
     >
       {children}
@@ -31,8 +30,8 @@ export function CardHeader({ title, subtitle, action }: CardHeaderProps) {
   return (
     <div className="flex items-start justify-between mb-4">
       <div>
-        <h3 className="text-lg font-semibold text-[#f5f5f7]">{title}</h3>
-        {subtitle && <p className="text-sm text-[#a1a1aa] mt-1">{subtitle}</p>}
+        <h3 className="text-lg font-semibold text-content-primary">{title}</h3>
+        {subtitle && <p className="text-sm text-content-muted mt-1">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>

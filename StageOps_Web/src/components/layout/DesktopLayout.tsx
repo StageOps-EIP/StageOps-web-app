@@ -6,7 +6,7 @@ export function DesktopLayout() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto h-full">
         <Outlet />
       </main>
       <Toaster
@@ -14,9 +14,9 @@ export function DesktopLayout() {
         position="bottom-right"
         toastOptions={{
           style: {
-            background: '#131316',
-            border: '1px solid #27272e',
-            color: '#f5f5f7',
+            background: 'var(--bg-base)',
+            border: '1px solid var(--border)',
+            color: 'var(--text-primary)',
           },
         }}
       />
