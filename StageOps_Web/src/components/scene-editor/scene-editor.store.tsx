@@ -26,12 +26,12 @@ const initialLights: SceneLight[] = [
     id: 'light-overhead-1',
     name: 'Lumière générale',
     type: 'directional',
-    position: [5, 12, 5],
-    targetPosition: [0, 0, 0],
+    position: [5, 14, 8],
+    targetPosition: [0, 1, 0],
     color: kelvinToHex(5500),
-    intensity: 1.2,
+    intensity: 1.5,
     temperature: 5500,
-    castShadow: true,
+    castShadow: false,
     distance: 0,
     angle: Math.PI / 4,
     penumbra: 0.3,
@@ -43,14 +43,14 @@ const initialLights: SceneLight[] = [
     id: 'light-jardin-1',
     name: 'Spot jardin',
     type: 'spot',
-    position: [-5, 9, -2],
-    targetPosition: [0, 0, 2],
+    position: [-6, 9, 0],
+    targetPosition: [0, 2, -2],
     color: kelvinToHex(3200),
-    intensity: 7.0,
+    intensity: 8.0,
     temperature: 3200,
-    castShadow: true,
+    castShadow: false,
     distance: 25,
-    angle: Math.PI / 6,
+    angle: Math.PI / 5,
     penumbra: 0.4,
     width: 2,
     height: 2,
@@ -60,14 +60,14 @@ const initialLights: SceneLight[] = [
     id: 'light-cour-1',
     name: 'Spot cour',
     type: 'spot',
-    position: [5, 9, -2],
-    targetPosition: [0, 0, 2],
+    position: [6, 9, 0],
+    targetPosition: [0, 2, -2],
     color: kelvinToHex(5600),
-    intensity: 7.0,
+    intensity: 8.0,
     temperature: 5600,
-    castShadow: true,
+    castShadow: false,
     distance: 25,
-    angle: Math.PI / 6,
+    angle: Math.PI / 5,
     penumbra: 0.4,
     width: 2,
     height: 2,
@@ -81,10 +81,12 @@ const initialState: SceneEditorState = {
   objects: [],
   lights: initialLights,
   surfaces: initialSurfaces,
+  stageSize: { width: 24, depth: 18, height: 10 },
   selectedId: null,
   selectedType: null,
   selectedSurface: null,
   transformMode: 'translate',
+  snapEnabled: false,
   postProcessing: {
     bloom: true,
     bloomIntensity: 0.4,
@@ -157,6 +159,11 @@ export function reducer(state: SceneEditorState, action: SceneAction): SceneEdit
     case 'SET_TRANSFORM_MODE':
       return { ...state, transformMode: action.mode };
 
+    case 'TOGGLE_SNAP':
+      return { ...state, snapEnabled: !state.snapEnabled };
+
+    case 'UPDATE_STAGE_SIZE':
+      return { ...state, stageSize: { ...state.stageSize, ...action.updates } };
     case 'ADD_OBJECT': {
       const withHistory = pushHistory(state);
       return { ...withHistory, objects: [...withHistory.objects, action.object] };

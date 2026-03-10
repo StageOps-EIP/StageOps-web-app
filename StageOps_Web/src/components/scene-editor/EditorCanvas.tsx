@@ -1,7 +1,7 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import type { RefObject } from 'react';
 import type * as THREE from 'three';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useSceneEditor } from './scene-editor.store';
 import { EditableObject } from './EditableObject';
@@ -9,12 +9,58 @@ import { EditableLight } from './EditableLight';
 import { SurfaceObjects } from './SurfaceObjects';
 import { PostProcessingEffects } from './PostProcessingEffects';
 
+export type CameraView = { type: 'top' | 'front' | 'side' | 'persp' | 'focus'; target?: [number, number, number] } | null;
+
 interface EditorCanvasProps {
   canvasRef?: RefObject<HTMLCanvasElement>;
   readOnly?: boolean;
+  cameraView?: CameraView;
+  onCameraViewHandled?: () => void;
 }
 
-export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps) {
+// ─── Inner R3F component — controls camera from outside Canvas ────────────────
+function CameraController({ view, onDone }: { view: CameraView; onDone?: () => void }) {
+  const { camera, controls } = useThree();
+
+  useEffect(() => {
+    if (!view) return;
+    const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
+
+    switch (view.type) {
+      case 'top':
+        camera.position.set(0, 28, 0.01);
+        orbit?.target?.set(0, 0, 0);
+        break;
+      case 'front':
+        camera.position.set(0, 5, 26);
+        orbit?.target?.set(0, 3, 0);
+        break;
+      case 'side':
+        camera.position.set(26, 5, 0);
+        orbit?.target?.set(0, 3, 0);
+        break;
+      case 'persp':
+        camera.position.set(0, 7, 20);
+        orbit?.target?.set(0, 3, 0);
+        break;
+      case 'focus':
+        if (view.target) {
+          const [tx, ty, tz] = view.target;
+          camera.position.set(tx + 4, ty + 5, tz + 10);
+          orbit?.target?.set(tx, ty, tz);
+        }
+        break;
+    }
+
+    orbit?.update?.();
+    camera.updateProjectionMatrix();
+    onDone?.();
+  }, [view]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
+}
+
+export function EditorCanvas({ canvasRef, readOnly = false, cameraView, onCameraViewHandled }: EditorCanvasProps) {
   const { state, dispatch } = useSceneEditor();
   const { objects, lights, selectedId, selectedType, transformMode, postProcessing } = state;
   const pp = postProcessing;
@@ -66,6 +112,10 @@ export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps)
         enabled={!isDragging}
         target={[0, 3, 0] as unknown as THREE.Vector3}
       />
+
+      {cameraView && (
+        <CameraController view={cameraView} onDone={onCameraViewHandled} />
+      )}
 
       <Suspense fallback={null}>
         <PostProcessingEffects pp={pp} />

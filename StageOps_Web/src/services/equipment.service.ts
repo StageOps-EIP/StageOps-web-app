@@ -1,18 +1,40 @@
 import type { Equipment } from '@/lib/types';
-import { mockEquipment } from '@/lib/mockData';
 
-// Stub — replace with fetch('/api/equipment') when backend ready
-export async function getEquipment(): Promise<Equipment[]> {
-  return Promise.resolve([...mockEquipment]);
+const KEY = 'stageops-equipment';
+
+function load(): Equipment[] {
+  try {
+    return JSON.parse(localStorage.getItem(KEY) ?? '[]');
+  } catch {
+    return [];
+  }
 }
 
-export async function updateEquipment(id: string, patch: Partial<Equipment>): Promise<Equipment> {
-  const item = mockEquipment.find((e) => e.id === id);
-  if (!item) throw new Error(`Équipement introuvable: ${id}`);
-  return Promise.resolve({ ...item, ...patch });
+function save(items: Equipment[]): void {
+  localStorage.setItem(KEY, JSON.stringify(items));
+}
+
+export async function getEquipment(): Promise<Equipment[]> {
+  return load();
 }
 
 export async function createEquipment(data: Omit<Equipment, 'id'>): Promise<Equipment> {
+  const items = load();
   const newItem: Equipment = { ...data, id: `eq-${Date.now()}` };
-  return Promise.resolve(newItem);
+  save([...items, newItem]);
+  return newItem;
+}
+
+export async function updateEquipment(id: string, patch: Partial<Equipment>): Promise<Equipment> {
+  const items = load();
+  const idx = items.findIndex((e) => e.id === id);
+  if (idx === -1) throw new Error(`Équipement introuvable: ${id}`);
+  const updated = { ...items[idx], ...patch };
+  items[idx] = updated;
+  save(items);
+  return updated;
+}
+
+export async function deleteEquipment(id: string): Promise<void> {
+  save(load().filter((e) => e.id !== id));
 }

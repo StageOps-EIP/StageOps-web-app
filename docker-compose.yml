@@ -5,8 +5,8 @@
 #
 # Services:
 #   couchdb   → http://localhost:5984  (admin UI: /_utils)
-#   backend   → http://localhost:8080
-#   frontend  → http://localhost:3000
+#   backend   → http://localhost:3000
+#   frontend  → http://localhost:8080
 #
 # Mobile: not yet containerised — run `expo start` locally.
 
@@ -41,14 +41,15 @@ services:
       couchdb:
         condition: service_healthy
     environment:
-      APP_PORT: "8080"
+      APP_PORT: "3000"
       COUCHDB_URL: http://couchdb:5984
       COUCHDB_DB: ${COUCHDB_DB:-stageops}
       COUCHDB_USER: ${COUCHDB_USER}
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: http://localhost:8080
     ports:
-      - "8080:8080"
+      - "3000:3000"
 
   # ── Frontend (Vite + React) ─────────────────────────────────────────────────
   frontend:
@@ -60,14 +61,21 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: http://localhost:8080
+      # Vite proxy target: backend service name on the internal Docker network
+      VITE_API_URL: http://backend:3000
     ports:
-      - "3000:3000"
+      - "8080:8080"
     volumes:
       # Mount source for hot reload; node_modules stays inside the container
       - ./StageOps_Web/src:/app/src
       - ./StageOps_Web/public:/app/public
       - ./StageOps_Web/index.html:/app/index.html
+      - ./StageOps_Web/vite.config.ts:/app/vite.config.ts:ro
+      - ./StageOps_Web/tailwind.config.js:/app/tailwind.config.js:ro
+      - ./StageOps_Web/postcss.config.js:/app/postcss.config.js:ro
+      - ./StageOps_Web/tsconfig.app.json:/app/tsconfig.app.json:ro
+      - ./StageOps_Web/tsconfig.json:/app/tsconfig.json:ro
+      - ./StageOps_Web/tsconfig.node.json:/app/tsconfig.node.json:ro
 
 volumes:
   couchdb_data:

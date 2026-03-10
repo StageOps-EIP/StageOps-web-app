@@ -11,13 +11,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 8080,
     host: true,        // bind 0.0.0.0 (requis dans Docker)
     open: false,       // désactivé en Docker
     proxy: {
       // Toutes les requêtes /api sont redirigées vers le backend
       '/api': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:8080',
+        target: process.env.VITE_API_URL ?? 'http://localhost:3000',
         changeOrigin: true,
       },
     },

@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Wand2, ArrowLeft, Move, RotateCw, Maximize2,
-  Plus, Undo2, Redo2, Camera, ChevronDown, X,
+  Plus, Undo2, Redo2, Camera, ChevronDown, X, Magnet,
 } from 'lucide-react';
 import { useSceneEditor } from './scene-editor.store';
 import type { SceneObject, SceneLight, TransformMode } from './scene-editor.types';
@@ -30,18 +30,29 @@ function newObject(type: SceneObject['type'], name: string): SceneObject {
 }
 
 function newLight(type: SceneLight['type'], name: string): SceneLight {
+  // Position defaults: on the gril at height 8, slight offset
+  const position: [number,number,number] = [0, 8, 0];
+  // Target: mid-height back wall for spots, center floor for others
+  const targetPosition: [number,number,number] =
+    type === 'spot' || type === 'directional' ? [0, 4, -6] : [0, 0, 0];
+  // Wider angle for more coverage
+  const angle = type === 'spot' ? Math.PI / 5 : Math.PI / 6;
+  // Point lights need more intensity to fill the space
+  const intensity = type === 'point' ? 4 : 3;
+  const distance = type === 'point' ? 25 : 22;
+
   return {
     id: `light-${Date.now()}`,
     name,
     type,
-    position: [0, 8, 0],
-    targetPosition: [0, 0, 0],
+    position,
+    targetPosition,
     color: kelvinToHex(5500),
-    intensity: 2,
+    intensity,
     temperature: 5500,
     castShadow: false,
-    distance: 20,
-    angle: Math.PI / 6,
+    distance,
+    angle,
     penumbra: 0.4,
     width: 2,
     height: 2,
@@ -58,7 +69,7 @@ const TRANSFORM_MODES: { mode: TransformMode; label: string; shortcut: string; I
 export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
   const navigate = useNavigate();
   const { state, dispatch } = useSceneEditor();
-  const { transformMode, postProcessing, historyIndex, history } = state;
+  const { transformMode, postProcessing, historyIndex, history, snapEnabled } = state;
   const pp = postProcessing;
 
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -202,6 +213,22 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
             <Redo2 size={14} />
           </button>
         </div>
+
+        <div className="w-px h-6 bg-[#27272e]" />
+
+        {/* Snap to grid */}
+        <button
+          onClick={() => dispatch({ type: 'TOGGLE_SNAP' })}
+          title={`Magnétisme grille (0.5u) — ${snapEnabled ? 'Actif' : 'Inactif'}`}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            snapEnabled
+              ? 'bg-cyan-400/15 text-cyan-400 border border-cyan-400/30'
+              : 'text-[#71717a] hover:text-[#f5f5f7] hover:bg-[#27272e]'
+          }`}
+        >
+          <Magnet size={13} />
+          Snap
+        </button>
       </div>
 
       {/* ─ Right ────────────────────────────────────────────────────── */}

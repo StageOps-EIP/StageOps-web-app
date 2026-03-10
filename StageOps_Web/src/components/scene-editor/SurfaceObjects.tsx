@@ -2,12 +2,8 @@ import * as THREE from 'three';
 import { useMemo } from 'react';
 import { type ThreeEvent } from '@react-three/fiber';
 import { useSceneEditor } from './scene-editor.store';
-import { STAGE_WIDTH, STAGE_DEPTH, GRID_HEIGHT } from '../stage3d/stage3d.constants';
 import { kelvinToHex } from './scene-editor.materials';
 import type { SurfaceKey, SceneMaterial } from './scene-editor.types';
-
-const HW = STAGE_WIDTH / 2;  // 12
-const HD = STAGE_DEPTH / 2;  // 9
 
 function useLightPoolTexture(hexColor: string) {
   return useMemo(() => {
@@ -120,53 +116,47 @@ function SurfaceMesh({
 
 export function SurfaceObjects() {
   const { state } = useSceneEditor();
-  const { surfaces } = state;
+  const { surfaces, stageSize } = state;
+  const SW = stageSize.width;
+  const SD = stageSize.depth;
+  const GH = stageSize.height;
+  const HW = SW / 2;
+  const HD = SD / 2;
+  const grilCount = Math.max(2, Math.round(SD / 3) + 1);
 
   return (
     <group>
-      {/* Wall edge pillars — architectural definition */}
+      {/* Wall edge pillars */}
       {[[-HW, -HD], [-HW, HD], [HW, -HD], [HW, HD]].map(([x, z], i) => (
-        <mesh key={`pillar-${i}`} position={[x, GRID_HEIGHT / 2, z]}>
-          <boxGeometry args={[0.1, GRID_HEIGHT, 0.1]} />
+        <mesh key={`pillar-${i}`} position={[x, GH / 2, z]}>
+          <boxGeometry args={[0.1, GH, 0.1]} />
           <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={0.3} roughness={0.5} />
         </mesh>
       ))}
       <gridHelper
-        args={[STAGE_WIDTH, STAGE_WIDTH / 2, '#2a2a32', '#1e1e26']}
+        args={[SW, Math.max(4, Math.round(SW / 2)), '#3a3a48', '#2a2a36']}
         position={[0, 0.003, 0]}
-        scale={[1, 1, STAGE_DEPTH / STAGE_WIDTH]}
+        scale={[1, 1, SD / SW]}
       />
 
       {/* Gril bars */}
-      {Array.from({ length: 7 }, (_, i) => {
-        const z = -HD + i * 3;
+      {Array.from({ length: grilCount }, (_, i) => {
+        const z = -HD + i * (SD / (grilCount - 1));
         return (
           <group key={`pipe-${i}`}>
-            <mesh position={[0, GRID_HEIGHT, z]} castShadow>
-              <boxGeometry args={[STAGE_WIDTH, 0.12, 0.12]} />
+            <mesh position={[0, GH, z]}>
+              <boxGeometry args={[SW, 0.12, 0.12]} />
               <meshStandardMaterial color="#2a2a32" metalness={0.85} roughness={0.25} />
             </mesh>
-            {/* PAR simulation: subtle cyan fill under each bar */}
-            <pointLight
-              position={[0, GRID_HEIGHT - 0.3, z]}
-              color="#00e5ff"
-              intensity={0.1}
-              distance={6}
-            />
+            <pointLight position={[0, GH - 0.3, z]} color="#00e5ff" intensity={0.1} distance={6} />
           </group>
         );
       })}
 
       {/* Avant-scène edge */}
-      <mesh position={[0, 0.06, HD]} castShadow>
-        <boxGeometry args={[STAGE_WIDTH, 0.12, 0.3]} />
-        <meshStandardMaterial
-          color="#22d3ee"
-          emissive="#22d3ee"
-          emissiveIntensity={1.2}
-          roughness={0.3}
-          metalness={0.3}
-        />
+      <mesh position={[0, 0.06, HD]}>
+        <boxGeometry args={[SW, 0.12, 0.3]} />
+        <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={1.2} roughness={0.3} metalness={0.3} />
       </mesh>
       <pointLight position={[0, 0.3, HD]} color="#22d3ee" intensity={0.8} distance={4} />
 
@@ -176,39 +166,38 @@ export function SurfaceObjects() {
         material={surfaces.floor}
         position={[0, 0, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
-        geometry={[STAGE_WIDTH, STAGE_DEPTH]}
+        geometry={[SW, SD]}
       />
 
-      {/* Light pools — dynamic, follow spot positions from store */}
       <DynamicLightPools />
 
       {/* Back wall */}
       <SurfaceMesh
         surfaceKey="backWall"
         material={surfaces.backWall}
-        position={[0, GRID_HEIGHT / 2, -HD]}
+        position={[0, GH / 2, -HD]}
         rotation={[0, 0, 0]}
-        geometry={[STAGE_WIDTH, GRID_HEIGHT]}
+        geometry={[SW, GH]}
         side={THREE.DoubleSide}
       />
 
-      {/* Left wall (jardin, -X) */}
+      {/* Left wall (jardin) */}
       <SurfaceMesh
         surfaceKey="leftWall"
         material={surfaces.leftWall}
-        position={[-HW, GRID_HEIGHT / 2, 0]}
+        position={[-HW, GH / 2, 0]}
         rotation={[0, Math.PI / 2, 0]}
-        geometry={[STAGE_DEPTH, GRID_HEIGHT]}
+        geometry={[SD, GH]}
         side={THREE.DoubleSide}
       />
 
-      {/* Right wall (cour, +X) */}
+      {/* Right wall (cour) */}
       <SurfaceMesh
         surfaceKey="rightWall"
         material={surfaces.rightWall}
-        position={[HW, GRID_HEIGHT / 2, 0]}
+        position={[HW, GH / 2, 0]}
         rotation={[0, -Math.PI / 2, 0]}
-        geometry={[STAGE_DEPTH, GRID_HEIGHT]}
+        geometry={[SD, GH]}
         side={THREE.DoubleSide}
       />
 
@@ -216,9 +205,9 @@ export function SurfaceObjects() {
       <SurfaceMesh
         surfaceKey="ceiling"
         material={surfaces.ceiling}
-        position={[0, GRID_HEIGHT, 0]}
+        position={[0, GH, 0]}
         rotation={[Math.PI / 2, 0, 0]}
-        geometry={[STAGE_WIDTH, STAGE_DEPTH]}
+        geometry={[SW, SD]}
         side={THREE.DoubleSide}
       />
     </group>

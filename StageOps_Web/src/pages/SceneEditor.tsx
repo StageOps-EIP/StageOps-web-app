@@ -1,18 +1,21 @@
-import { useRef, useEffect } from 'react';
-import { Mouse, Settings2 } from 'lucide-react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { Mouse, Settings2, Maximize2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider';
 import { useSceneEditor } from '@/components/scene-editor/scene-editor.store';
 import { EditorToolbar } from '@/components/scene-editor/EditorToolbar';
-import { EditorCanvas } from '@/components/scene-editor/EditorCanvas';
+import { EditorCanvas, type CameraView } from '@/components/scene-editor/EditorCanvas';
 import { SceneTreePanel } from '@/components/scene-editor/SceneTreePanel';
 import { PropertiesPanel } from '@/components/scene-editor/PropertiesPanel';
 
 // Inner component that has access to the store context
 function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) {
   const { state, dispatch } = useSceneEditor();
-  const { selectedId, selectedType, transformMode, objects, lights } = state;
+  const { selectedId, selectedType, transformMode, objects, lights, stageSize } = state;
   const navigate = useNavigate();
+  const [cameraView, setCameraView] = useState<CameraView>(null);
+  const handleCameraViewHandled = useCallback(() => setCameraView(null), []);
+  const [showStagePanel, setShowStagePanel] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -64,11 +67,19 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
           return;
         }
       }
+      // Focus selected (F)
+      if (e.key === 'f' || e.key === 'F') {
+        const selObj = selectedType === 'object' ? objects.find(o => o.id === selectedId) : null;
+        const selLight = selectedType === 'light' ? lights.find(l => l.id === selectedId) : null;
+        const target = selObj?.position ?? selLight?.position;
+        if (target) setCameraView({ type: 'focus', target });
+        return;
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dispatch, selectedId, selectedType, navigate]);
+  }, [dispatch, selectedId, selectedType, navigate, objects, lights, setCameraView]);
 
   const selectedObj = selectedType === 'object' ? objects.find(o => o.id === selectedId) : null;
   const selectedLight = selectedType === 'light' ? lights.find(l => l.id === selectedId) : null;
@@ -86,13 +97,72 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
         <SceneTreePanel />
         <div className="flex-1 relative flex flex-col">
           <div className="flex-1 relative">
-            <EditorCanvas canvasRef={canvasRef} />
+            <EditorCanvas
+              canvasRef={canvasRef}
+              cameraView={cameraView}
+              onCameraViewHandled={handleCameraViewHandled}
+            />
+            {/* Camera view preset buttons */}
+            <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+              {([
+                { key: 'persp', label: 'Persp' },
+                { key: 'top',   label: 'Haut' },
+                { key: 'front', label: 'Face' },
+                { key: 'side',  label: 'Côté' },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setCameraView({ type: key })}
+                  className="px-2 py-1 rounded-lg text-[10px] font-medium bg-black/50 text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-black/70 backdrop-blur-sm border border-white/10 transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
+
+              {/* Stage size button */}
+              <button
+                onClick={() => setShowStagePanel(v => !v)}
+                className={`mt-1 px-2 py-1 rounded-lg text-[10px] font-medium backdrop-blur-sm border transition-colors flex items-center gap-1 ${
+                  showStagePanel
+                    ? 'bg-cyan-400/20 text-cyan-400 border-cyan-400/30'
+                    : 'bg-black/50 text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-black/70 border-white/10'
+                }`}
+              >
+                <Maximize2 size={10} /> Scène
+              </button>
+
+              {/* Stage size panel */}
+              {showStagePanel && (
+                <div className="mt-1 p-3 rounded-xl bg-[#0e0e12]/90 backdrop-blur-sm border border-[#27272e] text-[11px] flex flex-col gap-2 min-w-[140px]">
+                  <p className="text-[#a1a1aa] font-semibold uppercase tracking-widest text-[9px]">Dimensions (m)</p>
+                  {([
+                    { key: 'width',  label: 'Largeur' },
+                    { key: 'depth',  label: 'Profondeur' },
+                    { key: 'height', label: 'Hauteur' },
+                  ] as const).map(({ key, label }) => (
+                    <label key={key} className="flex items-center justify-between gap-2">
+                      <span className="text-[#71717a]">{label}</span>
+                      <input
+                        type="number"
+                        min={4}
+                        max={60}
+                        step={1}
+                        value={stageSize[key]}
+                        onChange={e => dispatch({ type: 'UPDATE_STAGE_SIZE', updates: { [key]: Number(e.target.value) } })}
+                        className="w-14 bg-[#131316] border border-[#27272e] rounded-md px-2 py-0.5 text-[#f5f5f7] text-right focus:outline-none focus:border-cyan-400/50"
+                      />
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* Hint overlay when nothing selected */}
             {!selectedId && (
               <div className="absolute inset-0 flex items-end justify-center pb-8 pointer-events-none z-10">
                 <div className="flex items-center gap-4 px-4 py-2 bg-black/40 backdrop-blur-sm rounded-xl text-xs text-[#52525b]">
                   <span><Mouse size={11} className="inline mr-0.5" /> Orbiter</span>
                   <span><Settings2 size={11} className="inline mr-0.5" /> G/R/S transformer</span>
+                  <span>F centrer</span>
                   <span>Del supprimer</span>
                   <span>Ctrl+Z annuler</span>
                 </div>

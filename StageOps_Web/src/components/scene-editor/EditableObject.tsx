@@ -14,7 +14,7 @@ interface EditableObjectProps {
 }
 
 export function EditableObject({ object, isSelected, transformMode, onDrag, readOnly = false }: EditableObjectProps) {
-  const { dispatch } = useSceneEditor();
+  const { dispatch, state } = useSceneEditor();
   const meshRef = useRef<THREE.Mesh>(null!);
   const [hovered, setHovered] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -25,6 +25,10 @@ export function EditableObject({ object, isSelected, transformMode, onDrag, read
   }, []);
 
   const { material, geometry, position, rotation, scale, visible, locked, type } = object;
+  const { snapEnabled } = state;
+
+  const SNAP = 0.5;
+  function snapVal(v: number) { return Math.round(v / SNAP) * SNAP; }
 
   function handleClick(e: ThreeEvent<MouseEvent>) {
     if (readOnly) return;
@@ -39,11 +43,12 @@ export function EditableObject({ object, isSelected, transformMode, onDrag, read
   function handleObjectChange() {
     if (!meshRef.current) return;
     const mesh = meshRef.current;
+    const pos = mesh.position.toArray() as [number, number, number];
     dispatch({
       type: 'UPDATE_OBJECT',
       id: object.id,
       updates: {
-        position: mesh.position.toArray() as [number, number, number],
+        position: snapEnabled ? [snapVal(pos[0]), snapVal(pos[1]), snapVal(pos[2])] : pos,
         rotation: [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z],
         scale: mesh.scale.toArray() as [number, number, number],
       },

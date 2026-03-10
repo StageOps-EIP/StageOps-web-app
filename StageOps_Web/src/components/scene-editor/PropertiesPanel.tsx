@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Copy } from 'lucide-react';
 import { useSceneEditor } from './scene-editor.store';
 import { MATERIAL_PRESETS, PRESET_LABELS, kelvinToHex } from './scene-editor.materials';
 import type { SceneMaterial, MaterialPreset, SurfaceKey } from './scene-editor.types';
@@ -169,7 +169,12 @@ function ObjectPanel() {
   return (
     <div>
       <div className="px-4 pb-3">
-        <p className="text-xs text-[#a1a1aa] font-medium truncate">{obj.name}</p>
+        <input
+          type="text"
+          value={obj.name}
+          onChange={e => updateObj({ name: e.target.value })}
+          className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50 mb-1"
+        />
         <p className="text-[10px] text-[#52525b]">{obj.type}</p>
       </div>
 
@@ -265,6 +270,24 @@ function ObjectPanel() {
             onChange={updates => updateObj({ material: { ...obj.material, ...updates } })}
           />
         )}
+      </div>
+
+      {/* Actions */}
+      <div className="px-4 pt-4 pb-2 flex gap-2">
+        <button
+          onClick={() => dispatch({ type: 'DUPLICATE_OBJECT', id: obj.id })}
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-[#a1a1aa] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] border border-[#27272e] transition-colors"
+        >
+          <Copy size={12} />
+          Dupliquer
+        </button>
+        <button
+          onClick={() => dispatch({ type: 'DELETE_OBJECT', id: obj.id })}
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+        >
+          <Trash2 size={12} />
+          Supprimer
+        </button>
       </div>
     </div>
   );

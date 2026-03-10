@@ -73,10 +73,12 @@ export interface SceneEditorState {
   objects: SceneObject[];
   lights: SceneLight[];
   surfaces: SurfaceMaterials;
+  stageSize: { width: number; depth: number; height: number };
   selectedId: string | null;
   selectedType: 'object' | 'light' | 'surface' | null;
   selectedSurface: SurfaceKey | null;
   transformMode: TransformMode;
+  snapEnabled: boolean;
   postProcessing: PostProcessingState;
   history: HistoryEntry[];
   historyIndex: number;
@@ -88,6 +90,8 @@ export type SceneAction =
   | { type: 'SELECT_SURFACE'; surface: SurfaceKey }
   | { type: 'DESELECT' }
   | { type: 'SET_TRANSFORM_MODE'; mode: TransformMode }
+  | { type: 'TOGGLE_SNAP' }
+  | { type: 'UPDATE_STAGE_SIZE'; updates: Partial<{ width: number; depth: number; height: number }> }
   | { type: 'ADD_OBJECT'; object: SceneObject }
   | { type: 'UPDATE_OBJECT'; id: string; updates: Partial<SceneObject> }
   | { type: 'DELETE_OBJECT'; id: string }
