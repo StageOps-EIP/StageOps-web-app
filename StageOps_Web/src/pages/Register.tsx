@@ -42,7 +42,7 @@ export function Register() {
     if (!form.firstName.trim()) e.firstName = 'Requis';
     if (!form.lastName.trim()) e.lastName = 'Requis';
     if (!form.email.trim()) e.email = 'Requis';
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) e.email = 'Email invalide';
+    else if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(form.email)) e.email = 'Email invalide';
     if (!form.role) e.role = 'Requis';
     setErrors(e);
     return Object.keys(e).length === 0;
