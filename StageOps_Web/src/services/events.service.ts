@@ -1,40 +1,36 @@
 import type { Event } from '@/lib/types';
+import { request } from '@/lib/api';
 
-const KEY = 'stageops-events';
-
-function load(): Event[] {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
-function save(items: Event[]): void {
-  localStorage.setItem(KEY, JSON.stringify(items));
+function parseEvent(raw: unknown): Event {
+  const r = raw as Record<string, unknown>;
+  return {
+    ...r,
+    startDate: new Date(r.startDate as string),
+    endDate: new Date(r.endDate as string),
+  } as Event;
 }
 
 export async function getEvents(): Promise<Event[]> {
-  return load();
+  const items = await request<unknown[]>('/api/events/');
+  return items.map(parseEvent);
 }
 
 export async function createEvent(data: Omit<Event, 'id'>): Promise<Event> {
-  const items = load();
-  const newItem: Event = { ...data, id: `evt-${Date.now()}` };
-  save([...items, newItem]);
-  return newItem;
+  const raw = await request<unknown>('/api/events/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return parseEvent(raw);
 }
 
 export async function updateEvent(id: string, patch: Partial<Event>): Promise<Event> {
-  const items = load();
-  const idx = items.findIndex((e) => e.id === id);
-  if (idx === -1) throw new Error(`Événement introuvable: ${id}`);
-  const updated = { ...items[idx], ...patch };
-  items[idx] = updated;
-  save(items);
-  return updated;
+  const raw = await request<unknown>(`/api/events/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
+  return parseEvent(raw);
 }
 
 export async function deleteEvent(id: string): Promise<void> {
-  save(load().filter((e) => e.id !== id));
+  await request<void>(`/api/events/${id}`, { method: 'DELETE' });
 }

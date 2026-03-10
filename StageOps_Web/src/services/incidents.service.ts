@@ -1,40 +1,36 @@
 import type { Incident } from '@/lib/types';
+import { request } from '@/lib/api';
 
-const KEY = 'stageops-incidents';
-
-function load(): Incident[] {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
-function save(items: Incident[]): void {
-  localStorage.setItem(KEY, JSON.stringify(items));
+function parseIncident(raw: unknown): Incident {
+  const r = raw as Record<string, unknown>;
+  return {
+    ...r,
+    timestamp: new Date(r.timestamp as string),
+    resolvedAt: r.resolvedAt ? new Date(r.resolvedAt as string) : undefined,
+  } as Incident;
 }
 
 export async function getIncidents(): Promise<Incident[]> {
-  return load();
+  const items = await request<unknown[]>('/api/incidents/');
+  return items.map(parseIncident);
 }
 
 export async function createIncident(data: Omit<Incident, 'id'>): Promise<Incident> {
-  const items = load();
-  const newItem: Incident = { ...data, id: `inc-${Date.now()}` };
-  save([...items, newItem]);
-  return newItem;
+  const raw = await request<unknown>('/api/incidents/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return parseIncident(raw);
 }
 
 export async function updateIncident(id: string, patch: Partial<Incident>): Promise<Incident> {
-  const items = load();
-  const idx = items.findIndex((i) => i.id === id);
-  if (idx === -1) throw new Error(`Incident introuvable: ${id}`);
-  const updated = { ...items[idx], ...patch };
-  items[idx] = updated;
-  save(items);
-  return updated;
+  const raw = await request<unknown>(`/api/incidents/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
+  return parseIncident(raw);
 }
 
 export async function deleteIncident(id: string): Promise<void> {
-  save(load().filter((i) => i.id !== id));
+  await request<void>(`/api/incidents/${id}`, { method: 'DELETE' });
 }

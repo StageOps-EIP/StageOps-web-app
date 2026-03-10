@@ -1,40 +1,24 @@
 import type { TeamMember } from '@/lib/types';
-
-const KEY = 'stageops-team';
-
-function load(): TeamMember[] {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
-function save(items: TeamMember[]): void {
-  localStorage.setItem(KEY, JSON.stringify(items));
-}
+import { request } from '@/lib/api';
 
 export async function getTeamMembers(): Promise<TeamMember[]> {
-  return load();
+  return request<TeamMember[]>('/api/team/');
 }
 
 export async function createTeamMember(data: Omit<TeamMember, 'id'>): Promise<TeamMember> {
-  const items = load();
-  const newItem: TeamMember = { ...data, id: `tm-${Date.now()}` };
-  save([...items, newItem]);
-  return newItem;
+  return request<TeamMember>('/api/team/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updateTeamMember(id: string, patch: Partial<TeamMember>): Promise<TeamMember> {
-  const items = load();
-  const idx = items.findIndex((m) => m.id === id);
-  if (idx === -1) throw new Error(`Membre introuvable: ${id}`);
-  const updated = { ...items[idx], ...patch };
-  items[idx] = updated;
-  save(items);
-  return updated;
+  return request<TeamMember>(`/api/team/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function deleteTeamMember(id: string): Promise<void> {
-  save(load().filter((m) => m.id !== id));
+  await request<void>(`/api/team/${id}`, { method: 'DELETE' });
 }

@@ -7,7 +7,7 @@ import type { TeamMember } from '@/lib/types';
 import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants';
 import { useTeamFilter } from '@/hooks/useTeamFilter';
 import { EditMemberModal } from '@/components/team/EditMemberModal';
-import { getTeamMembers, updateTeamMember } from '@/services/team.service';
+import { getTeamMembers, updateTeamMember, createTeamMember } from '@/services/team.service';
 import {
   Users,
   Mail,
@@ -155,7 +155,12 @@ export function Team() {
         </div>
       </div>
 
-      {showNewForm && <NewMemberModal onClose={() => setShowNewForm(false)} />}
+      {showNewForm && (
+        <NewMemberModal
+          onClose={() => setShowNewForm(false)}
+          onAdd={(m) => { setTeamList((prev) => [...prev, m]); setShowNewForm(false); }}
+        />
+      )}
 
       {editingMember && (
         <EditMemberModal
@@ -259,7 +264,29 @@ function MemberDetail({ member, onClose, onEdit }: { member: TeamMember; onClose
   );
 }
 
-function NewMemberModal({ onClose }: { onClose: () => void }) {
+function NewMemberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (m: TeamMember) => void }) {
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('Régisseur Son');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  function togglePermission(key: string) {
+    setPermissions((prev) => prev.includes(key) ? prev.filter((p) => p !== key) : [...prev, key]);
+  }
+
+  async function handleSubmit() {
+    if (!name.trim() || !email.trim()) { setError('Nom et email requis.'); return; }
+    setError(null);
+    try {
+      const m = await createTeamMember({ name: name.trim(), role, email: email.trim(), phone: phone.trim(), permissions });
+      onAdd(m);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur lors de la création.');
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div role="dialog" aria-modal="true" aria-labelledby="new-member-title" className="w-full max-w-lg">
@@ -285,6 +312,8 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                   id="new-member-name"
                   type="text"
                   placeholder="Prénom Nom"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
                 />
               </div>
@@ -295,6 +324,8 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                 <div className="relative">
                   <select
                     id="new-member-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
                     className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]"
                   >
                     <option>Régisseur Son</option>
@@ -317,6 +348,8 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                 id="new-member-email"
                 type="email"
                 placeholder="nom@theatre.fr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
               />
             </div>
@@ -328,6 +361,8 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                 id="new-member-phone"
                 type="tel"
                 placeholder="+33 6 00 00 00 00"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
               />
             </div>
@@ -339,17 +374,18 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                     key={key}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-elevated border border-theme-border rounded-lg text-xs text-content-muted cursor-pointer hover:border-cyan-400/30 transition-colors"
                   >
-                    <input type="checkbox" className="accent-cyan-400" />
+                    <input type="checkbox" className="accent-cyan-400" checked={permissions.includes(key)} onChange={() => togglePermission(key)} />
                     {label}
                   </label>
                 ))}
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-2">
+              {error && <p className="text-red-400 text-sm self-center mr-auto">{error}</p>}
               <Button variant="secondary" onClick={onClose}>
                 Annuler
               </Button>
-              <Button variant="primary" onClick={onClose}>
+              <Button variant="primary" onClick={() => void handleSubmit()}>
                 <Plus size={16} />
                 Ajouter
               </Button>

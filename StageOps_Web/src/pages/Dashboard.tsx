@@ -1,24 +1,54 @@
+import { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card, CardHeader } from '@/components/design-system/Card';
 import { Button } from '@/components/design-system/Button';
+import { Badge } from '@/components/design-system/Badge';
 import { useNavigate } from 'react-router';
+import { getEquipment } from '@/services/equipment.service';
+import { getIncidents } from '@/services/incidents.service';
+import { getEvents } from '@/services/events.service';
+import type { Equipment, Incident, Event } from '@/lib/types';
+import { getSeverityColor, getSeverityLabel } from '@/lib/utils';
 
 export function Dashboard() {
   usePageTitle('Tableau de bord');
   const navigate = useNavigate();
 
-  const hsEquipment: Array<{ id: string; name: string; location: string; status: string }> = [];
-  const toCheckEquipment: Array<{ id: string; name: string; location: string; status: string; notes?: string }> = [];
-  const openIncidents: Array<{ id: string; title: string; severity: string }> = [];
-  const readinessScore = 0;
-  const operationalEquipmentCount = 0;
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    void getEquipment().then(setEquipment).catch(() => {});
+    void getIncidents().then(setIncidents).catch(() => {});
+    void getEvents().then(setEvents).catch(() => {});
+  }, []);
+
+  const hsEquipment = equipment.filter((e) => e.status === 'hs');
+  const toCheckEquipment = equipment.filter((e) => e.status === 'to-check');
+  const operationalEquipmentCount = equipment.filter((e) => e.status === 'ok').length;
+  const openIncidents = incidents.filter((i) => i.status === 'open' || i.status === 'in-progress');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayEvents = events.filter((e) => {
+    const d = new Date(e.startDate);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime();
+  });
+  const nextEvent = todayEvents[0] ?? events.find((e) => new Date(e.startDate) > new Date());
+
+  const total = equipment.length;
+  const readinessScore = total === 0 ? 0 : Math.round((operationalEquipmentCount / total) * 100);
 
   return (
     <div className="p-8 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-content-primary mb-2">Tableau de bord</h1>
-        <p className="text-content-muted">Aucune donnée disponible</p>
+        <p className="text-content-muted">
+          {equipment.length} équipements · {openIncidents.length} incident{openIncidents.length !== 1 ? 's' : ''} ouvert{openIncidents.length !== 1 ? 's' : ''}
+        </p>
       </div>
 
       <Card className="bg-gradient-to-br from-cyan-400/10 to-cyan-600/10 border-cyan-400/20">
@@ -26,10 +56,14 @@ export function Dashboard() {
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <span className="px-3 py-1 bg-cyan-400/20 text-cyan-400 rounded-lg text-sm font-medium border border-cyan-400/30">Aujourd'hui</span>
-              <span className="text-content-muted">—</span>
+              {nextEvent && <span className="text-content-muted">{todayEvents.length > 1 ? `${todayEvents.length} événements` : ''}</span>}
             </div>
-            <h2 className="text-2xl font-semibold text-content-primary mb-1">Aucun événement</h2>
-            <p className="text-content-muted">—</p>
+            <h2 className="text-2xl font-semibold text-content-primary mb-1">
+              {nextEvent ? nextEvent.title : 'Aucun événement'}
+            </h2>
+            <p className="text-content-muted">
+              {nextEvent ? nextEvent.venue ?? nextEvent.description : '—'}
+            </p>
           </div>
 
           <div className="flex flex-col items-center">
@@ -49,7 +83,7 @@ export function Dashboard() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-cyan-400">0%</span>
+                <span className="text-2xl font-bold text-cyan-400">{readinessScore}%</span>
               </div>
             </div>
             <span className="text-xs text-content-muted mt-2">Préparation</span>
@@ -72,7 +106,7 @@ export function Dashboard() {
             <div className="p-3 bg-red-500/20 rounded-xl">
               <AlertCircle size={24} className="text-red-500" />
             </div>
-            <span className="text-3xl font-bold text-red-500">0</span>
+            <span className="text-3xl font-bold text-red-500">{hsEquipment.length}</span>
           </div>
           <p className="text-sm font-medium text-content-primary">Équipements HS</p>
           <p className="text-xs text-content-subtle mt-1">Nécessite attention</p>
@@ -83,7 +117,7 @@ export function Dashboard() {
             <div className="p-3 bg-amber-500/20 rounded-xl">
               <Clock size={24} className="text-amber-500" />
             </div>
-            <span className="text-3xl font-bold text-amber-500">0</span>
+            <span className="text-3xl font-bold text-amber-500">{toCheckEquipment.length}</span>
           </div>
           <p className="text-sm font-medium text-content-primary">À vérifier</p>
           <p className="text-xs text-content-subtle mt-1">Avant le show</p>
@@ -105,7 +139,7 @@ export function Dashboard() {
             <div className="p-3 bg-purple-500/20 rounded-xl">
               <TrendingUp size={24} className="text-purple-500" />
             </div>
-            <span className="text-3xl font-bold text-purple-500">0</span>
+            <span className="text-3xl font-bold text-purple-500">{openIncidents.length}</span>
           </div>
           <p className="text-sm font-medium text-content-primary">Incidents ouverts</p>
           <p className="text-xs text-content-subtle mt-1">En cours</p>
@@ -124,14 +158,26 @@ export function Dashboard() {
             }
           />
           <div className="space-y-3">
-            {hsEquipment.length === 0 && <p className="text-sm text-content-subtle text-center py-8">Aucun équipement HS actuellement</p>}
+            {hsEquipment.length === 0 ? (
+              <p className="text-sm text-content-subtle text-center py-8">Aucun équipement HS actuellement</p>
+            ) : (
+              hsEquipment.slice(0, 5).map((eq) => (
+                <div key={eq.id} className="flex items-center justify-between p-3 bg-theme-elevated rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-content-primary">{eq.name}</p>
+                    <p className="text-xs text-content-subtle">{eq.location}</p>
+                  </div>
+                  <Badge status="hs" />
+                </div>
+              ))
+            )}
           </div>
         </Card>
 
         <Card>
           <CardHeader
             title="Incidents récents"
-            subtitle="Dernières 24 heures"
+            subtitle="Ouverts & en cours"
             action={
               <Button variant="ghost" size="sm" onClick={() => navigate('/incidents')}>
                 Voir tout
@@ -139,15 +185,43 @@ export function Dashboard() {
             }
           />
           <div className="space-y-3">
-            {openIncidents.length === 0 && <p className="text-sm text-content-subtle text-center py-8">Aucun incident ouvert</p>}
+            {openIncidents.length === 0 ? (
+              <p className="text-sm text-content-subtle text-center py-8">Aucun incident ouvert</p>
+            ) : (
+              openIncidents.slice(0, 5).map((inc) => (
+                <div key={inc.id} className="flex items-center justify-between p-3 bg-theme-elevated rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-content-primary">{inc.title}</p>
+                    <p className="text-xs text-content-subtle">{getSeverityLabel(inc.severity)}</p>
+                  </div>
+                  <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: `${getSeverityColor(inc.severity)}20`, color: getSeverityColor(inc.severity) }}>
+                    {inc.severity}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </Card>
       </div>
 
       <Card>
-        <CardHeader title="À vérifier avant le show" subtitle={`${toCheckEquipment.length} équipements nécessitent une vérification`} />
+        <CardHeader title="À vérifier avant le show" subtitle={`${toCheckEquipment.length} équipement${toCheckEquipment.length !== 1 ? 's' : ''} nécessite${toCheckEquipment.length === 1 ? '' : 'nt'} une vérification`} />
         <div className="grid grid-cols-3 gap-4">
-          {toCheckEquipment.length === 0 && <p className="text-sm text-content-subtle col-span-3 text-center py-8">Aucun équipement à vérifier</p>}
+          {toCheckEquipment.length === 0 ? (
+            <p className="text-sm text-content-subtle col-span-3 text-center py-8">Aucun équipement à vérifier</p>
+          ) : (
+            toCheckEquipment.slice(0, 6).map((eq) => (
+              <div key={eq.id} className="flex items-center gap-3 p-3 bg-theme-elevated rounded-xl border border-amber-500/20">
+                <div className="p-2 bg-amber-500/10 rounded-lg">
+                  <Clock size={16} className="text-amber-500" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-content-primary truncate">{eq.name}</p>
+                  <p className="text-xs text-content-subtle truncate">{eq.location}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </Card>
     </div>

@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Card } from '../components/design-system/Card';
 import { Button } from '../components/design-system/Button';
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../lib/utils';
 import { IncidentDetailModal } from '../components/incidents/IncidentDetailModal';
-import type { Incident, IncidentStatus } from '../lib/types';
+import type { Equipment, Incident, IncidentStatus } from '../lib/types';
 import { CheckCircle2, Plus, LayoutGrid, List, ChevronRight, Wrench } from 'lucide-react';
 import { INCIDENT_COLUMNS, SEVERITY_ORDER } from '../lib/constants';
 import { IncidentCard } from '../components/incidents/IncidentCard';
 import { NewIncidentModal } from '../components/incidents/NewIncidentModal';
-import { getIncidents } from '../services/incidents.service';
+import { getIncidents, updateIncident } from '../services/incidents.service';
+import { getEquipment } from '../services/equipment.service';
 
 const columns = INCIDENT_COLUMNS;
 
@@ -20,9 +21,13 @@ export function Incidents() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [allIncidents, setAllIncidents] = useState<Incident[]>([]);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+  const [dragOverCol, setDragOverCol] = useState<IncidentStatus | null>(null);
+  const draggedId = useRef<string | null>(null);
 
   useEffect(() => {
     void loadIncidents();
+    void getEquipment().then(setEquipmentList).catch(() => {});
   }, []);
 
   async function loadIncidents() {
@@ -30,8 +35,37 @@ export function Incidents() {
     setAllIncidents(items);
   }
 
-  const filtered = filterSeverity ? allIncidents.filter((i) => i.severity === filterSeverity) : allIncidents;
+  function handleDragStart(e: React.DragEvent, id: string) {
+    draggedId.current = id;
+    e.dataTransfer.effectAllowed = 'move';
+  }
 
+  function handleDragOver(e: React.DragEvent, status: IncidentStatus) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverCol(status);
+  }
+
+  async function handleDrop(e: React.DragEvent, status: IncidentStatus) {
+    e.preventDefault();
+    setDragOverCol(null);
+    const id = draggedId.current;
+    if (!id) return;
+    draggedId.current = null;
+    const incident = allIncidents.find((i) => i.id === id);
+    if (!incident || incident.status === status) return;
+    // Optimistic update
+    setAllIncidents((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+    try {
+      // Backend requires full object (title + severity are mandatory)
+      await updateIncident(id, { ...incident, status });
+    } catch {
+      // Revert on error
+      setAllIncidents((prev) => prev.map((i) => (i.id === id ? { ...i, status: incident.status } : i)));
+    }
+  }
+
+  const filtered = filterSeverity ? allIncidents.filter((i) => i.severity === filterSeverity) : allIncidents;
   const getByStatus = (status: IncidentStatus) => filtered.filter((i) => i.status === status);
 
   const openCount = allIncidents.filter((i) => i.status === 'open').length;
@@ -119,21 +153,35 @@ export function Incidents() {
           {columns.map((col) => {
             const items = getByStatus(col.key);
             const Icon = col.icon;
+            const isOver = dragOverCol === col.key;
             return (
-              <div key={col.key} className="space-y-3">
+              <div
+                key={col.key}
+                className="space-y-3"
+                onDragOver={(e) => handleDragOver(e, col.key)}
+                onDragLeave={() => setDragOverCol(null)}
+                onDrop={(e) => void handleDrop(e, col.key)}
+              >
                 <div className="flex items-center gap-2 px-2 py-2">
                   <Icon size={16} style={{ color: col.color }} />
                   <span className="text-sm text-content-primary">{col.label}</span>
                   <span className="ml-auto text-xs text-content-subtle bg-theme-elevated px-2 py-0.5 rounded-full">{items.length}</span>
                 </div>
-                <div className="space-y-2">
+                <div
+                  className={`space-y-2 min-h-[80px] rounded-xl p-1 transition-colors ${isOver ? 'bg-cyan-400/5 ring-1 ring-cyan-400/30' : ''}`}
+                >
                   {items.map((inc) => (
-                    <IncidentCard key={inc.id} incident={inc} onClick={() => setSelectedIncident(inc)} />
+                    <IncidentCard
+                      key={inc.id}
+                      incident={inc}
+                      onClick={() => setSelectedIncident(inc)}
+                      onDragStart={(e) => handleDragStart(e, inc.id)}
+                    />
                   ))}
                   {items.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-8 text-content-subtle">
+                    <div className={`flex flex-col items-center justify-center py-8 transition-colors ${isOver ? 'text-cyan-400/60' : 'text-content-subtle'}`}>
                       <CheckCircle2 size={24} className="mb-2 opacity-40" />
-                      <p className="text-xs">Aucun incident</p>
+                      <p className="text-xs">{isOver ? 'Déposer ici' : 'Aucun incident'}</p>
                     </div>
                   )}
                 </div>
@@ -199,7 +247,7 @@ export function Incidents() {
         <NewIncidentModal
           onClose={() => setShowNewForm(false)}
           onAdd={(i) => setAllIncidents((prev) => [i, ...prev])}
-          equipmentList={[]}
+          equipmentList={equipmentList}
         />
       )}
     </div>

@@ -21,6 +21,8 @@ export function NewIncidentModal({
   const [severity, setSeverity] = useState<IncidentSeverity>('low');
   const [equipmentId, setEquipmentId] = useState('');
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -31,21 +33,25 @@ export function NewIncidentModal({
 
   async function handleSubmit() {
     if (!title.trim()) {
+      setError('Le titre est requis.');
       return;
     }
-
-    const newIncident = await createIncident({
-      title: title.trim(),
-      description: description.trim(),
-      severity,
-      status: 'open',
-      reportedBy: 'RG',
-      timestamp: new Date(),
-      equipmentId: equipmentId || undefined,
-    });
-
-    onAdd(newIncident);
-    onClose();
+    setError(null);
+    try {
+      const newIncident = await createIncident({
+        title: title.trim(),
+        description: description.trim(),
+        severity,
+        status: 'open',
+        reportedBy: 'RG',
+        timestamp: new Date(),
+        equipmentId: equipmentId || undefined,
+      });
+      onAdd(newIncident);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur lors de la création.');
+    }
   }
 
   return (
@@ -132,6 +138,7 @@ export function NewIncidentModal({
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-2">
+              {error && <p className="text-red-400 text-sm self-center mr-auto">{error}</p>}
               <Button variant="secondary" onClick={onClose}>
                 Annuler
               </Button>
