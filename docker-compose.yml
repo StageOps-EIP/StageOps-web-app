@@ -1,0 +1,73 @@
+# StageOps — Development stack
+# Usage:
+#   cp .env.example .env   # fill in secrets
+#   docker compose up --build
+#
+# Services:
+#   couchdb   → http://localhost:5984  (admin UI: /_utils)
+#   backend   → http://localhost:8080
+#   frontend  → http://localhost:3000
+#
+# Mobile: not yet containerised — run `expo start` locally.
+
+services:
+
+  # ── Database ────────────────────────────────────────────────────────────────
+  couchdb:
+    image: couchdb:3.3
+    container_name: stageops-couchdb
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    ports:
+      - "5984:5984"
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend (Go / Fiber) ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ../StageOps-backend
+      dockerfile: Dockerfile
+    container_name: stageops-backend
+    restart: unless-stopped
+    depends_on:
+      couchdb:
+        condition: service_healthy
+    environment:
+      APP_PORT: "8080"
+      COUCHDB_URL: http://couchdb:5984
+      COUCHDB_DB: ${COUCHDB_DB:-stageops}
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
+
+  # ── Frontend (Vite + React) ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./StageOps_Web
+      dockerfile: Dockerfile
+    container_name: stageops-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source for hot reload; node_modules stays inside the container
+      - ./StageOps_Web/src:/app/src
+      - ./StageOps_Web/public:/app/public
+      - ./StageOps_Web/index.html:/app/index.html
+
+volumes:
+  couchdb_data:
