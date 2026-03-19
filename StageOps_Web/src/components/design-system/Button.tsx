@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes} from 'react';
-import { forwardRef } from 'react';
+import { Children, forwardRef } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -8,7 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', fullWidth = false, className = '', children, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', fullWidth = false, className = '', children, 'aria-label': ariaLabel, ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-void';
     
     const variants = {
@@ -25,10 +25,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
     
     const widthClass = fullWidth ? 'w-full' : '';
+    const textChild = Children.toArray(children).find((child) => typeof child === 'string');
+    const computedAriaLabel = ariaLabel ?? (typeof textChild === 'string' ? textChild.trim() : undefined);
     
     return (
       <button
         ref={ref}
+        aria-label={computedAriaLabel}
         className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
         {...props}
       >

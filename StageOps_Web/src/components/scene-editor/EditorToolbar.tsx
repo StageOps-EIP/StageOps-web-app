@@ -5,6 +5,7 @@ import {
   Wand2, ArrowLeft, Move, RotateCw, Maximize2,
   Plus, Undo2, Redo2, Camera, ChevronDown, X, Magnet,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useSceneEditor } from './scene-editor.store';
 import type { SceneObject, SceneLight, TransformMode } from './scene-editor.types';
 import { DEFAULT_MATERIAL } from './scene-editor.materials';
@@ -60,7 +61,7 @@ function newLight(type: SceneLight['type'], name: string): SceneLight {
   };
 }
 
-const TRANSFORM_MODES: { mode: TransformMode; label: string; shortcut: string; Icon: React.FC<{ size?: number }> }[] = [
+const TRANSFORM_MODES: { mode: TransformMode; label: string; shortcut: string; Icon: LucideIcon }[] = [
   { mode: 'translate', label: 'Déplacer', shortcut: 'G', Icon: Move },
   { mode: 'rotate',    label: 'Rotation',  shortcut: 'R', Icon: RotateCw },
   { mode: 'scale',     label: 'Échelle',   shortcut: 'S', Icon: Maximize2 },

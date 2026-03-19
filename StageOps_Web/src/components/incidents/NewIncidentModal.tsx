@@ -5,6 +5,7 @@ import { Button } from '../design-system/Button';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import type { Equipment, Incident, IncidentSeverity } from '../../lib/types';
 import { createIncident } from '../../services/incidents.service';
+import { normalizeText, validateRequiredText } from '../../lib/validation';
 
 export function NewIncidentModal({
   onClose,
@@ -22,6 +23,7 @@ export function NewIncidentModal({
   const [equipmentId, setEquipmentId] = useState('');
 
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -32,15 +34,17 @@ export function NewIncidentModal({
   }, [onClose]);
 
   async function handleSubmit() {
-    if (!title.trim()) {
-      setError('Le titre est requis.');
+    const titleError = validateRequiredText('Titre', title, { min: 2, max: 180 });
+    if (titleError) {
+      setError(titleError);
       return;
     }
     setError(null);
+    setIsSubmitting(true);
     try {
       const newIncident = await createIncident({
-        title: title.trim(),
-        description: description.trim(),
+        title: normalizeText(title),
+        description: normalizeText(description),
         severity,
         status: 'open',
         reportedBy: 'RG',
@@ -51,6 +55,8 @@ export function NewIncidentModal({
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur lors de la création.');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -142,8 +148,8 @@ export function NewIncidentModal({
               <Button variant="secondary" onClick={onClose}>
                 Annuler
               </Button>
-              <Button variant="danger" onClick={() => void handleSubmit()}>
-                <AlertCircle size={16} /> Signaler l'incident
+              <Button variant="danger" onClick={() => void handleSubmit()} disabled={isSubmitting}>
+                <AlertCircle size={16} /> {isSubmitting ? 'Envoi...' : "Signaler l'incident"}
               </Button>
             </div>
           </div>

@@ -5,7 +5,9 @@ import { Button } from '@/components/design-system/Button';
 import { AlertTriangle, Plus, List, CalendarDays } from 'lucide-react';
 import type { Event } from '@/lib/types';
 import { CalendarView, EventListView, NewEventModal, EventDetail } from '@/components/events';
-import { getEvents } from '@/services/events.service';
+import { deleteEvent, getEvents } from '@/services/events.service';
+import { isValidDate } from '@/lib/utils';
+import { useRole } from '@/hooks/useRole';
 
 function getCalendarDays(year: number, month: number): (number | null)[] {
   const firstDay = new Date(year, month, 1);
@@ -38,6 +40,7 @@ function getConflicts(events: Event[]): { a: Event; b: Event }[] {
 
 export function Events() {
   usePageTitle('Événements');
+  const { canDeleteRecords } = useRole();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -53,6 +56,20 @@ export function Events() {
     setAllEvents(items);
   }
 
+  async function handleDeleteEvent(eventId: string) {
+    const confirmed = window.confirm('Supprimer cet événement ? Cette action est irréversible.');
+    if (!confirmed) return;
+
+    try {
+      await deleteEvent(eventId);
+      setAllEvents((prev) => prev.filter((event) => event.id !== eventId));
+      setSelectedEvent((prev) => (prev?.id === eventId ? null : prev));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Suppression impossible pour le moment.';
+      window.alert(message);
+    }
+  }
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const days = getCalendarDays(year, month);
@@ -62,7 +79,12 @@ export function Events() {
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
-  const eventsThisMonth = allEvents.filter((e) => e.startDate.getMonth() === month && e.startDate.getFullYear() === year);
+  const monthStart = new Date(year, month, 1);
+  const monthEnd = new Date(year, month + 1, 0, 23, 59, 59, 999);
+  const eventsThisMonth = allEvents.filter((e) => {
+    const endDate = isValidDate(e.endDate) ? e.endDate : e.startDate;
+    return e.startDate <= monthEnd && endDate >= monthStart;
+  });
 
   return (
     <div className="p-8 space-y-6">
@@ -128,6 +150,10 @@ export function Events() {
           eventsThisMonth={eventsThisMonth}
           selectedEvent={selectedEvent}
           onSelectEvent={setSelectedEvent}
+          onDeleteEvent={(eventId) => {
+            if (!canDeleteRecords) return;
+            void handleDeleteEvent(eventId);
+          }}
           onPrevMonth={prevMonth}
           onNextMonth={nextMonth}
         />
@@ -142,7 +168,13 @@ export function Events() {
       {selectedEvent && viewMode === 'list' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-lg">
-            <EventDetail event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+            <EventDetail
+              event={selectedEvent}
+              onClose={() => setSelectedEvent(null)}
+              onDelete={
+                canDeleteRecords ? (eventId) => void handleDeleteEvent(eventId) : undefined
+              }
+            />
           </div>
         </div>
       )}

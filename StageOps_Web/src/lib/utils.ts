@@ -115,3 +115,41 @@ export function formatTime(date: Date): string {
     minute: '2-digit',
   });
 }
+
+export function isValidDate(value: Date): boolean {
+  return value instanceof Date && !Number.isNaN(value.getTime());
+}
+
+function areSameCalendarDay(a: Date, b: Date): boolean {
+  return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+}
+
+function formatEventDateLabel(date: Date): string {
+  return date.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+  });
+}
+
+export function formatEventDateRange(startDate: Date, endDate: Date): string {
+  if (!isValidDate(startDate)) {
+    return 'Date de début manquante';
+  }
+  if (!isValidDate(endDate)) {
+    return 'Date de fin manquante';
+  }
+  if (areSameCalendarDay(startDate, endDate)) {
+    return formatEventDateLabel(startDate);
+  }
+  return `${formatEventDateLabel(startDate)} – ${formatEventDateLabel(endDate)}`;
+}
+
+export function formatEventTimeRange(startDate: Date, endDate: Date): string {
+  if (!isValidDate(startDate)) {
+    return 'Horaire de début manquant';
+  }
+  if (!isValidDate(endDate)) {
+    return 'Horaire de fin manquant';
+  }
+  return `${formatTime(startDate)} – ${formatTime(endDate)}`;
+}

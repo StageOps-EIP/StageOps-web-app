@@ -1,0 +1,105 @@
+{
+  "generatedAt": "2026-03-16T12:47:49.316Z",
+  "benchmarkRepo": "/home/taka/StageOps-BenchMark",
+  "benchmarkReportPath": "/home/taka/StageOps-BenchMark/BENCHMARK_REPORT.md",
+  "benchmarkReport": {
+    "webgl2Table": [
+      "| Nombre d'instances | Three.js (FPS) | Babylon.js (FPS) | PlayCanvas (FPS) |\r",
+      "|-------------------:|:--------------:|:-----------------:|:----------------:|\r",
+      "| **1 000**          | **60** ✅       | 60                | 60               |\r",
+      "| **10 000**         | **60** ✅       | 52–55             | 30–38            |\r",
+      "| **100 000**        | **42–48** ✅    | 28–32             | 4–8              |\r",
+      "| **1 000 000**      | **15–20** ✅    | 6–10              | <1 ❌             |\r"
+    ],
+    "webgpuTable": [
+      "| Nombre d'instances | Three.js (FPS) | Babylon.js (FPS) | PlayCanvas (FPS) |\r",
+      "|-------------------:|:--------------:|:-----------------:|:----------------:|\r",
+      "| **1 000**          | 60             | 60                | 60               |\r",
+      "| **10 000**         | **60** ✅       | 58                | 42–48            |\r",
+      "| **100 000**        | **52–58** ✅    | 40–45             | 10–15            |\r",
+      "| **1 000 000**      | **28–35** ✅    | 12–18             | 2–4              |\r"
+    ],
+    "bundleTable": [
+      "| Moteur         | Bundle Core (gzippé)  | Bundle complet (gzippé)        | Ratio vs Three.js |\r",
+      "|:--------------:|:---------------------:|:------------------------------:|:------------------:|\r",
+      "| **Three.js**   | **~148 kB**           | ~168 kB (avec loaders courants)| **1×** (référence)  |\r",
+      "| **Babylon.js** | ~350–500 kB (optimisé)| **~1 400 kB** (full engine)    | **~8.3×**          |\r",
+      "| **PlayCanvas** | ~150 kB (runtime)     | ~300 kB (avec éditeur runtime) | **~1.8×**          |\r"
+    ]
+  },
+  "stageOpsWeb": {
+    "jsFileCount": 1,
+    "cssFileCount": 1,
+    "jsBytes": 1447440,
+    "cssBytes": 34213,
+    "totalBytes": 1481653
+  },
+  "stageOpsBackend": {
+    "baseUrl": "http://localhost:3000",
+    "status": "reachable",
+    "checks": [
+      {
+        "endpoint": "/api/events/",
+        "runs": 5,
+        "failures": 0,
+        "successRate": 100,
+        "statuses": [
+          401
+        ],
+        "avgMs": 12.8,
+        "minMs": 1,
+        "p50Ms": 3,
+        "p95Ms": 50,
+        "maxMs": 50
+      },
+      {
+        "endpoint": "/api/incidents/",
+        "runs": 5,
+        "failures": 0,
+        "successRate": 100,
+        "statuses": [
+          401
+        ],
+        "avgMs": 7,
+        "minMs": 1,
+        "p50Ms": 4,
+        "p95Ms": 23,
+        "maxMs": 23
+      },
+      {
+        "endpoint": "/api/equipment/",
+        "runs": 5,
+        "failures": 0,
+        "successRate": 100,
+        "statuses": [
+          401
+        ],
+        "avgMs": 7,
+        "minMs": 0,
+        "p50Ms": 2,
+        "p95Ms": 22,
+        "maxMs": 22
+      },
+      {
+        "endpoint": "/api/team/",
+        "runs": 5,
+        "failures": 0,
+        "successRate": 100,
+        "statuses": [
+          401
+        ],
+        "avgMs": 6.6,
+        "minMs": 1,
+        "p50Ms": 3,
+        "p95Ms": 22,
+        "maxMs": 22
+      }
+    ]
+  },
+  "stageOpsDatabase": {
+    "baseUrl": "http://localhost:5984",
+    "status": "reachable",
+    "httpStatus": 200,
+    "latencyMs": 8
+  }
+}

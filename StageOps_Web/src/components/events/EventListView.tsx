@@ -1,6 +1,6 @@
 import { Card, CardHeader } from '@/components/design-system/Card';
-import { Clock, MapPin, Users } from 'lucide-react';
-import { formatTime } from '@/lib/utils';
+import { Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { formatEventDateRange, formatEventTimeRange } from '@/lib/utils';
 import { EVENT_STATUS_CONFIG } from '@/lib/constants';
 import type { Event, TeamMember } from '@/lib/types';
 
@@ -41,11 +41,17 @@ export function EventListView({ allEvents, onSelectEvent, teamMembers = [] }: Ev
                       {sc.label}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-content-subtle">
+                  <div className="space-y-1 text-xs text-content-subtle">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      {formatEventDateRange(evt.startDate, evt.endDate)}
+                    </span>
                     <span className="flex items-center gap-1">
                       <Clock size={12} />
-                      {formatTime(evt.startDate)} – {formatTime(evt.endDate)}
+                      {formatEventTimeRange(evt.startDate, evt.endDate)}
                     </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-content-subtle">
                     <span className="flex items-center gap-1">
                       <MapPin size={12} />
                       {evt.venue}

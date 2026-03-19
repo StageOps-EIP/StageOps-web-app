@@ -6,6 +6,7 @@ import { Button } from '@/components/design-system/Button';
 import type { TeamMember } from '@/lib/types';
 import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants';
 import { useTeamFilter } from '@/hooks/useTeamFilter';
+import { useRole } from '@/hooks/useRole';
 import { EditMemberModal } from '@/components/team/EditMemberModal';
 import { getTeamMembers, updateTeamMember, createTeamMember } from '@/services/team.service';
 import {
@@ -24,6 +25,7 @@ import {
 
 export function Team() {
   usePageTitle('Équipe');
+  const { canManageTeam } = useRole();
   const [teamList, setTeamList] = useState<TeamMember[]>([]);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -51,10 +53,12 @@ export function Team() {
             {teamList.length} membres · {roles.length} rôles
           </p>
         </div>
-        <Button variant="primary" onClick={() => setShowNewForm(true)}>
-          <Plus size={16} />
-          Ajouter un membre
-        </Button>
+        {canManageTeam && (
+          <Button variant="primary" onClick={() => setShowNewForm(true)}>
+            <Plus size={16} />
+            Ajouter un membre
+          </Button>
+        )}
       </div>
 
       <div className="relative max-w-md">
@@ -145,7 +149,12 @@ export function Team() {
 
         <div>
           {selectedMember ? (
-            <MemberDetail member={selectedMember} onClose={() => setSelectedMember(null)} onEdit={() => setEditingMember(selectedMember)} />
+            <MemberDetail
+              member={selectedMember}
+              onClose={() => setSelectedMember(null)}
+              onEdit={() => setEditingMember(selectedMember)}
+              canEdit={canManageTeam}
+            />
           ) : (
             <Card className="flex flex-col items-center justify-center py-16">
               <UserCircle size={48} className="text-[#27272e] mb-4" />
@@ -155,14 +164,14 @@ export function Team() {
         </div>
       </div>
 
-      {showNewForm && (
+      {showNewForm && canManageTeam && (
         <NewMemberModal
           onClose={() => setShowNewForm(false)}
           onAdd={(m) => { setTeamList((prev) => [...prev, m]); setShowNewForm(false); }}
         />
       )}
 
-      {editingMember && (
+      {editingMember && canManageTeam && (
         <EditMemberModal
           member={editingMember}
           onClose={() => setEditingMember(null)}
@@ -178,7 +187,17 @@ export function Team() {
   );
 }
 
-function MemberDetail({ member, onClose, onEdit }: { member: TeamMember; onClose: () => void; onEdit: () => void }) {
+function MemberDetail({
+  member,
+  onClose,
+  onEdit,
+  canEdit,
+}: {
+  member: TeamMember;
+  onClose: () => void;
+  onEdit: () => void;
+  canEdit: boolean;
+}) {
   const color = ROLE_COLORS[member.role] || '#71717a';
 
   return (
@@ -246,10 +265,12 @@ function MemberDetail({ member, onClose, onEdit }: { member: TeamMember; onClose
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button variant="secondary" className="flex-1" onClick={onEdit}>
-            <Edit3 size={14} />
-            Modifier
-          </Button>
+          {canEdit && (
+            <Button variant="secondary" className="flex-1" onClick={onEdit}>
+              <Edit3 size={14} />
+              Modifier
+            </Button>
+          )}
           <Button variant="ghost" aria-label="Envoyer un email">
             <Mail size={14} />
           </Button>

@@ -1,6 +1,6 @@
 import { Card, CardHeader } from '@/components/design-system/Card';
 import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatTime } from '@/lib/utils';
+import { formatEventDateRange, formatEventTimeRange, isValidDate } from '@/lib/utils';
 import { EVENT_STATUS_CONFIG, DAYS_FR, MONTHS_FR } from '@/lib/constants';
 import { EventDetail } from './EventDetail';
 import type { Event } from '@/lib/types';
@@ -13,14 +13,19 @@ interface CalendarViewProps {
   eventsThisMonth: Event[];
   selectedEvent: Event | null;
   onSelectEvent: (evt: Event | null) => void;
+  onDeleteEvent: (eventId: string) => void;
   onPrevMonth: () => void;
   onNextMonth: () => void;
 }
 
 function getEventsForDay(events: Event[], day: number, month: number, year: number): Event[] {
+  const currentDay = new Date(year, month, day);
   return events.filter((e) => {
-    const d = e.startDate;
-    return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
+    const startDate = new Date(e.startDate.getFullYear(), e.startDate.getMonth(), e.startDate.getDate());
+    const endSource = isValidDate(e.endDate) ? e.endDate : e.startDate;
+    const endDate = new Date(endSource.getFullYear(), endSource.getMonth(), endSource.getDate());
+
+    return currentDay >= startDate && currentDay <= endDate;
   });
 }
 
@@ -32,6 +37,7 @@ export function CalendarView({
   eventsThisMonth,
   selectedEvent,
   onSelectEvent,
+  onDeleteEvent,
   onPrevMonth,
   onNextMonth,
 }: CalendarViewProps) {
@@ -164,15 +170,15 @@ export function CalendarView({
                         {sc.label}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-content-subtle">
-                      <Calendar size={12} />
-                      <span>
-                        {evt.startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                      </span>
-                      <Clock size={12} />
-                      <span>
-                        {formatTime(evt.startDate)} – {formatTime(evt.endDate)}
-                      </span>
+                    <div className="space-y-1 text-xs text-content-subtle">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={12} />
+                        <span>{formatEventDateRange(evt.startDate, evt.endDate)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={12} />
+                        <span>{formatEventTimeRange(evt.startDate, evt.endDate)}</span>
+                      </div>
                     </div>
                     {/* Progress bar */}
                     <div className="mt-2 h-1 bg-[#27272e] rounded-full overflow-hidden">
@@ -192,7 +198,7 @@ export function CalendarView({
 
         {/* Selected event detail */}
         {selectedEvent && (
-          <EventDetail event={selectedEvent} onClose={() => onSelectEvent(null)} />
+          <EventDetail event={selectedEvent} onClose={() => onSelectEvent(null)} onDelete={onDeleteEvent} />
         )}
       </div>
     </div>

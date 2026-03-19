@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect } from 'react';
+import { Component, type ErrorInfo, type ReactNode, Suspense, useState, useEffect } from 'react';
 import type { RefObject } from 'react';
 import type * as THREE from 'three';
 import { Canvas, useThree } from '@react-three/fiber';
@@ -16,6 +16,48 @@ interface EditorCanvasProps {
   readOnly?: boolean;
   cameraView?: CameraView;
   onCameraViewHandled?: () => void;
+}
+
+interface WebGLErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface WebGLErrorBoundaryState {
+  hasError: boolean;
+}
+
+class WebGLErrorBoundary extends Component<WebGLErrorBoundaryProps, WebGLErrorBoundaryState> {
+  state: WebGLErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): WebGLErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('webgl_context_error', {
+      message: error.message,
+      stack: error.stack,
+      componentStack: info.componentStack,
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-full w-full flex items-center justify-center bg-[#0a0a0b] border border-theme-border rounded-xl p-6">
+          <div className="text-center space-y-2 max-w-md">
+            <p className="text-base text-content-primary">WebGL indisponible sur cet appareil</p>
+            <p className="text-sm text-content-muted">
+              La vue 3D ne peut pas démarrer (contexte WebGL non créé). Essaie un autre navigateur ou active
+              l&apos;accélération matérielle.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 // ─── Inner R3F component — controls camera from outside Canvas ────────────────
@@ -68,58 +110,65 @@ export function EditorCanvas({ canvasRef, readOnly = false, cameraView, onCamera
   const [isDragging, setIsDragging] = useState(false);
 
   return (
-    <Canvas
-      ref={canvasRef ?? null}
-      shadows="soft"
-      dpr={pp.highQuality ? [1, 2] : [1, 1]}
-      frameloop="always"
-      gl={{ antialias: true, preserveDrawingBuffer: true, alpha: false }}
-      camera={{ position: [0, 7, 20], fov: 55 }}
-      style={{ width: '100%', height: '100%', background: '#0a0a0b' }}
-      onPointerMissed={readOnly ? undefined : () => dispatch({ type: 'DESELECT' })}
-    >
-      <fog attach="fog" args={['#0a0a0b', 40, 90]} />
-      <hemisphereLight args={['#fff4e0', '#0a0a18', 0.18] as [string, string, number]} />
-      <ambientLight intensity={0.12} />
+    <WebGLErrorBoundary>
+      <Canvas
+        ref={canvasRef ?? null}
+        shadows="soft"
+        dpr={pp.highQuality ? [1, 2] : [1, 1]}
+        frameloop="always"
+        gl={{ antialias: true, preserveDrawingBuffer: true, alpha: false }}
+        fallback={
+          <div className="h-full w-full flex items-center justify-center text-sm text-content-muted">
+            WebGL non supporté par ce navigateur.
+          </div>
+        }
+        camera={{ position: [0, 7, 20], fov: 55 }}
+        style={{ width: '100%', height: '100%', background: '#0a0a0b' }}
+        onPointerMissed={readOnly ? undefined : () => dispatch({ type: 'DESELECT' })}
+      >
+        <fog attach="fog" args={['#0a0a0b', 40, 90]} />
+        <hemisphereLight args={['#fff4e0', '#0a0a18', 0.18] as [string, string, number]} />
+        <ambientLight intensity={0.12} />
 
-      <SurfaceObjects />
+        <SurfaceObjects />
 
-      {lights.map((l) => (
-        <EditableLight
-          key={l.id}
-          light={l}
-          isSelected={selectedId === l.id && selectedType === 'light'}
-          onDrag={setIsDragging}
-          readOnly={readOnly}
+        {lights.map((l) => (
+          <EditableLight
+            key={l.id}
+            light={l}
+            isSelected={selectedId === l.id && selectedType === 'light'}
+            onDrag={setIsDragging}
+            readOnly={readOnly}
+          />
+        ))}
+
+        {objects.map((o) => (
+          <EditableObject
+            key={o.id}
+            object={o}
+            isSelected={selectedId === o.id && selectedType === 'object'}
+            transformMode={transformMode}
+            onDrag={setIsDragging}
+            readOnly={readOnly}
+          />
+        ))}
+
+        <OrbitControls
+          makeDefault
+          enableDamping
+          dampingFactor={0.08}
+          enabled={!isDragging}
+          target={[0, 3, 0] as unknown as THREE.Vector3}
         />
-      ))}
 
-      {objects.map((o) => (
-        <EditableObject
-          key={o.id}
-          object={o}
-          isSelected={selectedId === o.id && selectedType === 'object'}
-          transformMode={transformMode}
-          onDrag={setIsDragging}
-          readOnly={readOnly}
-        />
-      ))}
+        {cameraView && (
+          <CameraController view={cameraView} onDone={onCameraViewHandled} />
+        )}
 
-      <OrbitControls
-        makeDefault
-        enableDamping
-        dampingFactor={0.08}
-        enabled={!isDragging}
-        target={[0, 3, 0] as unknown as THREE.Vector3}
-      />
-
-      {cameraView && (
-        <CameraController view={cameraView} onDone={onCameraViewHandled} />
-      )}
-
-      <Suspense fallback={null}>
-        <PostProcessingEffects pp={pp} />
-      </Suspense>
-    </Canvas>
+        <Suspense fallback={null}>
+          <PostProcessingEffects pp={pp} />
+        </Suspense>
+      </Canvas>
+    </WebGLErrorBoundary>
   );
 }

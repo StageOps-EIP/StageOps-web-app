@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Trash2, Copy } from 'lucide-react';
 import { useSceneEditor } from './scene-editor.store';
 import { MATERIAL_PRESETS, PRESET_LABELS, kelvinToHex } from './scene-editor.materials';
-import type { SceneMaterial, MaterialPreset, SurfaceKey } from './scene-editor.types';
+import type { SceneAction, SceneMaterial, MaterialPreset, SurfaceKey } from './scene-editor.types';
 
 const PRESET_KEYS = Object.keys(MATERIAL_PRESETS) as MaterialPreset[];
+type UpdateObjectUpdates = Extract<SceneAction, { type: 'UPDATE_OBJECT' }>['updates'];
+type UpdateLightUpdates = Extract<SceneAction, { type: 'UPDATE_LIGHT' }>['updates'];
 
 const SURFACE_LABELS: Record<SurfaceKey, string> = {
   floor:     'Sol',
@@ -162,7 +164,7 @@ function ObjectPanel() {
   const obj = state.objects.find(o => o.id === state.selectedId);
   if (!obj) return null;
 
-  function updateObj(updates: Parameters<typeof dispatch>[0] extends { type: 'UPDATE_OBJECT'; updates: infer U } ? U : never) {
+  function updateObj(updates: UpdateObjectUpdates) {
     dispatch({ type: 'UPDATE_OBJECT', id: obj!.id, updates });
   }
 
@@ -299,7 +301,7 @@ function LightPanel() {
   const light = state.lights.find(l => l.id === state.selectedId);
   if (!light) return null;
 
-  function update(updates: Parameters<typeof dispatch>[0] extends { type: 'UPDATE_LIGHT'; updates: infer U } ? U : never) {
+  function update(updates: UpdateLightUpdates) {
     dispatch({ type: 'UPDATE_LIGHT', id: light!.id, updates });
   }
 

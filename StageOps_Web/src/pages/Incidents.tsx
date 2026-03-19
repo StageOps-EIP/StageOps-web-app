@@ -23,17 +23,25 @@ export function Incidents() {
   const [allIncidents, setAllIncidents] = useState<Incident[]>([]);
   const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
   const [dragOverCol, setDragOverCol] = useState<IncidentStatus | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const draggedId = useRef<string | null>(null);
 
-  useEffect(() => {
-    void loadIncidents();
-    void getEquipment().then(setEquipmentList).catch(() => {});
-  }, []);
+  const loadData = async () => {
+    setLoadError(null);
+    try {
+      const [incidentItems, equipmentItems] = await Promise.all([getIncidents(), getEquipment()]);
+      setAllIncidents(incidentItems);
+      setEquipmentList(equipmentItems);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Impossible de charger les incidents.';
+      setLoadError(message);
+    }
+  };
 
-  async function loadIncidents() {
-    const items = await getIncidents();
-    setAllIncidents(items);
-  }
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadData();
+  }, []);
 
   function handleDragStart(e: React.DragEvent, id: string) {
     draggedId.current = id;
@@ -59,9 +67,11 @@ export function Incidents() {
     try {
       // Backend requires full object (title + severity are mandatory)
       await updateIncident(id, { ...incident, status });
-    } catch {
+    } catch (error) {
       // Revert on error
       setAllIncidents((prev) => prev.map((i) => (i.id === id ? { ...i, status: incident.status } : i)));
+      const message = error instanceof Error ? error.message : 'Échec de la mise à jour du statut.';
+      setLoadError(message);
     }
   }
 
@@ -129,6 +139,17 @@ export function Incidents() {
           </Button>
         </div>
       </div>
+
+      {loadError && (
+        <Card className="border-red-500/30 bg-red-500/10">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-red-300">{loadError}</p>
+            <Button variant="secondary" size="sm" onClick={() => void loadData()}>
+              Réessayer
+            </Button>
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-4 gap-4">
         {columns.map((col) => {

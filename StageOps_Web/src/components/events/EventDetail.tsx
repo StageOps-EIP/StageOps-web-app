@@ -1,12 +1,14 @@
 import { Card } from '@/components/design-system/Card';
-import { formatTime } from '@/lib/utils';
+import { Button } from '@/components/design-system/Button';
+import { formatEventDateRange, formatEventTimeRange } from '@/lib/utils';
 import { EVENT_STATUS_CONFIG } from '@/lib/constants';
-import { Calendar, Clock, MapPin, Users, Box, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Box, X, Trash2 } from 'lucide-react';
 import type { Equipment, Event, TeamMember } from '@/lib/types';
 
 interface EventDetailProps {
   event: Event;
   onClose: () => void;
+  onDelete?: (eventId: string) => void;
   equipmentList?: Equipment[];
   teamMembers?: TeamMember[];
 }
@@ -14,6 +16,7 @@ interface EventDetailProps {
 export function EventDetail({
   event,
   onClose,
+  onDelete,
   equipmentList = [],
   teamMembers = [],
 }: EventDetailProps) {
@@ -43,17 +46,13 @@ export function EventDetail({
           <div className="flex items-center gap-2 text-content-muted">
             <Calendar size={14} />
             <span>
-              {event.startDate.toLocaleDateString('fr-FR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })}
+              {formatEventDateRange(event.startDate, event.endDate)}
             </span>
           </div>
           <div className="flex items-center gap-2 text-content-muted">
             <Clock size={14} />
             <span>
-              {formatTime(event.startDate)} – {formatTime(event.endDate)}
+              {formatEventTimeRange(event.startDate, event.endDate)}
             </span>
           </div>
           <div className="flex items-center gap-2 text-content-muted">
@@ -112,6 +111,15 @@ export function EventDetail({
             )}
           </div>
         </div>
+
+        {onDelete && (
+          <div className="flex justify-end pt-2">
+            <Button variant="danger" size="sm" onClick={() => onDelete(event.id)}>
+              <Trash2 size={14} />
+              Supprimer l'événement
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -18,11 +18,28 @@ export function Dashboard() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const loadDashboardData = async () => {
+    setLoadError(null);
+    try {
+      const [equipmentItems, incidentItems, eventItems] = await Promise.all([
+        getEquipment(),
+        getIncidents(),
+        getEvents(),
+      ]);
+      setEquipment(equipmentItems);
+      setIncidents(incidentItems);
+      setEvents(eventItems);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Impossible de charger le tableau de bord.';
+      setLoadError(message);
+    }
+  };
 
   useEffect(() => {
-    void getEquipment().then(setEquipment).catch(() => {});
-    void getIncidents().then(setIncidents).catch(() => {});
-    void getEvents().then(setEvents).catch(() => {});
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadDashboardData();
   }, []);
 
   const hsEquipment = equipment.filter((e) => e.status === 'hs');
@@ -51,6 +68,17 @@ export function Dashboard() {
         </p>
       </div>
 
+      {loadError && (
+        <Card className="border-red-500/30 bg-red-500/10">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-red-300">{loadError}</p>
+            <Button variant="secondary" size="sm" onClick={() => void loadDashboardData()}>
+              Réessayer
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <Card className="bg-gradient-to-br from-cyan-400/10 to-cyan-600/10 border-cyan-400/20">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -62,7 +90,7 @@ export function Dashboard() {
               {nextEvent ? nextEvent.title : 'Aucun événement'}
             </h2>
             <p className="text-content-muted">
-              {nextEvent ? nextEvent.venue ?? nextEvent.description : '—'}
+              {nextEvent ? nextEvent.venue || nextEvent.stage || '—' : '—'}
             </p>
           </div>
 

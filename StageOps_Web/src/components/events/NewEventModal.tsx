@@ -5,6 +5,7 @@ import { X, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import type { Event } from '@/lib/types';
 import { createEvent } from '@/services/events.service';
+import { isDateRangeInvalid, normalizeText, validateRequiredText } from '@/lib/validation';
 
 type NewEventStatus = 'planning' | 'setup' | 'running' | 'strike';
 
@@ -16,6 +17,11 @@ export function NewEventModal({ onClose, onAdd }: { onClose: () => void; onAdd: 
   const [venue, setVenue] = useState('');
   const [stage, setStage] = useState('');
   const [status, setStatus] = useState<NewEventStatus>('planning');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const parsedStartDate = startDate ? new Date(startDate) : null;
+  const parsedEndDate = endDate ? new Date(endDate) : null;
+  const hasInvalidDateRange = isDateRangeInvalid(parsedStartDate, parsedEndDate);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -24,24 +30,37 @@ export function NewEventModal({ onClose, onAdd }: { onClose: () => void; onAdd: 
   }, [onClose]);
 
   async function handleCreate() {
-    if (!title.trim()) {
+    const titleError = validateRequiredText('Titre', title, { min: 2, max: 160 });
+    if (titleError) {
+      setError(titleError);
+      return;
+    }
+    if (hasInvalidDateRange) {
+      setError('La date de fin doit être postérieure à la date de début.');
       return;
     }
 
-    const createdEvent = await createEvent({
-      title: title.trim(),
-      startDate: startDate ? new Date(startDate) : new Date(),
-      endDate: endDate ? new Date(endDate) : (startDate ? new Date(startDate) : new Date()),
-      venue: venue.trim(),
-      stage: stage.trim(),
-      status,
-      checklistProgress: 0,
-      equipmentIds: [],
-      teamMembers: [],
-    });
-
-    onAdd(createdEvent);
-    onClose();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const createdEvent = await createEvent({
+        title: normalizeText(title),
+        startDate: startDate ? new Date(startDate) : new Date(),
+        endDate: endDate ? new Date(endDate) : (startDate ? new Date(startDate) : new Date()),
+        venue: normalizeText(venue),
+        stage: normalizeText(stage),
+        status,
+        checklistProgress: 0,
+        equipmentIds: [],
+        teamMembers: [],
+      });
+      onAdd(createdEvent);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur lors de la création.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -90,10 +109,17 @@ export function NewEventModal({ onClose, onAdd }: { onClose: () => void; onAdd: 
                 type="datetime-local"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]"
+                className={`w-full bg-theme-elevated border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none [color-scheme:dark] ${
+                  hasInvalidDateRange
+                    ? 'border-red-500/70 focus:border-red-500'
+                    : 'border-theme-border focus:border-cyan-400/50'
+                }`}
               />
             </div>
           </div>
+          {hasInvalidDateRange && !error && (
+            <p className="text-xs text-red-400">La date de fin doit être postérieure à la date de début.</p>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="event-venue" className="block text-sm text-content-muted mb-1.5">Lieu</label>
@@ -135,12 +161,13 @@ export function NewEventModal({ onClose, onAdd }: { onClose: () => void; onAdd: 
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
+            {error && <p className="text-red-400 text-sm self-center mr-auto">{error}</p>}
             <Button variant="secondary" onClick={onClose}>
               Annuler
             </Button>
-            <Button variant="primary" onClick={() => void handleCreate()}>
+            <Button variant="primary" onClick={() => void handleCreate()} disabled={hasInvalidDateRange || isSubmitting}>
               <CheckCircle2 size={16} />
-              Créer l'événement
+              {isSubmitting ? 'Création...' : 'Créer l\'événement'}
             </Button>
           </div>
         </div>
