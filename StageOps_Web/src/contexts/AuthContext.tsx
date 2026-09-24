@@ -1,33 +1,16 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { api, type UserPublic } from '@/lib/api';
-
-interface AuthState {
-  user: UserPublic | null;
-  token: string | null;
-  isLoading: boolean;
-}
-
-interface AuthContextValue extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
+import { useEffect, useState, type ReactNode } from 'react';
+import { api } from '@/lib/api';
+import { AuthContext, type AuthState } from './auth.context';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    token: localStorage.getItem('auth_token'),
-    isLoading: true,
+  const [state, setState] = useState<AuthState>(() => {
+    const token = localStorage.getItem('auth_token');
+    return { user: null, token, isLoading: Boolean(token) };
   });
 
   useEffect(() => {
     const storedToken = localStorage.getItem('auth_token');
-    if (!storedToken) {
-      setState((s) => ({ ...s, isLoading: false }));
-      return;
-    }
+    if (!storedToken) return;
 
     api
       .me()
@@ -62,10 +45,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
-  return ctx;
 }

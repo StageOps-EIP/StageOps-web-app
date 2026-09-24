@@ -12,7 +12,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { useTheme } from '@/lib/use-theme';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth.context';
 
 const navigation = [
   { name: 'Tableau de bord', href: '/', icon: LayoutDashboard },

@@ -6,7 +6,7 @@
 # Services:
 #   couchdb   → http://localhost:5984  (admin UI: /_utils)
 #   backend   → http://localhost:8080
-#   frontend  → http://localhost:3000
+#   frontend  → http://localhost:3001
 #
 # Mobile: not yet containerised — run `expo start` locally.
 
@@ -35,6 +35,9 @@ services:
     build:
       context: ../StageOps-backend
       dockerfile: Dockerfile
+      network: host
+      args:
+        STAGEOPS_NET_BRIDGE: ${STAGEOPS_NET_BRIDGE:-}
     container_name: stageops-backend
     restart: unless-stopped
     depends_on:
@@ -55,14 +58,19 @@ services:
     build:
       context: ./StageOps_Web
       dockerfile: Dockerfile
+      network: host
+      args:
+        STAGEOPS_NET_BRIDGE: ${STAGEOPS_NET_BRIDGE:-}
     container_name: stageops-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      VITE_API_URL: http://localhost:8080
+      # Vite runs inside this container, so its proxy must target the Docker
+      # service name rather than the container's own localhost.
+      VITE_API_URL: http://backend:8080
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       # Mount source for hot reload; node_modules stays inside the container
       - ./StageOps_Web/src:/app/src

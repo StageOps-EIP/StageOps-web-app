@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { Toaster } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth.context';
 
 export function DesktopLayout() {
   const { token, isLoading } = useAuth();

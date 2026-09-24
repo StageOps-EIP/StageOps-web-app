@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth.context';
 import { Layers, Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const roleOptions = [
@@ -30,7 +30,7 @@ export function Register() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Partial<typeof form & { general: string }>>({});
-  const [isLoading, setIsLoading] = useState(false);;
+  const [isLoading, setIsLoading] = useState(false);
 
   function set(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -42,7 +42,7 @@ export function Register() {
     if (!form.firstName.trim()) e.firstName = 'Requis';
     if (!form.lastName.trim()) e.lastName = 'Requis';
     if (!form.email.trim()) e.email = 'Requis';
-    else if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(form.email)) e.email = 'Email invalide';
+    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) e.email = 'Email invalide';
     if (!form.role) e.role = 'Requis';
     setErrors(e);
     return Object.keys(e).length === 0;

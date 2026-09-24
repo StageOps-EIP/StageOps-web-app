@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
 import { Input } from '@/components/design-system/Input';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth.context';
 import { Layers, Mail, Lock } from 'lucide-react';
 
 export function Login() {

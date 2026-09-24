@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useNavigate } from 'react-router';
 import { Button } from '@/components/design-system/Button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth.context';
 import {
   Mail,
   Shield,
@@ -26,8 +25,6 @@ export function Profile() {
   usePageTitle('Profil');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [isEditing] = useState(false);
-
   function handleLogout() {
     logout();
     navigate('/login');
