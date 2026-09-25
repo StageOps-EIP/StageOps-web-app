@@ -105,7 +105,7 @@ export const EquipmentMarker = memo(function EquipmentMarker({
       {/* Hover tooltip */}
       {isHovered && (
         <Html center distanceFactor={8} position={[0, 1.4, 0]}>
-          <div className="px-2 py-1 bg-theme-base/90 border border-theme-border rounded text-xs text-content-primary whitespace-nowrap pointer-events-none select-none shadow-lg">
+          <div className="px-2 py-1 bg-theme-base border border-theme-border rounded text-xs text-content-primary whitespace-nowrap pointer-events-none select-none shadow-lg">
             <span className="font-medium">{equipment.name}</span>
             <br />
             <span className="text-content-subtle">{equipment.location}</span>

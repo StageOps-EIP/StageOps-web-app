@@ -19,18 +19,18 @@ export function StageView() {
         </div>
 
         {/* Badge Prévisualisation — haut-gauche */}
-        <div className="absolute top-4 left-4 z-10 pointer-events-none">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/80 border border-zinc-700/60 px-3 py-1 text-xs font-medium text-zinc-300 backdrop-blur-sm">
+        <div className="pointer-events-none absolute left-4 top-4 z-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/20 bg-[#0a1025]/85 px-3 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur-xl">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Prévisualisation
           </span>
         </div>
 
         {/* Bouton Modifier — bas-droite */}
-        <div className="absolute bottom-6 right-6 z-10">
+        <div className="absolute bottom-24 right-4 z-10 lg:bottom-6 lg:right-6">
           <button
             onClick={() => navigate('/editor')}
-            className="inline-flex items-center gap-2 rounded-xl bg-zinc-900/90 border border-zinc-700/60 px-4 py-2.5 text-sm font-medium text-zinc-100 backdrop-blur-sm hover:bg-zinc-800/90 hover:border-zinc-600 transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/20 bg-[#0a1025]/90 px-4 py-2.5 text-sm font-semibold text-white shadow-brand backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-cyan-300/40"
           >
             <Pencil size={15} />
             Modifier la scène

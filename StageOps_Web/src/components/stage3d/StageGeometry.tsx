@@ -148,25 +148,25 @@ export const StageGeometry = memo(function StageGeometry() {
 
       {/* ── Labels ──────────────────────────────────────────────────── */}
       <Html center position={[0, 0.5, -HD + 0.6]}>
-        <div className="px-3 py-1 bg-theme-base/90 border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
+        <div className="px-3 py-1 bg-theme-base border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
           Fond de scène
         </div>
       </Html>
 
       <Html center position={[0, 0.5, HD - 0.6]}>
-        <div className="px-3 py-1 bg-theme-base/90 border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
+        <div className="px-3 py-1 bg-theme-base border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
           Avant-scène
         </div>
       </Html>
 
       <Html center position={[-HW + 0.8, 0.5, 0]}>
-        <div className="px-3 py-1 bg-theme-base/90 border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
+        <div className="px-3 py-1 bg-theme-base border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
           Jardin
         </div>
       </Html>
 
       <Html center position={[HW - 0.8, 0.5, 0]}>
-        <div className="px-3 py-1 bg-theme-base/90 border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
+        <div className="px-3 py-1 bg-theme-base border border-cyan-400/25 rounded-full text-xs text-cyan-400/80 whitespace-nowrap pointer-events-none select-none backdrop-blur-sm">
           Cour
         </div>
       </Html>

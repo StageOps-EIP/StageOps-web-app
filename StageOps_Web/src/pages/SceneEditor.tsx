@@ -100,7 +100,7 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
             )}
           </div>
           {/* Status bar */}
-          <div className="h-6 flex-shrink-0 flex items-center px-4 gap-6 bg-[#0a0a0b] border-t border-[#1e1e28] text-[10px] text-[#52525b] font-mono">
+          <div className="flex h-6 flex-shrink-0 items-center gap-6 border-t border-[#263356] bg-[#070b1a] px-4 font-mono text-[10px] text-[#606b90]">
             {statusText ? (
               <span className="text-[#71717a]">{statusText}</span>
             ) : (
@@ -119,7 +119,7 @@ export function SceneEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#0a0a0b]">
+    <div className="flex h-dvh w-screen flex-col overflow-hidden bg-[#070b1a]">
       <SceneEditorProvider>
         <EditorInner canvasRef={canvasRef} />
       </SceneEditorProvider>

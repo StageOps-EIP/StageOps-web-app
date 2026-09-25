@@ -1,20 +1,22 @@
-import { Outlet, Navigate } from 'react-router';
-import { Sidebar } from './Sidebar';
+import { Outlet } from 'react-router';
 import { Toaster } from 'sonner';
-import { useAuth } from '@/contexts/auth.context';
+import { MobileHeader, MobileNav, Sidebar } from './Sidebar';
 
 export function DesktopLayout() {
-  const { token, isLoading } = useAuth();
-
-  if (isLoading) return null;
-  if (!token) return <Navigate to="/login" replace />;
-
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-dvh overflow-hidden bg-theme-void">
       <Sidebar />
-      <main id="main-content" aria-label="Contenu principal" className="flex-1 overflow-y-auto h-full">
-        <Outlet />
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileHeader />
+        <main
+          id="main-content"
+          aria-label="Contenu principal"
+          className="app-surface min-h-0 flex-1 overflow-y-auto pb-20 lg:pb-0"
+        >
+          <Outlet />
+        </main>
+      </div>
+      <MobileNav />
       <Toaster
         theme="dark"
         position="bottom-right"
