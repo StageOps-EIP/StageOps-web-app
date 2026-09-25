@@ -1,10 +1,10 @@
-import { Outlet } from 'react-router';
-import { Toaster } from 'sonner';
-import { MobileHeader, MobileNav, Sidebar } from './Sidebar';
+import { Outlet } from 'react-router'
+import { Toaster } from 'sonner'
+import { MobileHeader, MobileNav, Sidebar } from './Sidebar'
 
 export function DesktopLayout() {
   return (
-    <div className="flex h-dvh overflow-hidden bg-theme-void">
+    <div className="relative flex h-dvh overflow-hidden bg-theme-void">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileHeader />
@@ -29,5 +29,5 @@ export function DesktopLayout() {
         }}
       />
     </div>
-  );
+  )
 }

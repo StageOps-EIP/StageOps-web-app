@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
-import { Button } from '@/components/design-system/Button';
-import { StageOpsLogo } from '@/components/brand/StageOpsLogo';
-import { useAuth } from '@/contexts/auth.context';
-import { Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router'
+import { Button } from '@/components/design-system/Button'
+import { StageOpsLogo } from '@/components/brand/StageOpsLogo'
+import { useAuth } from '@/contexts/auth.context'
+import { Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react'
 
 const roleOptions = [
   'Régisseur Général',
@@ -15,12 +15,12 @@ const roleOptions = [
   'Machiniste',
   'Cintrier',
   'Technicien',
-];
+]
 
 export function Register() {
-  const navigate = useNavigate();
-  const { register } = useAuth();
-  const [step, setStep] = useState<1 | 2>(1);
+  const navigate = useNavigate()
+  const { register } = useAuth()
+  const [step, setStep] = useState<1 | 2>(1)
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -29,82 +29,79 @@ export function Register() {
     role: '',
     password: '',
     confirmPassword: '',
-  });
-  const [errors, setErrors] = useState<Partial<typeof form & { general: string }>>({});
-  const [isLoading, setIsLoading] = useState(false);
+  })
+  const [errors, setErrors] = useState<Partial<typeof form & { general: string }>>({})
+  const [isLoading, setIsLoading] = useState(false)
 
   function set(key: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+    setForm((prev) => ({ ...prev, [key]: value }))
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
   function validateStep1() {
-    const e: Partial<typeof form> = {};
-    if (!form.firstName.trim()) e.firstName = 'Requis';
-    if (!form.lastName.trim()) e.lastName = 'Requis';
-    if (!form.email.trim()) e.email = 'Requis';
-    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) e.email = 'Email invalide';
-    if (!form.role) e.role = 'Requis';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    const e: Partial<typeof form> = {}
+    if (!form.firstName.trim()) e.firstName = 'Requis'
+    if (!form.lastName.trim()) e.lastName = 'Requis'
+    if (!form.email.trim()) e.email = 'Requis'
+    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email))
+      e.email = 'Email invalide'
+    if (!form.role) e.role = 'Requis'
+    setErrors(e)
+    return Object.keys(e).length === 0
   }
 
   function validateStep2() {
-    const e: Partial<typeof form> = {};
-    if (!form.password) e.password = 'Requis';
-    else if (form.password.length < 8) e.password = '8 caractères minimum';
-    else if (!/[A-Z]/.test(form.password)) e.password = 'Au moins une majuscule requise';
-    else if (!/[0-9]/.test(form.password)) e.password = 'Au moins un chiffre requis';
-    else if (!/[^a-zA-Z0-9]/.test(form.password)) e.password = 'Au moins un caractère spécial requis';
-    if (form.password !== form.confirmPassword) e.confirmPassword = 'Les mots de passe ne correspondent pas';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    const e: Partial<typeof form> = {}
+    if (!form.password) e.password = 'Requis'
+    else if (form.password.length < 8) e.password = '8 caractères minimum'
+    else if (!/[A-Z]/.test(form.password)) e.password = 'Au moins une majuscule requise'
+    else if (!/[0-9]/.test(form.password)) e.password = 'Au moins un chiffre requis'
+    else if (!/[^a-zA-Z0-9]/.test(form.password))
+      e.password = 'Au moins un caractère spécial requis'
+    if (form.password !== form.confirmPassword)
+      e.confirmPassword = 'Les mots de passe ne correspondent pas'
+    setErrors(e)
+    return Object.keys(e).length === 0
   }
 
   function handleNext(e: React.FormEvent) {
-    e.preventDefault();
-    if (validateStep1()) setStep(2);
+    e.preventDefault()
+    if (validateStep1()) setStep(2)
   }
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validateStep2()) return;
-    setIsLoading(true);
+    e.preventDefault()
+    if (!validateStep2()) return
+    setIsLoading(true)
     try {
-      await register(form.email, form.password);
-      navigate('/');
+      await register(form.email, form.password)
+      navigate('/')
     } catch (err) {
       setErrors((prev) => ({
         ...prev,
         general: err instanceof Error ? err.message : 'Erreur lors de la création du compte',
-      }));
+      }))
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
   return (
-    <div id="main-content" className="auth-surface relative min-h-dvh overflow-hidden bg-[#05060a] px-4 py-8 text-white sm:px-6">
-      {/* Background grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-20">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, #7885ff 1px, transparent 0)`,
-            backgroundSize: '48px 48px',
-          }}
-        />
-      </div>
-
-      <div className="relative mx-auto w-full max-w-lg">
+    <div
+      id="main-content"
+      className="auth-surface min-h-dvh bg-theme-void px-4 py-8 text-content-primary sm:px-6"
+    >
+      <div className="mx-auto w-full max-w-lg">
         {/* Logo */}
         <div className="mb-8 text-center">
           <StageOpsLogo inverse className="mb-6" />
           <h1 className="mb-2 text-3xl font-semibold text-white">Créer votre espace</h1>
-          <p className="text-sm text-blue-100/55">Configurez votre profil de régie en quelques instants.</p>
+          <p className="text-sm text-blue-100/55">
+            Configurez votre profil de régie en quelques instants.
+          </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-[#0f1730]/90 p-5 shadow-2xl backdrop-blur-xl sm:p-8">
+        <div className="panel p-5 shadow-xl sm:p-8">
           {/* Step indicator */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex items-center gap-2">
@@ -143,18 +140,25 @@ export function Register() {
                 <div>
                   <label className="block text-sm text-[#a1a1aa] mb-1.5">Prénom *</label>
                   <div className="relative">
-                    <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                    <User
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                    />
                     <input
                       type="text"
                       value={form.firstName}
                       onChange={(e) => set('firstName', e.target.value)}
                       placeholder="Prénom"
                       className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                        errors.firstName ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                        errors.firstName
+                          ? 'border-red-500/60'
+                          : 'border-[#27272e] focus:border-cyan-400/50'
                       }`}
                     />
                   </div>
-                  {errors.firstName && <p className="text-xs text-red-400 mt-1">{errors.firstName}</p>}
+                  {errors.firstName && (
+                    <p className="text-xs text-red-400 mt-1">{errors.firstName}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm text-[#a1a1aa] mb-1.5">Nom *</label>
@@ -164,24 +168,33 @@ export function Register() {
                     onChange={(e) => set('lastName', e.target.value)}
                     placeholder="Nom"
                     className={`w-full bg-[#1c1c21] border rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                      errors.lastName ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                      errors.lastName
+                        ? 'border-red-500/60'
+                        : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
                   />
-                  {errors.lastName && <p className="text-xs text-red-400 mt-1">{errors.lastName}</p>}
+                  {errors.lastName && (
+                    <p className="text-xs text-red-400 mt-1">{errors.lastName}</p>
+                  )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm text-[#a1a1aa] mb-1.5">Email professionnel *</label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <Mail
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                  />
                   <input
                     type="email"
                     value={form.email}
                     onChange={(e) => set('email', e.target.value)}
                     placeholder="votre.email@theatre.fr"
                     className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                      errors.email ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                      errors.email
+                        ? 'border-red-500/60'
+                        : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
                   />
                 </div>
@@ -191,7 +204,10 @@ export function Register() {
               <div>
                 <label className="block text-sm text-[#a1a1aa] mb-1.5">Téléphone</label>
                 <div className="relative">
-                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <Phone
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                  />
                   <input
                     type="tel"
                     value={form.phone}
@@ -205,17 +221,24 @@ export function Register() {
               <div>
                 <label className="block text-sm text-[#a1a1aa] mb-1.5">Rôle *</label>
                 <div className="relative">
-                  <Briefcase size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                  <Briefcase
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none"
+                  />
                   <select
                     value={form.role}
                     onChange={(e) => set('role', e.target.value)}
                     className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors [color-scheme:dark] ${
-                      errors.role ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                      errors.role
+                        ? 'border-red-500/60'
+                        : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
                   >
                     <option value="">Sélectionner un rôle</option>
                     {roleOptions.map((r) => (
-                      <option key={r} value={r}>{r}</option>
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -248,22 +271,31 @@ export function Register() {
                   <User size={16} className="text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#f5f5f7]">{form.firstName} {form.lastName}</p>
-                  <p className="text-xs text-[#71717a]">{form.role} · {form.email}</p>
+                  <p className="text-sm text-[#f5f5f7]">
+                    {form.firstName} {form.lastName}
+                  </p>
+                  <p className="text-xs text-[#71717a]">
+                    {form.role} · {form.email}
+                  </p>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm text-[#a1a1aa] mb-1.5">Mot de passe *</label>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <Lock
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                  />
                   <input
                     type="password"
                     value={form.password}
                     onChange={(e) => set('password', e.target.value)}
                     placeholder="8 car. min, 1 maj, 1 chiffre, 1 spécial"
                     className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                      errors.password ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                      errors.password
+                        ? 'border-red-500/60'
+                        : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
                   />
                 </div>
@@ -278,7 +310,11 @@ export function Register() {
                         style={{
                           backgroundColor:
                             form.password.length > i * 3
-                              ? form.password.length >= 12 ? '#22c55e' : form.password.length >= 8 ? '#f59e0b' : '#ef4444'
+                              ? form.password.length >= 12
+                                ? '#22c55e'
+                                : form.password.length >= 8
+                                  ? '#f59e0b'
+                                  : '#ef4444'
                               : '#27272e',
                         }}
                       />
@@ -288,16 +324,23 @@ export function Register() {
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">Confirmer le mot de passe *</label>
+                <label className="block text-sm text-[#a1a1aa] mb-1.5">
+                  Confirmer le mot de passe *
+                </label>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <Lock
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                  />
                   <input
                     type="password"
                     value={form.confirmPassword}
                     onChange={(e) => set('confirmPassword', e.target.value)}
                     placeholder="••••••••"
                     className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                      errors.confirmPassword ? 'border-red-500/60' : 'border-[#27272e] focus:border-cyan-400/50'
+                      errors.confirmPassword
+                        ? 'border-red-500/60'
+                        : 'border-[#27272e] focus:border-cyan-400/50'
                     }`}
                   />
                 </div>
@@ -312,7 +355,14 @@ export function Register() {
                 </p>
               )}
 
-              <Button type="submit" variant="primary" size="lg" fullWidth className="mt-2" disabled={isLoading}>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                className="mt-2"
+                disabled={isLoading}
+              >
                 <CheckCircle2 size={18} />
                 {isLoading ? 'Création…' : 'Créer mon compte'}
               </Button>
@@ -334,5 +384,5 @@ export function Register() {
         </p>
       </div>
     </div>
-  );
+  )
 }

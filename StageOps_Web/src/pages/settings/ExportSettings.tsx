@@ -1,12 +1,14 @@
-import { Card, CardHeader } from '@/components/design-system/Card';
-import { Button } from '@/components/design-system/Button';
-import { Download, Database } from 'lucide-react';
-import { toast } from 'sonner';
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { Button } from '@/components/design-system/Button'
+import { Download, Database } from 'lucide-react'
 
 export function ExportSettings() {
   return (
     <Card>
-      <CardHeader title="Export & Données" subtitle="Exportez vos données et créez des sauvegardes" />
+      <CardHeader
+        title="Export & Données"
+        subtitle="Exportez vos données et créez des sauvegardes"
+      />
       <div className="space-y-4">
         {/* Export options */}
         <div className="grid grid-cols-2 gap-4">
@@ -34,14 +36,9 @@ export function ExportSettings() {
                 Planning événements
               </label>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              fullWidth
-              onClick={() => toast.success('Export PDF lancé — fichier prêt dans quelques secondes')}
-            >
+            <Button variant="secondary" size="sm" fullWidth disabled>
               <Download size={14} />
-              Générer PDF
+              Indisponible en démonstration
             </Button>
           </div>
 
@@ -69,14 +66,9 @@ export function ExportSettings() {
                 Liste équipe
               </label>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              fullWidth
-              onClick={() => toast.success('Export Excel lancé — fichier prêt dans quelques secondes')}
-            >
+            <Button variant="secondary" size="sm" fullWidth disabled>
               <Download size={14} />
-              Générer Excel
+              Indisponible en démonstration
             </Button>
           </div>
         </div>
@@ -95,19 +87,13 @@ export function ExportSettings() {
                 </p>
               </div>
             </div>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => toast.success('Sauvegarde en cours...')}
-            >
+            <Button variant="primary" size="sm" disabled>
               <Database size={14} />
-              Sauvegarder maintenant
+              Indisponible en démonstration
             </Button>
           </div>
         </div>
       </div>
     </Card>
-  );
+  )
 }
-
-

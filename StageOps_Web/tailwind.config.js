@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       borderRadius: {
@@ -14,22 +11,22 @@ export default {
       },
       colors: {
         cyan: {
-          50: '#f2f4ff',
-          100: '#e7e9ff',
-          200: '#d3d6ff',
-          300: '#afb5ff',
-          400: '#7885ff',
-          500: '#5265f4',
-          600: '#3d4bdd',
-          700: '#343db4',
-          800: '#2d3690',
-          900: '#293270',
+          50: '#f3f1eb',
+          100: '#f3f1eb',
+          200: '#9586ff',
+          300: '#9586ff',
+          400: '#7964ff',
+          500: '#7964ff',
+          600: '#7964ff',
+          700: '#3977ff',
+          800: '#3977ff',
+          900: '#3977ff',
         },
         brand: {
-          violet: '#7555f4',
-          blue: '#4566f2',
-          ink: '#0a1236',
-          frost: '#eef0ff',
+          violet: '#7964ff',
+          blue: '#3977ff',
+          ink: '#05060a',
+          frost: '#f3f1eb',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -60,11 +57,11 @@ export default {
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))',
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
@@ -122,4 +119,4 @@ export default {
     },
   },
   plugins: [],
-};
+}

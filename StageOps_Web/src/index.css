@@ -1,29 +1,43 @@
-@import "@fontsource-variable/manrope";
-@import "@fontsource-variable/bricolage-grotesque";
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/bricolage-grotesque';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* StageOps brand — values already used by the logo and previous interface. */
+  --brand-violet: #7964ff;
+  --brand-violet-hover: #9586ff;
+  --brand-blue: #3977ff;
+  --brand-soft: rgba(121, 100, 255, 0.12);
+  --brand-border: rgba(121, 100, 255, 0.38);
+
+  /* Dark work surface. */
   --bg-void: #05060a;
   --bg-deeper: #080a10;
   --bg-base: #0d1018;
   --bg-elevated: #141824;
+  --bg-hover: #1a1f2d;
   --border: #252b3a;
   --border-hover: #3b4357;
   --border-strong: #59647d;
   --text-primary: #f3f1eb;
   --text-muted: #a4a9b7;
-  --text-subtle: #747b8e;
-  --text-faint: #505767;
-  --accent: #7964ff;
-  --accent-hover: #9586ff;
-  --accent-violet: #7964ff;
-  --accent-blue: #3977ff;
-  --accent-soft: rgba(121, 100, 255, 0.11);
-  --signal: #c7ff4a;
-  --panel-shadow: 0 30px 80px rgba(0, 0, 0, 0.26);
+  --text-subtle: #7f879b;
+  --text-faint: #596174;
+
+  /* Semantic colours: never used as decoration. */
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+  --status-info: #3977ff;
+  --status-neutral: #7f879b;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --panel-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
 }
 
 .light {
@@ -31,20 +45,20 @@
   --bg-deeper: #efeee9;
   --bg-base: #f8f7f2;
   --bg-elevated: #e2e1dc;
+  --bg-hover: #d9d8d2;
   --border: #cac8c0;
   --border-hover: #aba9a1;
   --border-strong: #787a85;
   --text-primary: #11131a;
   --text-muted: #555b69;
-  --text-subtle: #747984;
-  --text-faint: #999b9e;
-  --accent: #5844e6;
-  --accent-hover: #4632d2;
-  --accent-violet: #5844e6;
-  --accent-blue: #205bdd;
-  --accent-soft: rgba(88, 68, 230, 0.08);
-  --signal: #547700;
-  --panel-shadow: 0 24px 60px rgba(24, 26, 35, 0.08);
+  --text-subtle: #686e7a;
+  --text-faint: #858991;
+  --brand-violet: #5844e6;
+  --brand-violet-hover: #4632d2;
+  --brand-blue: #205bdd;
+  --brand-soft: rgba(88, 68, 230, 0.09);
+  --brand-border: rgba(88, 68, 230, 0.34);
+  --panel-shadow: 0 12px 30px rgba(24, 26, 35, 0.07);
 }
 
 @layer base {
@@ -60,14 +74,14 @@
     padding: 0;
   }
 
-  html {
+  html,
+  body {
     background: var(--bg-void);
   }
 
   body {
-    background: var(--bg-void);
     color: var(--text-primary);
-    font-family: "Manrope Variable", "Manrope", sans-serif;
+    font-family: 'Manrope Variable', 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -75,9 +89,8 @@
   h1,
   h2,
   h3 {
-    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
-    font-variation-settings: "wdth" 85;
-    letter-spacing: -0.045em;
+    font-family: 'Manrope Variable', 'Manrope', sans-serif;
+    letter-spacing: -0.025em;
   }
 
   button,
@@ -87,28 +100,30 @@
   textarea {
     -webkit-tap-highlight-color: transparent;
   }
+  button,
+  a {
+    touch-action: manipulation;
+  }
 
   *:focus-visible {
-    outline: 1px solid var(--accent);
-    outline-offset: 3px;
+    outline: 2px solid var(--brand-violet-hover);
+    outline-offset: 2px;
   }
 
   ::selection {
-    background: var(--accent);
+    background: var(--brand-violet);
     color: white;
   }
-
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 7px;
+    height: 7px;
   }
-
   ::-webkit-scrollbar-track {
     background: var(--bg-deeper);
   }
-
   ::-webkit-scrollbar-thumb {
     background: var(--border-strong);
+    border-radius: 8px;
   }
 
   .sr-only {
@@ -129,123 +144,143 @@
     left: 1rem;
     z-index: 9999;
     padding: 0.7rem 1rem;
-    background: var(--accent);
+    border-radius: var(--radius-sm);
+    background: var(--brand-violet);
     color: white;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 700;
   }
 
   .skip-link:focus {
-    top: 0;
+    top: 0.75rem;
   }
 }
 
 @layer components {
   .app-surface {
-    position: relative;
-    isolation: isolate;
     min-height: 100%;
-    background:
-      linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(121, 100, 255, 0.05) calc(100% - 1px)),
-      var(--bg-void);
-    background-size: 88px 100%;
-  }
-
-  .app-surface::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      linear-gradient(180deg, rgba(121, 100, 255, 0.08), transparent 13rem),
-      linear-gradient(90deg, transparent 49.9%, rgba(255, 255, 255, 0.018) 50%, transparent 50.1%);
-  }
-
-  .app-surface::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0.18;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
-    mix-blend-mode: soft-light;
+    background: var(--bg-void);
   }
 
   .page-shell {
-    width: min(100%, 1720px);
+    width: min(100%, 1540px);
     margin-inline: auto;
     padding: 1.25rem;
-    animation: console-in 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .page-shell > header,
-  .page-shell > div:first-child {
-    position: relative;
   }
 
   .page-heading {
-    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
-    font-size: clamp(2.25rem, 4vw, 4.4rem);
-    font-weight: 580;
-    line-height: 0.94;
-    letter-spacing: -0.065em;
-  }
-
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--accent-hover);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.64rem;
+    color: var(--text-primary);
+    font-size: clamp(1.65rem, 2vw, 2rem);
     font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
   }
 
-  .eyebrow::before {
-    content: '';
-    width: 1.7rem;
-    height: 1px;
-    background: currentColor;
+  .page-kicker,
+  .eyebrow {
+    color: var(--brand-violet-hover);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .control-label {
+    color: var(--text-subtle);
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
   .glass-panel,
-  .tech-panel {
-    position: relative;
-    background: color-mix(in srgb, var(--bg-base) 96%, transparent);
+  .tech-panel,
+  .panel {
+    background: var(--bg-base);
     border: 1px solid var(--border);
-    box-shadow: var(--panel-shadow);
-    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
   }
 
-  .tech-panel::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    right: 13px;
-    width: 28px;
-    height: 1px;
-    background: var(--accent);
-    transform: rotate(45deg);
-    transform-origin: right center;
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .form-control {
+    width: 100%;
+    min-height: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .form-control:hover {
+    border-color: var(--border-hover);
+  }
+  .form-control:focus {
+    border-color: var(--brand-violet);
+    outline: none;
+  }
+
+  .segmented-control {
+    display: inline-flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-deeper);
+  }
+
+  .segmented-control > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .segmented-control > button[aria-pressed='true'] {
+    background: var(--brand-soft);
+    color: var(--brand-violet-hover);
+  }
+
+  .demo-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-deeper);
+    color: var(--text-subtle);
+    font-size: 0.75rem;
   }
 
   .stageops-logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.72rem;
+    gap: 0.7rem;
     min-width: 0;
   }
 
   .stageops-logo__mark {
     display: block;
-    width: 2.55rem;
-    height: 2.55rem;
+    width: 2.35rem;
+    height: 2.35rem;
     flex: none;
   }
 
@@ -254,68 +289,36 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 18px rgba(121, 100, 255, 0.26));
   }
 
   .stageops-logo__wordmark {
-    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
-    font-size: 1.2rem;
+    font-family: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+    font-size: 1.15rem;
     font-weight: 720;
-    letter-spacing: -0.06em;
+    letter-spacing: -0.045em;
     line-height: 1;
   }
 
   .stageops-logo--compact .stageops-logo__mark {
-    width: 2rem;
-    height: 2rem;
+    width: 1.9rem;
+    height: 1.9rem;
   }
-
-  .control-label {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .signal-dot {
-    width: 0.42rem;
-    height: 0.42rem;
-    background: var(--signal);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--signal) 70%, transparent);
-  }
-}
-
-@keyframes console-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@keyframes scan-line {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(900%); }
 }
 
 @media (min-width: 768px) {
   .page-shell {
-    padding: 2rem 2.25rem 3rem;
+    padding: 1.75rem 2rem 2.5rem;
   }
 }
 
-/* StageOps uses crisp control surfaces; only semantic pills remain circular. */
-:where(.app-surface, .auth-surface) .rounded-lg,
-:where(.app-surface, .auth-surface) .rounded-xl,
-:where(.app-surface, .auth-surface) .rounded-2xl,
-:where(.app-surface, .auth-surface) .rounded-3xl {
-  border-radius: 2px !important;
+/* Legacy screens inherit the same restrained geometry and label casing. */
+:where(.app-surface, .auth-surface) :is(.rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: var(--radius-lg);
+}
+
+:where(.app-surface, .auth-surface) .uppercase {
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 @media (prefers-reduced-motion: reduce) {

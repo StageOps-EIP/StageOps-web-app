@@ -1,63 +1,57 @@
-import { Card, CardHeader } from '@/components/design-system/Card';
-import { Button } from '@/components/design-system/Button';
-import { Check } from 'lucide-react';
-import { toast } from 'sonner';
-import { SettingRow, Toggle } from './shared';
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { SettingRow, Toggle } from './shared'
 
 export function NotificationSettings() {
   return (
     <Card>
-      <CardHeader title="Notifications" subtitle="Gérez vos alertes et canaux de notification" />
+      <CardHeader
+        title="Notifications"
+        subtitle="Les changements s’appliquent à la session de démonstration"
+      />
       <div>
         <SettingRow
           label="Incidents critiques"
           description="Notification immédiate pour les incidents de sévérité élevée ou critique"
         >
-          <Toggle defaultChecked />
+          <Toggle label="Notifications pour les incidents critiques" defaultChecked />
         </SettingRow>
         <SettingRow
           label="Équipement HS"
           description="Alerte quand un équipement passe en statut HS"
         >
-          <Toggle defaultChecked />
+          <Toggle label="Notifications pour les équipements hors service" defaultChecked />
         </SettingRow>
         <SettingRow
           label="Rappels de vérification"
           description="Rappel avant le show pour les équipements à vérifier"
         >
-          <Toggle defaultChecked />
+          <Toggle label="Rappels de vérification" defaultChecked />
         </SettingRow>
         <SettingRow
           label="Changements d'événement"
           description="Notification lors de modifications du planning"
         >
-          <Toggle />
+          <Toggle label="Notifications pour les changements d'événement" />
         </SettingRow>
         <SettingRow
           label="Notifications par email"
           description="Recevoir un résumé quotidien par email"
         >
-          <Toggle />
+          <Toggle label="Notifications par email" />
         </SettingRow>
         <SettingRow
           label="Notifications push"
           description="Activer les notifications push sur mobile"
         >
-          <Toggle defaultChecked />
+          <Toggle label="Notifications push" defaultChecked />
         </SettingRow>
         <SettingRow
           label="Son d'alerte critique"
           description="Son d'alarme pour les incidents critiques en régie"
         >
-          <Toggle defaultChecked />
+          <Toggle label="Son d'alerte critique" defaultChecked />
         </SettingRow>
       </div>
-      <div className="mt-6">
-        <Button variant="primary" onClick={() => toast.success('Notifications mises à jour')}>
-          <Check size={16} />
-          Sauvegarder
-        </Button>
-      </div>
     </Card>
-  );
+  )
 }

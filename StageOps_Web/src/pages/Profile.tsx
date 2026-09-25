@@ -1,180 +1,86 @@
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { useNavigate } from 'react-router';
-import { Button } from '@/components/design-system/Button';
-import { useAuth } from '@/contexts/auth.context';
-import {
-  Mail,
-  Shield,
-  Calendar,
-  LogOut,
-  LogIn,
-  Bell,
-  Key,
-  ChevronRight,
-} from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { useNavigate } from 'react-router'
+import { Button } from '@/components/design-system/Button'
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { useAuth } from '@/contexts/auth.context'
+import { Mail, Shield, LogOut, LogIn, Settings } from 'lucide-react'
 
 const ROLE_LABELS: Record<string, string> = {
-  rg: 'Régisseur Général',
-  lumiere: 'Régisseur Lumière',
-  son: 'Régisseur Son',
-  plateau: 'Régisseur Plateau',
-};
-
-const ROLE_COLOR = '#22c55e';
+  rg: 'Régisseur général',
+  lumiere: 'Régisseur lumière',
+  son: 'Régisseur son',
+  plateau: 'Régisseur plateau',
+}
 
 export function Profile() {
-  usePageTitle('Profil');
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  usePageTitle('Profil')
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : 'Accès invité'
+  const displayName = user?.email ?? 'Session de démonstration'
+  const initials = user?.email.slice(0, 2).toUpperCase() ?? 'SO'
+
   function handleLogout() {
-    logout();
-    navigate('/login');
+    logout()
+    navigate('/login')
   }
 
-  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : 'Accès invité';
-  const displayName = user?.email ?? 'Session de démonstration';
-  const initials = user?.email.slice(0, 2).toUpperCase() ?? 'SO';
-
   return (
-    <div className="page-shell max-w-6xl space-y-6">
-      {/* Header */}
-      <div>
-        <p className="eyebrow mb-2">Compte</p>
-        <h1 className="page-heading text-content-primary">Mon profil</h1>
-        <p className="text-content-muted">Gérez vos informations personnelles et préférences</p>
-      </div>
+    <div className="page-shell max-w-5xl space-y-5">
+      <PageHeader
+        context="Compte"
+        title="Profil"
+        description="Identité, rôle et accès à l’application."
+      />
+      {!user && (
+        <DemoNotice>
+          Vous utilisez StageOps sans compte dans l’environnement de démonstration.
+        </DemoNotice>
+      )}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Left column */}
-        <div className="space-y-6">
-
-          {/* Identity card */}
-          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-5">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                {/* Avatar */}
-                <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold"
-                  style={{ backgroundColor: `${ROLE_COLOR}20`, color: ROLE_COLOR }}
-                >
-                  {initials}
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-content-primary">{displayName}</h2>
-                  <p className="text-sm mt-0.5" style={{ color: ROLE_COLOR }}>
-                    {roleLabel}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <Card>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-[var(--brand-soft)] text-lg font-bold text-[var(--brand-violet-hover)]">
+              {initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-lg font-semibold text-content-primary">{displayName}</h2>
+              <p className="mt-1 text-sm text-content-muted">{roleLabel}</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-md border border-theme-border bg-theme-elevated p-3">
+                  <p className="flex items-center gap-2 text-xs text-content-subtle">
+                    <Mail size={13} /> Adresse e-mail
+                  </p>
+                  <p className="mt-1.5 truncate text-sm text-content-primary">
+                    {user?.email ?? 'Aucun compte connecté'}
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Contact fields */}
-            <div className="space-y-3">
-              <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
-              <div className="p-4 bg-theme-elevated rounded-xl">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Mail size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Email</p>
-                </div>
-                <p className="text-sm text-content-primary">{user?.email ?? 'Aucun compte connecté'}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Role */}
-          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <Shield size={16} className="text-content-subtle" />
-              <p className="text-xs text-content-subtle uppercase tracking-wider">Rôle</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
-                {roleLabel}
-              </span>
-            </div>
-            <p className="text-xs text-content-subtle">
-              Les rôles sont gérés par l'administrateur du système.
-            </p>
-          </div>
-
-          {/* Assigned events */}
-          <div className="bg-theme-base border border-theme-border rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-content-subtle" />
-              <p className="text-xs text-content-subtle uppercase tracking-wider">
-                Événements assignés
-              </p>
-            </div>
-            <p className="text-sm text-content-subtle">Aucun événement assigné.</p>
-          </div>
-        </div>
-
-        {/* Right column */}
-        <div className="space-y-4">
-          {/* Security */}
-          <div className="bg-theme-base border border-theme-border rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Key size={14} className="text-content-subtle" />
-              <p className="text-xs text-content-subtle uppercase tracking-wider">Sécurité</p>
-            </div>
-            <button className="w-full flex items-center justify-between p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors group">
-              <div>
-                <p className="text-sm text-content-primary text-left">Changer le mot de passe</p>
-                <p className="text-xs text-content-subtle">Dernière modification : il y a 30 jours</p>
-              </div>
-              <ChevronRight size={14} className="text-content-subtle group-hover:text-content-primary transition-colors" />
-            </button>
-            <button className="w-full flex items-center justify-between p-3 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors group">
-              <div>
-                <p className="text-sm text-content-primary text-left">Authentification à deux facteurs</p>
-                <p className="text-xs text-content-subtle">Non activée</p>
-              </div>
-              <ChevronRight size={14} className="text-content-subtle group-hover:text-content-primary transition-colors" />
-            </button>
-          </div>
-
-          {/* Notifications */}
-          <div className="bg-theme-base border border-theme-border rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Bell size={14} className="text-content-subtle" />
-              <p className="text-xs text-content-subtle uppercase tracking-wider">Notifications</p>
-            </div>
-            {[
-              { label: 'Nouveaux incidents', sub: 'Alertes en temps réel', on: true },
-              { label: 'Rappels d\'événements', sub: '1h avant chaque représentation', on: true },
-              { label: 'Mises à jour équipements', sub: 'Changements de statut', on: false },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between p-3 bg-theme-elevated rounded-xl">
-                <div>
-                  <p className="text-sm text-content-primary">{item.label}</p>
-                  <p className="text-xs text-content-subtle">{item.sub}</p>
-                </div>
-                <div
-                  className={`w-10 h-5 rounded-full relative transition-colors ${
-                    item.on ? 'bg-cyan-400' : 'bg-[#27272e]'
-                  }`}
-                >
-                  <div
-                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                      item.on ? 'translate-x-5' : 'translate-x-0.5'
-                    }`}
-                  />
+                <div className="rounded-md border border-theme-border bg-theme-elevated p-3">
+                  <p className="flex items-center gap-2 text-xs text-content-subtle">
+                    <Shield size={13} /> Niveau d’accès
+                  </p>
+                  <p className="mt-1.5 text-sm text-content-primary">{roleLabel}</p>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+        </Card>
 
-          {/* Logout */}
-          <Button
-            variant={user ? 'danger' : 'primary'}
-            fullWidth
-            onClick={handleLogout}
-          >
-            {user ? <LogOut size={16} /> : <LogIn size={16} />}
-            {user ? 'Se déconnecter' : 'Se connecter'}
-          </Button>
-        </div>
+        <Card>
+          <CardHeader title="Accès" subtitle={user ? 'Compte connecté' : 'Démonstration locale'} />
+          <div className="space-y-2">
+            <Button variant="secondary" fullWidth onClick={() => navigate('/settings')}>
+              <Settings size={16} /> Ouvrir les paramètres
+            </Button>
+            <Button variant={user ? 'danger' : 'primary'} fullWidth onClick={handleLogout}>
+              {user ? <LogOut size={16} /> : <LogIn size={16} />}
+              {user ? 'Se déconnecter' : 'Se connecter'}
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
-  );
+  )
 }

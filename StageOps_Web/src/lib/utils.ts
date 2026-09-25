@@ -1,62 +1,63 @@
-import type { EquipmentStatus, IncidentSeverity } from './types';
+import type { EquipmentStatus, IncidentSeverity } from './types'
+import { STATUS_COLORS } from './design-tokens'
 
 export function getStatusColor(status: EquipmentStatus): string {
   switch (status) {
     case 'ok':
-      return '#22c55e';
+      return STATUS_COLORS.success
     case 'to-check':
-      return '#f59e0b';
+      return STATUS_COLORS.warning
     case 'hs':
-      return '#ef4444';
+      return STATUS_COLORS.danger
     case 'repair':
-      return '#8b5cf6';
+      return STATUS_COLORS.warning
     default:
-      return '#71717a';
+      return STATUS_COLORS.neutral
   }
 }
 
 export function getStatusLabel(status: EquipmentStatus): string {
   switch (status) {
     case 'ok':
-      return 'OK';
+      return 'Opérationnel'
     case 'to-check':
-      return 'À vérifier';
+      return 'À vérifier'
     case 'hs':
-      return 'HS';
+      return 'Hors service'
     case 'repair':
-      return 'En réparation';
+      return 'En réparation'
     default:
-      return status;
+      return status
   }
 }
 
 export function getSeverityColor(severity: IncidentSeverity): string {
   switch (severity) {
     case 'low':
-      return '#22c55e';
+      return STATUS_COLORS.success
     case 'medium':
-      return '#f59e0b';
+      return STATUS_COLORS.warning
     case 'high':
-      return '#ef4444';
+      return STATUS_COLORS.danger
     case 'critical':
-      return '#dc2626';
+      return STATUS_COLORS.critical
     default:
-      return '#71717a';
+      return STATUS_COLORS.neutral
   }
 }
 
 export function getSeverityLabel(severity: IncidentSeverity): string {
   switch (severity) {
     case 'low':
-      return 'Faible';
+      return 'Faible'
     case 'medium':
-      return 'Moyenne';
+      return 'Moyenne'
     case 'high':
-      return 'Élevée';
+      return 'Élevée'
     case 'critical':
-      return 'Critique';
+      return 'Critique'
     default:
-      return severity;
+      return severity
   }
 }
 
@@ -68,8 +69,8 @@ export function getCategoryLabel(category: string): string {
     set: 'Plateau',
     safety: 'Sécurité',
     rigging: 'Accroche',
-  };
-  return labels[category] || category;
+  }
+  return labels[category] || category
 }
 
 export function getCategoryIcon(category: string): string {
@@ -80,23 +81,23 @@ export function getCategoryIcon(category: string): string {
     set: 'SCN',
     safety: 'SEC',
     rigging: 'GRE',
-  };
-  return icons[category] || 'EQP';
+  }
+  return icons[category] || 'EQP'
 }
 
 export function formatRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 1) return 'À l\'instant';
-  if (diffMins < 60) return `Il y a ${diffMins} min`;
-  if (diffHours < 24) return `Il y a ${diffHours}h`;
-  if (diffDays < 7) return `Il y a ${diffDays}j`;
-  
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  if (diffMins < 1) return "À l'instant"
+  if (diffMins < 60) return `Il y a ${diffMins} min`
+  if (diffHours < 24) return `Il y a ${diffHours}h`
+  if (diffDays < 7) return `Il y a ${diffDays}j`
+
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
 export function formatDateTime(date: Date): string {
@@ -106,12 +107,18 @@ export function formatDateTime(date: Date): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  });
+  })
 }
 
 export function formatTime(date: Date): string {
   return date.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
-  });
+  })
+}
+
+export function getProgressColor(progress: number): string {
+  if (progress > 75) return STATUS_COLORS.success
+  if (progress > 40) return STATUS_COLORS.warning
+  return STATUS_COLORS.danger
 }
