@@ -1,18 +1,27 @@
-import { useState } from 'react';
-import type { RefObject } from 'react';
-import { useNavigate } from 'react-router';
+import { useState } from 'react'
+import type { RefObject } from 'react'
+import { useNavigate } from 'react-router'
 import {
-  Wand2, ArrowLeft, Move, RotateCw, Maximize2,
-  Plus, Undo2, Redo2, Camera, ChevronDown, X,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { useSceneEditor } from './scene-editor.store';
-import type { SceneObject, SceneLight, TransformMode } from './scene-editor.types';
-import { DEFAULT_MATERIAL } from './scene-editor.materials';
-import { kelvinToHex } from './scene-editor.materials';
+  Boxes,
+  ArrowLeft,
+  Move,
+  RotateCw,
+  Maximize2,
+  Plus,
+  Undo2,
+  Redo2,
+  Camera,
+  ChevronDown,
+  X,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { useSceneEditor } from './scene-editor.store'
+import type { SceneObject, SceneLight, TransformMode } from './scene-editor.types'
+import { DEFAULT_MATERIAL } from './scene-editor.materials'
+import { kelvinToHex } from './scene-editor.materials'
 
 interface EditorToolbarProps {
-  canvasRef: RefObject<HTMLCanvasElement>;
+  canvasRef: RefObject<HTMLCanvasElement>
 }
 
 function newObject(type: SceneObject['type'], name: string): SceneObject {
@@ -27,7 +36,7 @@ function newObject(type: SceneObject['type'], name: string): SceneObject {
     geometry: { width: 2, height: type === 'plane' ? 2 : 1, depth: 2 },
     visible: true,
     locked: false,
-  };
+  }
 }
 
 function newLight(type: SceneLight['type'], name: string): SceneLight {
@@ -47,49 +56,53 @@ function newLight(type: SceneLight['type'], name: string): SceneLight {
     width: 2,
     height: 2,
     visible: true,
-  };
+  }
 }
 
-const TRANSFORM_MODES: { mode: TransformMode; label: string; shortcut: string; Icon: LucideIcon }[] = [
+const TRANSFORM_MODES: {
+  mode: TransformMode
+  label: string
+  shortcut: string
+  Icon: LucideIcon
+}[] = [
   { mode: 'translate', label: 'Déplacer', shortcut: 'G', Icon: Move },
-  { mode: 'rotate',    label: 'Rotation',  shortcut: 'R', Icon: RotateCw },
-  { mode: 'scale',     label: 'Échelle',   shortcut: 'S', Icon: Maximize2 },
-];
+  { mode: 'rotate', label: 'Rotation', shortcut: 'R', Icon: RotateCw },
+  { mode: 'scale', label: 'Échelle', shortcut: 'S', Icon: Maximize2 },
+]
 
 export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
-  const navigate = useNavigate();
-  const { state, dispatch } = useSceneEditor();
-  const { transformMode, postProcessing, historyIndex, history } = state;
-  const pp = postProcessing;
+  const navigate = useNavigate()
+  const { state, dispatch } = useSceneEditor()
+  const { transformMode, postProcessing, historyIndex, history } = state
+  const pp = postProcessing
 
-  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false)
 
-  const canUndo = historyIndex >= 0;
-  const canRedo = historyIndex < history.length - 1;
+  const canUndo = historyIndex >= 0
+  const canRedo = historyIndex < history.length - 1
 
   function handleExport() {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const url = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'scene-export.png';
-    a.click();
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'scene-export.png'
+    a.click()
   }
 
   return (
-    <div className="flex items-center justify-between h-14 px-4 bg-[#131316] border-b border-[#27272e] flex-shrink-0 z-20 relative">
-
+    <div className="relative z-20 flex min-h-14 flex-shrink-0 flex-wrap items-center gap-2 border-b border-theme-border bg-theme-base px-3 py-2 xl:flex-nowrap xl:px-4">
       {/* ─ Left ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-[#f5f5f7]">
-          <Wand2 size={18} className="text-cyan-400" />
-          <span className="text-sm font-semibold">Éditeur Scénique</span>
+      <div className="flex items-center gap-3 xl:mr-auto">
+        <div className="flex items-center gap-2 text-content-primary">
+          <Boxes size={18} className="text-[var(--brand-violet-hover)]" />
+          <span className="text-sm font-semibold">Éditeur du plateau</span>
         </div>
         <div className="w-px h-5 bg-[#27272e]" />
         <button
           onClick={() => navigate('/stage')}
-          className="flex items-center gap-1.5 text-xs text-[#71717a] hover:text-[#f5f5f7] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-content-subtle transition-colors hover:text-content-primary"
         >
           <ArrowLeft size={13} />
           Vue Scène
@@ -97,15 +110,10 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
       </div>
 
       {/* ─ Centre ───────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2">
-
+      <div className="order-3 flex w-full items-center gap-2 overflow-x-auto pt-1 xl:order-none xl:w-auto xl:overflow-visible xl:pt-0">
         {/* Mode badge */}
-        <span className="px-2 py-1 rounded text-[10px] font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 tracking-widest uppercase">
-          {transformMode}
-        </span>
-
         {/* Transform modes — button group */}
-        <div className="flex rounded-lg overflow-hidden border border-[#27272e]">
+        <div className="flex overflow-hidden rounded-md border border-theme-border">
           {TRANSFORM_MODES.map(({ mode, label, shortcut, Icon }, i) => (
             <button
               key={mode}
@@ -113,9 +121,9 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
               onClick={() => dispatch({ type: 'SET_TRANSFORM_MODE', mode })}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                 transformMode === mode
-                  ? 'bg-cyan-400 text-black'
-                  : 'bg-[#1c1c21] text-[#a1a1aa] hover:bg-[#27272e] hover:text-[#f5f5f7]'
-              } ${i > 0 ? 'border-l border-[#27272e]' : ''}`}
+                  ? 'bg-[var(--brand-violet)] text-white'
+                  : 'bg-theme-elevated text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary'
+              } ${i > 0 ? 'border-l border-theme-border' : ''}`}
             >
               <Icon size={13} />
               {shortcut}
@@ -123,13 +131,13 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
           ))}
         </div>
 
-        <div className="w-px h-6 bg-[#27272e]" />
+        <div className="h-6 w-px bg-theme-border" />
 
         {/* Add menu */}
         <div className="relative">
           <button
-            onClick={() => setShowAddMenu(v => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1c1c21] text-[#a1a1aa] hover:text-[#f5f5f7] transition-colors"
+            onClick={() => setShowAddMenu((v) => !v)}
+            className="flex items-center gap-1.5 rounded-md border border-theme-border bg-theme-elevated px-3 py-1.5 text-xs font-medium text-content-muted hover:text-content-primary"
           >
             <Plus size={13} />
             Ajouter
@@ -138,42 +146,46 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
 
           {showAddMenu && (
             <div
-              className="absolute top-10 left-0 z-50 w-52 bg-[#1c1c21] border border-[#27272e] rounded-xl shadow-2xl overflow-hidden py-1"
+              className="absolute left-0 top-10 z-50 w-52 overflow-hidden rounded-md border border-theme-border bg-theme-elevated py-1 shadow-2xl"
               onMouseLeave={() => setShowAddMenu(false)}
             >
-              <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#52525b]">Objets</p>
-              {([
-                ['box', 'Praticable (Cube)'],
-                ['plane', 'Décor plan'],
-                ['cylinder', 'Colonne / cylindre'],
-              ] as [SceneObject['type'], string][]).map(([type, label]) => (
+              <p className="px-3 py-1.5 text-xs font-semibold text-content-subtle">Objets</p>
+              {(
+                [
+                  ['box', 'Praticable (Cube)'],
+                  ['plane', 'Décor plan'],
+                  ['cylinder', 'Colonne / cylindre'],
+                ] as [SceneObject['type'], string][]
+              ).map(([type, label]) => (
                 <button
                   key={type}
                   onClick={() => {
-                    dispatch({ type: 'ADD_OBJECT', object: newObject(type, label) });
-                    setShowAddMenu(false);
+                    dispatch({ type: 'ADD_OBJECT', object: newObject(type, label) })
+                    setShowAddMenu(false)
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-[#a1a1aa] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
+                  className="w-full px-3 py-2 text-left text-sm text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary"
                 >
                   {label}
                 </button>
               ))}
 
-              <div className="h-px bg-[#27272e] my-1" />
-              <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#52525b]">Lumières</p>
-              {([
-                ['directional', 'Lumière directionnelle'],
-                ['spot',        'Spot'],
-                ['point',       'Lumière ponctuelle'],
-                ['rect-area',   'Area light'],
-              ] as [SceneLight['type'], string][]).map(([type, label]) => (
+              <div className="my-1 h-px bg-theme-border" />
+              <p className="px-3 py-1.5 text-xs font-semibold text-content-subtle">Lumières</p>
+              {(
+                [
+                  ['directional', 'Lumière directionnelle'],
+                  ['spot', 'Spot'],
+                  ['point', 'Lumière ponctuelle'],
+                  ['rect-area', 'Area light'],
+                ] as [SceneLight['type'], string][]
+              ).map(([type, label]) => (
                 <button
                   key={type}
                   onClick={() => {
-                    dispatch({ type: 'ADD_LIGHT', light: newLight(type, label) });
-                    setShowAddMenu(false);
+                    dispatch({ type: 'ADD_LIGHT', light: newLight(type, label) })
+                    setShowAddMenu(false)
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-[#a1a1aa] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
+                  className="w-full px-3 py-2 text-left text-sm text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary"
                 >
                   {label}
                 </button>
@@ -182,7 +194,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
           )}
         </div>
 
-        <div className="w-px h-6 bg-[#27272e]" />
+        <div className="h-6 w-px bg-theme-border" />
 
         {/* Undo / Redo */}
         <div className="flex items-center gap-1">
@@ -190,7 +202,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
             disabled={!canUndo}
             onClick={() => dispatch({ type: 'UNDO' })}
             title="Annuler (Ctrl+Z)"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#71717a] hover:text-[#f5f5f7] hover:bg-[#27272e] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Undo2 size={14} />
           </button>
@@ -198,7 +210,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
             disabled={!canRedo}
             onClick={() => dispatch({ type: 'REDO' })}
             title="Rétablir (Ctrl+Y)"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#71717a] hover:text-[#f5f5f7] hover:bg-[#27272e] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Redo2 size={14} />
           </button>
@@ -206,61 +218,82 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
       </div>
 
       {/* ─ Right ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-
+      <div className="ml-auto flex items-center gap-2">
         {/* HD Quality toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-xs text-[#71717a]">Qualité HD</span>
-          <div
-            onClick={() => dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { highQuality: !pp.highQuality } })}
-            className={`relative w-8 h-4 rounded-full transition-colors cursor-pointer ${pp.highQuality ? 'bg-cyan-400' : 'bg-[#27272e]'}`}
+        <button
+          type="button"
+          aria-pressed={pp.highQuality}
+          onClick={() =>
+            dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { highQuality: !pp.highQuality } })
+          }
+          className="flex items-center gap-2"
+        >
+          <span className="hidden text-xs text-content-subtle md:inline">Qualité HD</span>
+          <span
+            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.highQuality ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
           >
-            <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.highQuality ? 'translate-x-4' : 'translate-x-0.5'}`} />
-          </div>
-        </label>
+            <span
+              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.highQuality ? 'translate-x-4' : 'translate-x-0.5'}`}
+            />
+          </span>
+        </button>
 
         {/* Bloom toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-xs text-[#71717a]">Bloom</span>
-          <div
-            onClick={() => dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { bloom: !pp.bloom } })}
-            className={`relative w-8 h-4 rounded-full transition-colors cursor-pointer ${pp.bloom ? 'bg-cyan-400' : 'bg-[#27272e]'}`}
+        <button
+          type="button"
+          aria-pressed={pp.bloom}
+          onClick={() => dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { bloom: !pp.bloom } })}
+          className="flex items-center gap-2"
+        >
+          <span className="hidden text-xs text-content-subtle md:inline">Bloom</span>
+          <span
+            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.bloom ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
           >
-            <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.bloom ? 'translate-x-4' : 'translate-x-0.5'}`} />
-          </div>
-        </label>
+            <span
+              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.bloom ? 'translate-x-4' : 'translate-x-0.5'}`}
+            />
+          </span>
+        </button>
 
         {/* Vignette toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-xs text-[#71717a]">Vignette</span>
-          <div
-            onClick={() => dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { vignette: !pp.vignette } })}
-            className={`relative w-8 h-4 rounded-full transition-colors cursor-pointer ${pp.vignette ? 'bg-cyan-400' : 'bg-[#27272e]'}`}
+        <button
+          type="button"
+          aria-pressed={pp.vignette}
+          onClick={() =>
+            dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { vignette: !pp.vignette } })
+          }
+          className="flex items-center gap-2"
+        >
+          <span className="hidden text-xs text-content-subtle md:inline">Vignette</span>
+          <span
+            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.vignette ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
           >
-            <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.vignette ? 'translate-x-4' : 'translate-x-0.5'}`} />
-          </div>
-        </label>
+            <span
+              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.vignette ? 'translate-x-4' : 'translate-x-0.5'}`}
+            />
+          </span>
+        </button>
 
-        <div className="w-px h-6 bg-[#27272e]" />
+        <div className="h-6 w-px bg-theme-border" />
 
         {/* Export */}
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#a1a1aa] hover:text-[#f5f5f7] hover:bg-[#27272e] transition-colors"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-content-muted hover:bg-theme-elevated hover:text-content-primary"
         >
           <Camera size={13} />
-          Export PNG
+          <span className="hidden sm:inline">Export PNG</span>
         </button>
 
         {/* Close */}
         <button
           onClick={() => navigate('/stage')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#71717a] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-content-subtle hover:bg-red-500/10 hover:text-red-400"
         >
           <X size={13} />
-          Fermer
+          <span className="hidden sm:inline">Fermer</span>
         </button>
       </div>
     </div>
-  );
+  )
 }

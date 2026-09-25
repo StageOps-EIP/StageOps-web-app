@@ -1,42 +1,65 @@
-import { useNavigate } from 'react-router';
-import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider';
-import { EditorCanvas } from '@/components/scene-editor/EditorCanvas';
-import { Pencil } from 'lucide-react';
-import { usePageTitle } from '@/hooks/usePageTitle';
+import { useNavigate } from 'react-router'
+import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider'
+import { useSceneEditor } from '@/components/scene-editor/scene-editor.store'
+import { EditorCanvas } from '@/components/scene-editor/EditorCanvas'
+import { Box, Lightbulb, MousePointer2, Pencil } from 'lucide-react'
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { Button } from '@/components/design-system/Button'
 
-export function StageView() {
-  usePageTitle('Vue Scène');
-  const navigate = useNavigate();
+function StageWorkspace() {
+  const navigate = useNavigate()
+  const { state } = useSceneEditor()
 
   return (
-    <SceneEditorProvider>
-      <div className="relative h-full w-full overflow-hidden" style={{ minHeight: 0 }}>
-        {/* Titre de page accessible — visuellement masqué */}
-        <h1 className="sr-only">Vue Scène</h1>
-        {/* Canvas 3D — prend tout l'espace disponible */}
-        <div className="absolute inset-0">
-          <EditorCanvas readOnly />
-        </div>
+    <div className="relative h-full w-full overflow-hidden bg-theme-void" style={{ minHeight: 0 }}>
+      <h1 className="sr-only">Plateau 3D</h1>
+      <div className="absolute inset-0">
+        <EditorCanvas readOnly />
+      </div>
 
-        {/* Badge Prévisualisation — haut-gauche */}
-        <div className="pointer-events-none absolute left-4 top-4 z-10">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/20 bg-[#0a1025]/85 px-3 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur-xl">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Prévisualisation
+      <div className="absolute inset-x-3 top-3 z-10 flex flex-wrap items-center gap-3 rounded-lg border border-theme-border bg-theme-base/95 px-3 py-2.5 shadow-lg sm:inset-x-4 sm:px-4">
+        <div className="mr-auto min-w-0">
+          <p className="truncate text-sm font-semibold text-content-primary">
+            Plateau 3D · Grande Salle
+          </p>
+          <p className="text-xs text-content-subtle">
+            Prévisualisation de la scène enregistrée localement
+          </p>
+        </div>
+        <div className="hidden items-center gap-4 text-xs text-content-muted sm:flex">
+          <span className="flex items-center gap-1.5">
+            <Box size={14} /> {state.objects.length} objet{state.objects.length !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Lightbulb size={14} /> {state.lights.length} sources
+          </span>
+          <span className="flex items-center gap-1.5">
+            <MousePointer2 size={14} /> Glisser pour orbiter
           </span>
         </div>
-
-        {/* Bouton Modifier — bas-droite */}
-        <div className="absolute bottom-24 right-4 z-10 lg:bottom-6 lg:right-6">
-          <button
-            onClick={() => navigate('/editor')}
-            className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/20 bg-[#0a1025]/90 px-4 py-2.5 text-sm font-semibold text-white shadow-brand backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-cyan-300/40"
-          >
-            <Pencil size={15} />
-            Modifier la scène
-          </button>
-        </div>
+        <Button size="sm" onClick={() => navigate('/editor')}>
+          <Pencil size={14} /> Modifier la scène
+        </Button>
       </div>
+
+      {state.objects.length === 0 && (
+        <div className="pointer-events-none absolute bottom-24 left-1/2 z-10 w-[min(90%,28rem)] -translate-x-1/2 rounded-lg border border-theme-border bg-theme-base/95 px-4 py-3 text-center shadow-lg lg:bottom-5">
+          <p className="text-sm font-medium text-content-primary">Aucun objet de décor placé</p>
+          <p className="mt-1 text-xs text-content-subtle">
+            La structure du plateau et les éclairages restent visibles. Ouvrez l’éditeur pour
+            ajouter des éléments.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function StageView() {
+  usePageTitle('Plateau 3D')
+  return (
+    <SceneEditorProvider>
+      <StageWorkspace />
     </SceneEditorProvider>
-  );
+  )
 }

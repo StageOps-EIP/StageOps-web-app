@@ -1,20 +1,19 @@
-import React, { memo } from 'react';
-import { Html } from '@react-three/drei';
-import { STAGE_WIDTH, STAGE_DEPTH, GRID_HEIGHT } from './stage3d.constants';
+import React, { memo } from 'react'
+import { Html } from '@react-three/drei'
+import { STAGE_WIDTH, STAGE_DEPTH, GRID_HEIGHT } from './stage3d.constants'
 
-const HW = STAGE_WIDTH / 2;   // 12 — half width
-const HD = STAGE_DEPTH / 2;   // 9  — half depth
+const HW = STAGE_WIDTH / 2 // 12 — half width
+const HD = STAGE_DEPTH / 2 // 9  — half depth
 
 /**
  * Static theatre geometry: floor, walls, gril, zone markers, labels.
  * Enhanced with subtle checkerboard floor, zone delimiters, and atmospheric lights.
  */
 export const StageGeometry = memo(function StageGeometry() {
-  const CHECKER_SIZE = 3; // size of each checker tile in Three.js units
+  const CHECKER_SIZE = 3 // size of each checker tile in Three.js units
 
   return (
     <group>
-
       {/* ── Floor base ──────────────────────────────────────────────── */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[STAGE_WIDTH, STAGE_DEPTH]} />
@@ -25,10 +24,10 @@ export const StageGeometry = memo(function StageGeometry() {
       {/* We use alternating thin panels as checker tiles */}
       {Array.from({ length: Math.ceil(STAGE_WIDTH / CHECKER_SIZE) }, (_, col) =>
         Array.from({ length: Math.ceil(STAGE_DEPTH / CHECKER_SIZE) }, (_, row) => {
-          const isEven  = (col + row) % 2 === 0;
-          if (!isEven) return null; // only render "dark" tiles; base = light enough
-          const x = -HW + col * CHECKER_SIZE + CHECKER_SIZE / 2;
-          const z = -HD + row * CHECKER_SIZE + CHECKER_SIZE / 2;
+          const isEven = (col + row) % 2 === 0
+          if (!isEven) return null // only render "dark" tiles; base = light enough
+          const x = -HW + col * CHECKER_SIZE + CHECKER_SIZE / 2
+          const z = -HD + row * CHECKER_SIZE + CHECKER_SIZE / 2
           return (
             <mesh
               key={`tile-${col}-${row}`}
@@ -45,8 +44,8 @@ export const StageGeometry = memo(function StageGeometry() {
                 opacity={0.6}
               />
             </mesh>
-          );
-        })
+          )
+        }),
       )}
 
       {/* ── Fine grid ────────────────────────────────────────────────── */}
@@ -59,19 +58,19 @@ export const StageGeometry = memo(function StageGeometry() {
       {/* Centre line (Cour / Jardin axis) */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
         <planeGeometry args={[0.04, STAGE_DEPTH]} />
-        <meshStandardMaterial color="#22d3ee" transparent opacity={0.08} />
+        <meshStandardMaterial color="#3977ff" transparent opacity={0.08} />
       </mesh>
 
       {/* Front/back thirds delimiter — avant-scène zone */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, HD - 3]}>
         <planeGeometry args={[STAGE_WIDTH, 0.04]} />
-        <meshStandardMaterial color="#22d3ee" transparent opacity={0.06} />
+        <meshStandardMaterial color="#3977ff" transparent opacity={0.06} />
       </mesh>
 
       {/* Fond de scène zone delimiter */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, -HD + 3]}>
         <planeGeometry args={[STAGE_WIDTH, 0.04]} />
-        <meshStandardMaterial color="#22d3ee" transparent opacity={0.06} />
+        <meshStandardMaterial color="#3977ff" transparent opacity={0.06} />
       </mesh>
 
       {/* ── Back wall (fond de scène) — slightly blue-tinted ─────────── */}
@@ -109,7 +108,7 @@ export const StageGeometry = memo(function StageGeometry() {
 
       {/* ── Gril — overhead pipes ───────────────────────────────────── */}
       {Array.from({ length: 7 }, (_, i) => {
-        const z = -HD + i * 3;
+        const z = -HD + i * 3
         return (
           <group key={`pipe-${i}`}>
             <mesh position={[0, GRID_HEIGHT, z]} castShadow>
@@ -121,22 +120,22 @@ export const StageGeometry = memo(function StageGeometry() {
               position={[0, GRID_HEIGHT - 0.1, z]}
               target-position={[0, 0, z]}
               intensity={0.35}
-              color="#22d3ee"
+              color="#3977ff"
               angle={0.5}
               penumbra={0.8}
               distance={GRID_HEIGHT + 2}
               castShadow={false}
             />
           </group>
-        );
+        )
       })}
 
       {/* ── Avant-scène lip (glowing edge) ──────────────────────────── */}
       <mesh position={[0, 0.06, HD]} castShadow>
         <boxGeometry args={[STAGE_WIDTH, 0.12, 0.3]} />
         <meshStandardMaterial
-          color="#22d3ee"
-          emissive="#22d3ee"
+          color="#3977ff"
+          emissive="#3977ff"
           emissiveIntensity={0.55}
           roughness={0.4}
           metalness={0.2}
@@ -144,7 +143,7 @@ export const StageGeometry = memo(function StageGeometry() {
       </mesh>
 
       {/* ── Stage floor edge glow line ───────────────────────────────── */}
-      <pointLight position={[0, 0.3, HD]} intensity={0.4} color="#22d3ee" distance={8} />
+      <pointLight position={[0, 0.3, HD]} intensity={0.4} color="#3977ff" distance={8} />
 
       {/* ── Labels ──────────────────────────────────────────────────── */}
       <Html center position={[0, 0.5, -HD + 0.6]}>
@@ -171,5 +170,5 @@ export const StageGeometry = memo(function StageGeometry() {
         </div>
       </Html>
     </group>
-  );
-});
+  )
+})

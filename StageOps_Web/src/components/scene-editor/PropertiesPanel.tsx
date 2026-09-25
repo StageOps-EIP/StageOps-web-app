@@ -1,32 +1,47 @@
-import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { useSceneEditor } from './scene-editor.store';
-import { MATERIAL_PRESETS, PRESET_LABELS, kelvinToHex } from './scene-editor.materials';
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
+import { useSceneEditor } from './scene-editor.store'
+import { MATERIAL_PRESETS, PRESET_LABELS, kelvinToHex } from './scene-editor.materials'
 import type {
   SceneLight,
   SceneMaterial,
   SceneObject,
   MaterialPreset,
   SurfaceKey,
-} from './scene-editor.types';
+} from './scene-editor.types'
 
-const PRESET_KEYS = Object.keys(MATERIAL_PRESETS) as MaterialPreset[];
+const PRESET_KEYS = Object.keys(MATERIAL_PRESETS) as MaterialPreset[]
 
 const SURFACE_LABELS: Record<SurfaceKey, string> = {
-  floor:     'Sol',
-  backWall:  'Fond de scène',
-  leftWall:  'Jardin',
+  floor: 'Sol',
+  backWall: 'Fond de scène',
+  leftWall: 'Jardin',
   rightWall: 'Cour',
-  ceiling:   'Plafond',
-};
+  ceiling: 'Plafond',
+}
 
-function radToDeg(r: number) { return Math.round((r * 180) / Math.PI * 10) / 10; }
-function degToRad(d: number) { return (d * Math.PI) / 180; }
+function radToDeg(r: number) {
+  return Math.round(((r * 180) / Math.PI) * 10) / 10
+}
+function degToRad(d: number) {
+  return (d * Math.PI) / 180
+}
 
 // ─── Reusable slider ──────────────────────────────────────────────────────────
-function Slider({ label, value, min, max, step, onChange }: {
-  label: string; value: number; min: number; max: number; step: number;
-  onChange: (v: number) => void;
+function Slider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string
+  value: number
+  min: number
+  max: number
+  step: number
+  onChange: (v: number) => void
 }) {
   return (
     <div>
@@ -36,19 +51,30 @@ function Slider({ label, value, min, max, step, onChange }: {
       </div>
       <input
         type="range"
-        min={min} max={max} step={step}
+        min={min}
+        max={max}
+        step={step}
         value={value}
-        onChange={e => onChange(parseFloat(e.target.value))}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full h-1.5 rounded-full accent-cyan-400 bg-[#27272e]"
       />
     </div>
-  );
+  )
 }
 
 // ─── Number input ─────────────────────────────────────────────────────────────
-function NumInput({ label, value, step, min, onChange }: {
-  label: string; value: number; step?: number; min?: number;
-  onChange: (v: number) => void;
+function NumInput({
+  label,
+  value,
+  step,
+  min,
+  onChange,
+}: {
+  label: string
+  value: number
+  step?: number
+  min?: number
+  onChange: (v: number) => void
 }) {
   return (
     <div>
@@ -58,21 +84,24 @@ function NumInput({ label, value, step, min, onChange }: {
         step={step ?? 0.1}
         min={min}
         value={Math.round(value * 100) / 100}
-        onChange={e => onChange(parseFloat(e.target.value) || 0)}
+        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
         className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
       />
     </div>
-  );
+  )
 }
 
 // ─── Material preset grid ─────────────────────────────────────────────────────
-function MaterialPresetGrid({ current, onSelect }: {
-  current: SceneMaterial['preset'];
-  onSelect: (p: MaterialPreset) => void;
+function MaterialPresetGrid({
+  current,
+  onSelect,
+}: {
+  current: SceneMaterial['preset']
+  onSelect: (p: MaterialPreset) => void
 }) {
   return (
     <div className="grid grid-cols-4 gap-1.5 mb-4">
-      {PRESET_KEYS.map(p => (
+      {PRESET_KEYS.map((p) => (
         <button
           key={p}
           onClick={() => onSelect(p)}
@@ -93,26 +122,31 @@ function MaterialPresetGrid({ current, onSelect }: {
         </button>
       ))}
     </div>
-  );
+  )
 }
 
 // ─── Material editor ──────────────────────────────────────────────────────────
-function MaterialEditor({ material, onChange }: {
-  material: SceneMaterial;
-  onChange: (updates: Partial<SceneMaterial>) => void;
+function MaterialEditor({
+  material,
+  onChange,
+}: {
+  material: SceneMaterial
+  onChange: (updates: Partial<SceneMaterial>) => void
 }) {
   return (
     <div className="space-y-3">
       <MaterialPresetGrid
         current={material.preset}
         onSelect={(p) => {
-          const preset = MATERIAL_PRESETS[p];
-          onChange({ preset: p, ...preset });
+          const preset = MATERIAL_PRESETS[p]
+          onChange({ preset: p, ...preset })
         }}
       />
 
       <div className="h-px bg-[#27272e]" />
-      <p className="text-[10px] text-[#52525b] uppercase tracking-wider font-semibold">Personnaliser</p>
+      <p className="text-[10px] text-[#52525b] uppercase tracking-wider font-semibold">
+        Personnaliser
+      </p>
 
       <div>
         <label className="block text-[11px] text-[#71717a] mb-1">Couleur</label>
@@ -120,56 +154,80 @@ function MaterialEditor({ material, onChange }: {
           <input
             type="color"
             value={material.color}
-            onChange={e => onChange({ color: e.target.value, preset: 'custom' })}
+            onChange={(e) => onChange({ color: e.target.value, preset: 'custom' })}
             className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
           />
           <span className="text-xs text-[#52525b] font-mono">{material.color}</span>
         </div>
       </div>
 
-      <Slider label="Rugosité" value={material.roughness} min={0} max={1} step={0.01}
-        onChange={v => onChange({ roughness: v, preset: 'custom' })} />
-      <Slider label="Métallique" value={material.metalness} min={0} max={1} step={0.01}
-        onChange={v => onChange({ metalness: v, preset: 'custom' })} />
+      <Slider
+        label="Rugosité"
+        value={material.roughness}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={(v) => onChange({ roughness: v, preset: 'custom' })}
+      />
+      <Slider
+        label="Métallique"
+        value={material.metalness}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={(v) => onChange({ metalness: v, preset: 'custom' })}
+      />
 
       <div>
         <label className="block text-[11px] text-[#71717a] mb-1">Émissif</label>
         <input
           type="color"
           value={material.emissive}
-          onChange={e => onChange({ emissive: e.target.value })}
+          onChange={(e) => onChange({ emissive: e.target.value })}
           className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
         />
       </div>
 
-      <Slider label="Intensité émissive" value={material.emissiveIntensity} min={0} max={3} step={0.05}
-        onChange={v => onChange({ emissiveIntensity: v })} />
-      <Slider label="Opacité" value={material.opacity} min={0} max={1} step={0.01}
-        onChange={v => onChange({ opacity: v })} />
+      <Slider
+        label="Intensité émissive"
+        value={material.emissiveIntensity}
+        min={0}
+        max={3}
+        step={0.05}
+        onChange={(v) => onChange({ emissiveIntensity: v })}
+      />
+      <Slider
+        label="Opacité"
+        value={material.opacity}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={(v) => onChange({ opacity: v })}
+      />
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
           checked={material.wireframe}
-          onChange={e => onChange({ wireframe: e.target.checked })}
+          onChange={(e) => onChange({ wireframe: e.target.checked })}
           className="accent-cyan-400"
         />
         <span className="text-xs text-[#a1a1aa]">Wireframe</span>
       </label>
     </div>
-  );
+  )
 }
 
 // ─── Object panel ─────────────────────────────────────────────────────────────
 function ObjectPanel() {
-  const { state, dispatch } = useSceneEditor();
-  const [tab, setTab] = useState<'transform' | 'material'>('transform');
+  const { state, dispatch } = useSceneEditor()
+  const [tab, setTab] = useState<'transform' | 'material'>('transform')
 
-  const obj = state.objects.find(o => o.id === state.selectedId);
-  if (!obj) return null;
+  const obj = state.objects.find((o) => o.id === state.selectedId)
+  if (!obj) return null
 
   function updateObj(updates: Partial<SceneObject>) {
-    dispatch({ type: 'UPDATE_OBJECT', id: obj!.id, updates });
+    dispatch({ type: 'UPDATE_OBJECT', id: obj!.id, updates })
   }
 
   return (
@@ -181,12 +239,14 @@ function ObjectPanel() {
 
       {/* Tabs */}
       <div className="flex border-b border-[#27272e] mb-4 px-2">
-        {(['transform', 'material'] as const).map(t => (
+        {(['transform', 'material'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-3 py-2 text-xs font-medium capitalize transition-colors ${
-              tab === t ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-[#71717a] hover:text-[#a1a1aa]'
+              tab === t
+                ? 'text-cyan-400 border-b-2 border-cyan-400'
+                : 'text-[#71717a] hover:text-[#a1a1aa]'
             }`}
           >
             {t === 'transform' ? 'Transform' : 'Matériau'}
@@ -198,51 +258,72 @@ function ObjectPanel() {
         {tab === 'transform' && (
           <>
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">Position</p>
+              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+                Position
+              </p>
               <div className="grid grid-cols-3 gap-1.5">
                 {(['x', 'y', 'z'] as const).map((axis, i) => (
-                  <NumInput key={axis} label={axis.toUpperCase()} value={obj.position[i]}
-                    onChange={v => {
-                      const pos = [...obj.position] as [number,number,number];
-                      pos[i] = v;
-                      updateObj({ position: pos });
-                    }} />
+                  <NumInput
+                    key={axis}
+                    label={axis.toUpperCase()}
+                    value={obj.position[i]}
+                    onChange={(v) => {
+                      const pos = [...obj.position] as [number, number, number]
+                      pos[i] = v
+                      updateObj({ position: pos })
+                    }}
+                  />
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">Rotation (°)</p>
+              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+                Rotation (°)
+              </p>
               <div className="grid grid-cols-3 gap-1.5">
                 {(['x', 'y', 'z'] as const).map((axis, i) => (
-                  <NumInput key={axis} label={axis.toUpperCase()} value={radToDeg(obj.rotation[i])}
+                  <NumInput
+                    key={axis}
+                    label={axis.toUpperCase()}
+                    value={radToDeg(obj.rotation[i])}
                     step={1}
-                    onChange={v => {
-                      const rot = [...obj.rotation] as [number,number,number];
-                      rot[i] = degToRad(v);
-                      updateObj({ rotation: rot });
-                    }} />
+                    onChange={(v) => {
+                      const rot = [...obj.rotation] as [number, number, number]
+                      rot[i] = degToRad(v)
+                      updateObj({ rotation: rot })
+                    }}
+                  />
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">Échelle</p>
+              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+                Échelle
+              </p>
               <div className="grid grid-cols-3 gap-1.5">
                 {(['x', 'y', 'z'] as const).map((axis, i) => (
-                  <NumInput key={axis} label={axis.toUpperCase()} value={obj.scale[i]}
-                    step={0.01} min={0.01}
-                    onChange={v => {
-                      const sc = [...obj.scale] as [number,number,number];
-                      sc[i] = Math.max(0.01, v);
-                      updateObj({ scale: sc });
-                    }} />
+                  <NumInput
+                    key={axis}
+                    label={axis.toUpperCase()}
+                    value={obj.scale[i]}
+                    step={0.01}
+                    min={0.01}
+                    onChange={(v) => {
+                      const sc = [...obj.scale] as [number, number, number]
+                      sc[i] = Math.max(0.01, v)
+                      updateObj({ scale: sc })
+                    }}
+                  />
                 ))}
               </div>
             </div>
 
             <button
-              onClick={() => updateObj({ position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [1, 1, 1] })}
+              onClick={() =>
+                updateObj({ position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [1, 1, 1] })
+              }
               className="w-full px-3 py-1.5 rounded-lg text-xs text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
             >
               Réinitialiser transform
@@ -250,15 +331,21 @@ function ObjectPanel() {
 
             <div className="flex gap-4">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={obj.visible}
-                  onChange={e => updateObj({ visible: e.target.checked })}
-                  className="accent-cyan-400" />
+                <input
+                  type="checkbox"
+                  checked={obj.visible}
+                  onChange={(e) => updateObj({ visible: e.target.checked })}
+                  className="accent-cyan-400"
+                />
                 <span className="text-xs text-[#a1a1aa]">Visible</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={obj.locked}
-                  onChange={e => updateObj({ locked: e.target.checked })}
-                  className="accent-cyan-400" />
+                <input
+                  type="checkbox"
+                  checked={obj.locked}
+                  onChange={(e) => updateObj({ locked: e.target.checked })}
+                  className="accent-cyan-400"
+                />
                 <span className="text-xs text-[#a1a1aa]">Verrouillé</span>
               </label>
             </div>
@@ -268,31 +355,33 @@ function ObjectPanel() {
         {tab === 'material' && (
           <MaterialEditor
             material={obj.material}
-            onChange={updates => updateObj({ material: { ...obj.material, ...updates } })}
+            onChange={(updates) => updateObj({ material: { ...obj.material, ...updates } })}
           />
         )}
       </div>
     </div>
-  );
+  )
 }
 
 // ─── Light panel ──────────────────────────────────────────────────────────────
 function LightPanel() {
-  const { state, dispatch } = useSceneEditor();
-  const light = state.lights.find(l => l.id === state.selectedId);
-  if (!light) return null;
+  const { state, dispatch } = useSceneEditor()
+  const light = state.lights.find((l) => l.id === state.selectedId)
+  if (!light) return null
 
   function update(updates: Partial<SceneLight>) {
-    dispatch({ type: 'UPDATE_LIGHT', id: light!.id, updates });
+    dispatch({ type: 'UPDATE_LIGHT', id: light!.id, updates })
   }
 
   const typeLabels: Record<string, string> = {
-    directional: 'Directionnelle', spot: 'Spot', point: 'Ponctuelle', 'rect-area': 'Area',
-  };
+    directional: 'Directionnelle',
+    spot: 'Spot',
+    point: 'Ponctuelle',
+    'rect-area': 'Area',
+  }
 
   return (
     <div className="px-4 space-y-4">
-
       {/* En-tête : badge type + nom modifiable */}
       <div>
         <span className="inline-block px-2 py-0.5 rounded-full bg-[#27272e] text-[10px] text-[#a1a1aa] font-medium">
@@ -301,22 +390,28 @@ function LightPanel() {
         <input
           type="text"
           value={light.name}
-          onChange={e => update({ name: e.target.value })}
+          onChange={(e) => update({ name: e.target.value })}
           className="mt-1 w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
         />
       </div>
 
       {/* Position XYZ */}
       <div>
-        <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">Position</p>
+        <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+          Position
+        </p>
         <div className="grid grid-cols-3 gap-1.5">
           {(['x', 'y', 'z'] as const).map((axis, i) => (
-            <NumInput key={axis} label={axis.toUpperCase()} value={light.position[i]}
-              onChange={v => {
-                const pos = [...light.position] as [number, number, number];
-                pos[i] = v;
-                update({ position: pos });
-              }} />
+            <NumInput
+              key={axis}
+              label={axis.toUpperCase()}
+              value={light.position[i]}
+              onChange={(v) => {
+                const pos = [...light.position] as [number, number, number]
+                pos[i] = v
+                update({ position: pos })
+              }}
+            />
           ))}
         </div>
       </div>
@@ -324,22 +419,34 @@ function LightPanel() {
       {/* Target XYZ — spot uniquement */}
       {light.type === 'spot' && (
         <div>
-          <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">Cible (Target)</p>
+          <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+            Cible (Target)
+          </p>
           <div className="grid grid-cols-3 gap-1.5">
             {(['x', 'y', 'z'] as const).map((axis, i) => (
-              <NumInput key={axis} label={axis.toUpperCase()} value={(light.targetPosition ?? [0, 0, 0])[i]}
-                onChange={v => {
-                  const tgt = [...(light.targetPosition ?? [0, 0, 0])] as [number, number, number];
-                  tgt[i] = v;
-                  update({ targetPosition: tgt });
-                }} />
+              <NumInput
+                key={axis}
+                label={axis.toUpperCase()}
+                value={(light.targetPosition ?? [0, 0, 0])[i]}
+                onChange={(v) => {
+                  const tgt = [...(light.targetPosition ?? [0, 0, 0])] as [number, number, number]
+                  tgt[i] = v
+                  update({ targetPosition: tgt })
+                }}
+              />
             ))}
           </div>
         </div>
       )}
 
-      <Slider label="Intensité" value={light.intensity} min={0} max={10} step={0.05}
-        onChange={v => update({ intensity: v })} />
+      <Slider
+        label="Intensité"
+        value={light.intensity}
+        min={0}
+        max={10}
+        step={0.05}
+        onChange={(v) => update({ intensity: v })}
+      />
 
       {/* Température avec barre gradient */}
       <div>
@@ -354,11 +461,14 @@ function LightPanel() {
           </div>
         </div>
         <input
-          type="range" min={2700} max={10000} step={100}
+          type="range"
+          min={2700}
+          max={10000}
+          step={100}
           value={light.temperature}
-          onChange={e => {
-            const temp = parseInt(e.target.value);
-            update({ temperature: temp, color: kelvinToHex(temp) });
+          onChange={(e) => {
+            const temp = parseInt(e.target.value)
+            update({ temperature: temp, color: kelvinToHex(temp) })
           }}
           className="w-full h-1.5 rounded-full accent-cyan-400"
           style={{ background: 'transparent' }}
@@ -376,44 +486,71 @@ function LightPanel() {
 
       <div>
         <label className="block text-[11px] text-[#71717a] mb-1">Couleur override</label>
-        <input type="color" value={light.color}
-          onChange={e => update({ color: e.target.value })}
-          className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
+        <input
+          type="color"
+          value={light.color}
+          onChange={(e) => update({ color: e.target.value })}
+          className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
+        />
       </div>
 
       {(light.type === 'spot' || light.type === 'directional') && (
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={light.castShadow}
-            onChange={e => update({ castShadow: e.target.checked })}
-            className="accent-cyan-400" />
+          <input
+            type="checkbox"
+            checked={light.castShadow}
+            onChange={(e) => update({ castShadow: e.target.checked })}
+            className="accent-cyan-400"
+          />
           <span className="text-xs text-[#a1a1aa]">Projeter ombres</span>
         </label>
       )}
 
       {light.type === 'spot' && (
         <>
-          <Slider label="Angle (°)" value={radToDeg(light.angle)} min={1} max={90} step={1}
-            onChange={v => update({ angle: degToRad(v) })} />
-          <Slider label="Pénombre" value={light.penumbra} min={0} max={1} step={0.01}
-            onChange={v => update({ penumbra: v })} />
+          <Slider
+            label="Angle (°)"
+            value={radToDeg(light.angle)}
+            min={1}
+            max={90}
+            step={1}
+            onChange={(v) => update({ angle: degToRad(v) })}
+          />
+          <Slider
+            label="Pénombre"
+            value={light.penumbra}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={(v) => update({ penumbra: v })}
+          />
         </>
       )}
 
       {(light.type === 'spot' || light.type === 'point') && (
-        <Slider label="Distance" value={light.distance} min={0} max={50} step={0.5}
-          onChange={v => update({ distance: v })} />
+        <Slider
+          label="Distance"
+          value={light.distance}
+          min={0}
+          max={50}
+          step={0.5}
+          onChange={(v) => update({ distance: v })}
+        />
       )}
 
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" checked={light.visible}
-          onChange={e => update({ visible: e.target.checked })}
-          className="accent-cyan-400" />
+        <input
+          type="checkbox"
+          checked={light.visible}
+          onChange={(e) => update({ visible: e.target.checked })}
+          className="accent-cyan-400"
+        />
         <span className="text-xs text-[#a1a1aa]">Visible</span>
       </label>
 
       <button
         onClick={() => {
-          dispatch({ type: 'DELETE_LIGHT', id: light.id });
+          dispatch({ type: 'DELETE_LIGHT', id: light.id })
         }}
         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
       >
@@ -421,24 +558,24 @@ function LightPanel() {
         Supprimer la lumière
       </button>
     </div>
-  );
+  )
 }
 
 // ─── Surface panel ────────────────────────────────────────────────────────────
 function SurfacePanel() {
-  const { state, dispatch } = useSceneEditor();
-  const key = state.selectedSurface;
-  if (!key) return null;
+  const { state, dispatch } = useSceneEditor()
+  const key = state.selectedSurface
+  if (!key) return null
 
-  const mat = state.surfaces[key];
+  const mat = state.surfaces[key]
 
   function update(updates: Partial<typeof mat>) {
-    dispatch({ type: 'UPDATE_SURFACE', surface: key!, material: updates });
+    dispatch({ type: 'UPDATE_SURFACE', surface: key!, material: updates })
   }
 
   function applyToAll() {
-    const surfaces: SurfaceKey[] = ['floor', 'backWall', 'leftWall', 'rightWall', 'ceiling'];
-    surfaces.forEach(s => dispatch({ type: 'UPDATE_SURFACE', surface: s, material: mat }));
+    const surfaces: SurfaceKey[] = ['floor', 'backWall', 'leftWall', 'rightWall', 'ceiling']
+    surfaces.forEach((s) => dispatch({ type: 'UPDATE_SURFACE', surface: s, material: mat }))
   }
 
   return (
@@ -447,10 +584,7 @@ function SurfacePanel() {
         <p className="text-xs text-[#a1a1aa] font-medium">Surface : {SURFACE_LABELS[key]}</p>
       </div>
 
-      <MaterialEditor
-        material={mat}
-        onChange={update}
-      />
+      <MaterialEditor material={mat} onChange={update} />
 
       <button
         onClick={applyToAll}
@@ -459,32 +593,32 @@ function SurfacePanel() {
         Appliquer à toutes les surfaces
       </button>
     </div>
-  );
+  )
 }
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 export function PropertiesPanel() {
-  const { state } = useSceneEditor();
-  const { selectedType } = state;
+  const { state } = useSceneEditor()
+  const { selectedType } = state
 
   return (
-    <div className="w-72 flex-shrink-0 bg-[#0e0e12] border-l border-[#27272e] flex flex-col overflow-hidden">
-      <div className="px-4 py-3 border-b border-[#27272e] flex-shrink-0">
-        <h2 className="text-xs font-semibold text-[#f5f5f7] uppercase tracking-wider">Propriétés</h2>
+    <div className="flex w-64 flex-shrink-0 flex-col overflow-hidden border-l border-theme-border bg-theme-base lg:w-72">
+      <div className="flex-shrink-0 border-b border-theme-border px-4 py-3">
+        <h2 className="text-xs font-semibold text-content-primary">Propriétés</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto py-4">
         {!selectedType && (
           <div className="px-4 text-center py-12">
-            <p className="text-xs text-[#52525b] leading-relaxed">
+            <p className="text-xs leading-relaxed text-content-subtle">
               Cliquez sur un objet, une lumière ou une surface pour modifier ses propriétés.
             </p>
           </div>
         )}
         {selectedType === 'object' && <ObjectPanel />}
-        {selectedType === 'light'  && <LightPanel />}
+        {selectedType === 'light' && <LightPanel />}
         {selectedType === 'surface' && <SurfacePanel />}
       </div>
     </div>
-  );
+  )
 }

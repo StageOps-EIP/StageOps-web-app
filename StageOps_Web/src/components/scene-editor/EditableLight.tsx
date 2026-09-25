@@ -1,45 +1,45 @@
-import { useRef, useState, useCallback } from 'react';
-import * as THREE from 'three';
-import { type ThreeEvent } from '@react-three/fiber';
-import { TransformControls } from '@react-three/drei';
-import { useSceneEditor } from './scene-editor.store';
-import { kelvinToHex } from './scene-editor.materials';
-import type { SceneLight } from './scene-editor.types';
+import { useRef, useState, useCallback } from 'react'
+import * as THREE from 'three'
+import { type ThreeEvent } from '@react-three/fiber'
+import { TransformControls } from '@react-three/drei'
+import { useSceneEditor } from './scene-editor.store'
+import { kelvinToHex } from './scene-editor.materials'
+import type { SceneLight } from './scene-editor.types'
 
 interface EditableLightProps {
-  light: SceneLight;
-  isSelected: boolean;
-  onDrag: (dragging: boolean) => void;
-  readOnly?: boolean;
+  light: SceneLight
+  isSelected: boolean
+  onDrag: (dragging: boolean) => void
+  readOnly?: boolean
 }
 
 export function EditableLight({ light, isSelected, onDrag, readOnly = false }: EditableLightProps) {
-  const { dispatch } = useSceneEditor();
-  const helperRef = useRef<THREE.Mesh>(null!);
-  const [helperMounted, setHelperMounted] = useState(false);
-  const [spotTarget, setSpotTarget] = useState<THREE.Object3D | null>(null);
+  const { dispatch } = useSceneEditor()
+  const helperRef = useRef<THREE.Mesh>(null!)
+  const [helperMounted, setHelperMounted] = useState(false)
+  const [spotTarget, setSpotTarget] = useState<THREE.Object3D | null>(null)
 
   const callbackHelperRef = useCallback((node: THREE.Mesh | null) => {
-    helperRef.current = node!;
-    setHelperMounted(node !== null);
-  }, []);
+    helperRef.current = node!
+    setHelperMounted(node !== null)
+  }, [])
 
   // Temperature drives colour; light.color is an override tint
-  const finalColor = kelvinToHex(light.temperature);
+  const finalColor = kelvinToHex(light.temperature)
 
   function handleHelperClick(e: ThreeEvent<MouseEvent>) {
-    if (readOnly) return;
-    e.stopPropagation?.();
-    dispatch({ type: 'SELECT_LIGHT', id: isSelected ? null : light.id });
+    if (readOnly) return
+    e.stopPropagation?.()
+    dispatch({ type: 'SELECT_LIGHT', id: isSelected ? null : light.id })
   }
 
   function handleObjectChange() {
-    if (!helperRef.current) return;
-    const pos = helperRef.current.position.toArray() as [number, number, number];
-    dispatch({ type: 'UPDATE_LIGHT', id: light.id, updates: { position: pos } });
+    if (!helperRef.current) return
+    const pos = helperRef.current.position.toArray() as [number, number, number]
+    dispatch({ type: 'UPDATE_LIGHT', id: light.id, updates: { position: pos } })
   }
 
-  if (!light.visible) return null;
+  if (!light.visible) return null
 
   return (
     <group>
@@ -98,17 +98,9 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
       {/* ─ Helper sphere (hidden in readOnly) ───────────────────────── */}
       {!readOnly && (
         <>
-          <mesh
-            ref={callbackHelperRef}
-            position={light.position}
-            onClick={handleHelperClick}
-          >
+          <mesh ref={callbackHelperRef} position={light.position} onClick={handleHelperClick}>
             <sphereGeometry args={[0.4, 16, 16]} />
-            <meshBasicMaterial
-              color={finalColor}
-              transparent
-              opacity={isSelected ? 1.0 : 0.85}
-            />
+            <meshBasicMaterial color={finalColor} transparent opacity={isSelected ? 1.0 : 0.85} />
           </mesh>
 
           {/* Halo around helper */}
@@ -121,27 +113,31 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
           {isSelected && (
             <mesh position={light.position}>
               <sphereGeometry args={[0.55, 16, 16]} />
-              <meshBasicMaterial color="#22d3ee" wireframe transparent opacity={0.5} />
+              <meshBasicMaterial color="#7964ff" wireframe transparent opacity={0.5} />
             </mesh>
           )}
 
           {/* ─ SpotLight cone — oriented toward target ─────────────────── */}
-          {light.type === 'spot' && (() => {
-            const from = new THREE.Vector3(...light.position);
-            const to = new THREE.Vector3(...light.targetPosition);
-            const dir = to.clone().sub(from).normalize();
-            const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-            const euler = new THREE.Euler().setFromQuaternion(q);
-            const coneLen = 5;
-            const coneR = Math.tan(light.angle) * coneLen;
-            const midPos = from.clone().add(dir.clone().multiplyScalar(coneLen / 2));
-            return (
-              <mesh position={midPos.toArray() as [number, number, number]} rotation={[euler.x, euler.y, euler.z]}>
-                <coneGeometry args={[coneR, coneLen, 12, 1, true]} />
-                <meshBasicMaterial color={finalColor} wireframe transparent opacity={0.12} />
-              </mesh>
-            );
-          })()}
+          {light.type === 'spot' &&
+            (() => {
+              const from = new THREE.Vector3(...light.position)
+              const to = new THREE.Vector3(...light.targetPosition)
+              const dir = to.clone().sub(from).normalize()
+              const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir)
+              const euler = new THREE.Euler().setFromQuaternion(q)
+              const coneLen = 5
+              const coneR = Math.tan(light.angle) * coneLen
+              const midPos = from.clone().add(dir.clone().multiplyScalar(coneLen / 2))
+              return (
+                <mesh
+                  position={midPos.toArray() as [number, number, number]}
+                  rotation={[euler.x, euler.y, euler.z]}
+                >
+                  <coneGeometry args={[coneR, coneLen, 12, 1, true]} />
+                  <meshBasicMaterial color={finalColor} wireframe transparent opacity={0.12} />
+                </mesh>
+              )
+            })()}
 
           {/* ─ DirectionalLight disk + direction arrow ───────────────────── */}
           {light.type === 'directional' && (
@@ -149,7 +145,12 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
               {/* Flat disk */}
               <mesh rotation={[Math.PI / 2, 0, 0]}>
                 <circleGeometry args={[0.5, 16]} />
-                <meshBasicMaterial color={finalColor} transparent opacity={0.25} side={THREE.DoubleSide} />
+                <meshBasicMaterial
+                  color={finalColor}
+                  transparent
+                  opacity={0.25}
+                  side={THREE.DoubleSide}
+                />
               </mesh>
               {/* Direction line (towards target) */}
               <mesh rotation={[0, 0, 0]}>
@@ -185,5 +186,5 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
         </>
       )}
     </group>
-  );
+  )
 }
