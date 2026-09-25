@@ -1,37 +1,46 @@
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/bricolage-grotesque";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-void: #0a0a0b;
-  --bg-deeper: #0e0e12;
-  --bg-base: #131316;
-  --bg-elevated: #1c1c21;
-  --border: #27272e;
-  --border-hover: #35353e;
-  --border-strong: #3d3d47;
-  --text-primary: #f5f5f7;
-  --text-muted: #a1a1aa;
-  --text-subtle: #8b8b95;
-  --text-faint: #6b6b74;
-  --accent: #22d3ee;
-  --accent-hover: #06b6d4;
+  --bg-void: #070b1a;
+  --bg-deeper: #0a1025;
+  --bg-base: #0f1730;
+  --bg-elevated: #151f3d;
+  --border: #263356;
+  --border-hover: #384971;
+  --border-strong: #52638e;
+  --text-primary: #f7f8ff;
+  --text-muted: #aab2cf;
+  --text-subtle: #7e89ad;
+  --text-faint: #606b90;
+  --accent: #7885ff;
+  --accent-hover: #97a0ff;
+  --accent-violet: #7555f4;
+  --accent-soft: rgba(120, 133, 255, 0.12);
+  --panel-shadow: 0 18px 50px rgba(3, 7, 24, 0.2);
 }
 
 .light {
-  --bg-void: #f0f2f5;
-  --bg-deeper: #e8eaed;
+  --bg-void: #f3f5fc;
+  --bg-deeper: #e9edf8;
   --bg-base: #ffffff;
-  --bg-elevated: #f3f4f6;
-  --border: #e5e7eb;
-  --border-hover: #d1d5db;
-  --border-strong: #9ca3af;
-  --text-primary: #111827;
-  --text-muted: #6b7280;
-  --text-subtle: #6b7280;
-  --text-faint: #9ca3af;
-  --accent: #0891b2;
-  --accent-hover: #0e7490;
+  --bg-elevated: #f6f7fc;
+  --border: #dde2f1;
+  --border-hover: #c9d0e6;
+  --border-strong: #a8b3d2;
+  --text-primary: #101735;
+  --text-muted: #596582;
+  --text-subtle: #74809c;
+  --text-faint: #929cb5;
+  --accent: #4b5fe9;
+  --accent-hover: #354ad7;
+  --accent-violet: #6d4de8;
+  --accent-soft: rgba(75, 95, 233, 0.08);
+  --panel-shadow: 0 16px 44px rgba(43, 55, 104, 0.08);
 }
 
 
@@ -49,16 +58,18 @@
   }
 
   body {
-    background-color: var(--bg-void);
+    background:
+      radial-gradient(circle at 78% -10%, rgba(85, 93, 237, 0.13), transparent 34rem),
+      var(--bg-void);
     color: var(--text-primary);
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Manrope Variable", "Manrope", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   *:focus-visible {
-    outline: 2px solid #00ffff;
-    outline-offset: 2px;
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
   ::-webkit-scrollbar {
@@ -106,5 +117,133 @@
   }
   .skip-link:focus {
     top: 0;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .app-surface {
+    position: relative;
+    isolation: isolate;
+    min-height: 100%;
+  }
+
+  .app-surface::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.42;
+    background-image:
+      linear-gradient(rgba(120, 133, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120, 133, 255, 0.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent 65%);
+  }
+
+  .page-shell {
+    width: min(100%, 1600px);
+    margin-inline: auto;
+    padding: 1.25rem;
+    animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .page-heading {
+    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
+    font-size: clamp(1.75rem, 2.4vw, 2.5rem);
+    font-weight: 650;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .glass-panel {
+    background: color-mix(in srgb, var(--bg-base) 88%, transparent);
+    border: 1px solid var(--border);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(18px);
+  }
+
+  .stageops-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+  }
+
+  .stageops-logo__mark {
+    position: relative;
+    display: block;
+    width: 2.35rem;
+    height: 2.35rem;
+    flex: none;
+    overflow: hidden;
+    border-radius: 0.78rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(57, 77, 220, 0.3);
+  }
+
+  .stageops-logo__mark img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 215%;
+    max-width: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .stageops-logo__wordmark {
+    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 750;
+    letter-spacing: -0.055em;
+    line-height: 1;
+  }
+
+  .stageops-logo--compact .stageops-logo__mark {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .page-shell {
+    padding: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

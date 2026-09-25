@@ -44,17 +44,17 @@ export function AppearanceSettings() {
         >
           <div className="flex gap-2">
             {[
-              { color: '#00ffff', label: 'Cyan' },
-              { color: '#a3ff12', label: 'Lime' },
-              { color: '#a855f7', label: 'Violet' },
-              { color: '#3b82f6', label: 'Bleu' },
+              { color: '#7885ff', label: 'Indigo StageOps' },
+              { color: '#7555f4', label: 'Violet' },
+              { color: '#4566f2', label: 'Bleu électrique' },
+              { color: '#0a1236', label: 'Bleu nuit' },
             ].map((c) => (
               <button
                 key={c.color}
                 className="w-8 h-8 rounded-xl border-2 transition-all hover:scale-110"
                 style={{
                   backgroundColor: `${c.color}20`,
-                  borderColor: c.color === '#00ffff' ? c.color : 'transparent',
+                  borderColor: c.color === '#7885ff' ? c.color : 'transparent',
                 }}
                 title={c.label}
               >

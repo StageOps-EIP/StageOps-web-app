@@ -1,5 +1,4 @@
-import type { ButtonHTMLAttributes} from 'react';
-import { forwardRef } from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -9,33 +8,37 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', fullWidth = false, className = '', children, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-void';
-    
+    const baseStyles =
+      'group relative inline-flex items-center justify-center overflow-hidden font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-void active:translate-y-px';
+
     const variants = {
-      primary: 'bg-cyan-400 text-black hover:bg-cyan-300 active:bg-cyan-500',
-      secondary: 'bg-transparent text-content-primary hover:bg-white/5 border border-theme-border-hover hover:border-theme-border-strong',
-      ghost: 'text-content-primary hover:bg-theme-elevated active:bg-theme-border',
-      danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
+      primary:
+        'bg-gradient-to-r from-cyan-500 to-brand-violet text-white shadow-[0_10px_28px_rgba(82,101,244,0.24)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(82,101,244,0.34)]',
+      secondary:
+        'border border-theme-border-hover bg-theme-base text-content-primary shadow-sm hover:-translate-y-0.5 hover:border-cyan-400/35 hover:bg-theme-elevated',
+      ghost: 'text-content-muted hover:bg-cyan-400/10 hover:text-cyan-300',
+      danger: 'border border-red-400/30 bg-red-500/90 text-white shadow-lg shadow-red-950/15 hover:bg-red-500',
     };
-    
+
     const sizes = {
-      sm: 'px-3 py-1.5 text-sm rounded-lg gap-1.5',
-      md: 'px-4 py-2.5 text-sm rounded-xl gap-2',
-      lg: 'px-6 py-3 text-base rounded-xl gap-2',
+      sm: 'gap-1.5 rounded-lg px-3 py-1.5 text-xs',
+      md: 'gap-2 rounded-xl px-4 py-2.5 text-sm',
+      lg: 'gap-2.5 rounded-xl px-5 py-3 text-sm',
     };
-    
-    const widthClass = fullWidth ? 'w-full' : '';
-    
+
     return (
       <button
         ref={ref}
-        className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
+        className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
         {...props}
       >
-        {children}
+        {variant === 'primary' && (
+          <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-[500%]" />
+        )}
+        <span className="relative contents">{children}</span>
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = 'Button';
