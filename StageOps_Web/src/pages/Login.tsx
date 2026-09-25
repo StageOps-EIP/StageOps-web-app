@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff, Lock, Mail, Radio, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Radio, ShieldCheck } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { StageOpsLogo } from '@/components/brand/StageOpsLogo';
 import { Button } from '@/components/design-system/Button';
@@ -32,61 +32,70 @@ export function Login() {
   };
 
   return (
-    <main id="main-content" className="relative min-h-dvh overflow-hidden bg-[#070b1a] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(117,85,244,.2),transparent_28rem),radial-gradient(circle_at_90%_80%,rgba(69,102,242,.18),transparent_32rem)]" />
-      <div className="relative grid min-h-dvh lg:grid-cols-[1.05fr_.95fr]">
-        <section className="relative hidden overflow-hidden border-r border-white/10 p-10 lg:flex lg:flex-col xl:p-14">
-          <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(120,133,255,.13)_1px,transparent_1px),linear-gradient(90deg,rgba(120,133,255,.13)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
-          <div className="relative">
+    <main id="main-content" className="auth-surface relative min-h-dvh overflow-hidden bg-[#05060a] text-[#f3f1eb]">
+      <div className="absolute inset-x-0 top-0 z-20 grid h-1 grid-cols-[34%_22%_1fr]">
+        <span className="bg-[#7964ff]" /><span className="bg-[#3977ff]" /><span className="bg-[#11141d]" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_right,black,transparent_72%)]" />
+
+      <div className="relative grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_34rem]">
+        <section className="relative hidden overflow-hidden border-r border-[#252b3a] p-10 lg:flex lg:flex-col xl:p-14">
+          <div className="relative z-10 flex items-center justify-between">
             <StageOpsLogo inverse />
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#747b8e]">Operations system / 01</span>
           </div>
 
-          <div className="relative my-auto max-w-xl py-12">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold text-cyan-200">
-              <Radio size={13} /> Le poste de contrôle de vos productions
+          <div className="relative z-10 my-auto max-w-4xl py-16">
+            <div className="mb-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-[#9586ff]">
+              <span className="h-px w-10 bg-[#7964ff]" /><Radio size={12} /> Live production control
             </div>
-            <h1 className="text-5xl font-semibold leading-[1.04] tracking-[-0.055em] xl:text-6xl">
-              La régie gagne en <span className="bg-gradient-to-r from-cyan-300 to-violet-300 bg-clip-text text-transparent">précision.</span>
+            <h1 className="max-w-[11ch] text-[clamp(4.5rem,8vw,9rem)] font-medium leading-[0.78] tracking-[-0.085em]">
+              Pilotez<br />l’invisible<span className="text-[#7964ff]">.</span>
             </h1>
-            <p className="mt-6 max-w-lg text-base leading-7 text-blue-100/65">
-              Centralisez la scène, le matériel, les équipes et les incidents dans un espace pensé pour les opérations en direct.
+            <p className="mt-10 max-w-lg border-l border-[#7964ff] pl-5 text-sm leading-7 text-[#a4a9b7] xl:text-base">
+              La scène, le parc et les équipes réunis dans un seul poste de commandement conçu pour le direct.
             </p>
-            <div className="mt-10 grid max-w-lg grid-cols-3 gap-3">
-              {['Suivi temps réel', 'Parc centralisé', 'Équipe coordonnée'].map((feature) => (
-                <div key={feature} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4 backdrop-blur-sm">
-                  <CheckCircle2 size={17} className="mb-4 text-cyan-300" />
-                  <p className="text-xs font-semibold leading-5 text-blue-50/85">{feature}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <p className="relative text-xs text-blue-100/40">© 2026 StageOps · Opérations scéniques</p>
+          <div className="relative z-10 grid grid-cols-3 border-y border-[#252b3a] font-mono text-[9px] uppercase tracking-[0.12em] text-[#747b8e]">
+            <span className="border-r border-[#252b3a] py-3">Scene / 3D</span>
+            <span className="border-r border-[#252b3a] px-4 py-3">Assets / Live</span>
+            <span className="px-4 py-3">Team / Sync</span>
+          </div>
+
+          <img
+            src="/brand/stageops-mark-transparent.png"
+            alt=""
+            className="pointer-events-none absolute -bottom-28 -right-32 w-[38rem] opacity-[0.1] saturate-150"
+          />
         </section>
 
-        <section className="flex items-center justify-center p-5 sm:p-8 lg:p-12">
+        <section className="relative flex items-center justify-center bg-[#080a10]/90 px-5 py-10 sm:px-10 lg:px-12">
           <div className="w-full max-w-md animate-fade-up">
-            <div className="mb-10 flex items-center justify-between lg:hidden">
+            <div className="mb-12 flex items-center justify-between lg:hidden">
               <StageOpsLogo inverse />
-              <Link to="/" className="flex items-center gap-2 text-xs font-semibold text-blue-100/60 hover:text-white">
-                <ArrowLeft size={14} /> Retour
+              <Link to="/" className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-[#747b8e] hover:text-white">
+                <ArrowLeft size={13} /> Retour
               </Link>
             </div>
 
-            <div className="mb-8">
-              <p className="eyebrow mb-3"><ShieldCheck size={13} /> Espace sécurisé</p>
-              <h2 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Bienvenue.</h2>
-              <p className="mt-2 text-sm leading-6 text-blue-100/55">Connectez-vous pour retrouver votre environnement de production.</p>
+            <div className="mb-10 border-b border-[#252b3a] pb-7">
+              <div className="mb-5 flex items-center justify-between">
+                <p className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#9586ff]"><ShieldCheck size={12} /> Accès sécurisé</p>
+                <span className="font-mono text-[9px] text-[#505767]">01 / 02</span>
+              </div>
+              <h2 className="text-5xl font-medium tracking-[-0.065em]">Identification</h2>
+              <p className="mt-3 text-sm leading-6 text-[#747b8e]">Ouvrez votre environnement de production.</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleLogin} className="space-y-6">
               <Input
                 type="email"
                 label="Adresse e-mail"
                 placeholder="prenom@organisation.fr"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                icon={<Mail size={17} />}
+                icon={<Mail size={16} />}
                 autoComplete="email"
                 required
               />
@@ -99,7 +108,7 @@ export function Login() {
                     placeholder="Votre mot de passe"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    icon={<Lock size={17} />}
+                    icon={<Lock size={16} />}
                     autoComplete="current-password"
                     className="pr-12"
                     required
@@ -108,44 +117,37 @@ export function Login() {
                     type="button"
                     aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                     onClick={() => setShowPassword((visible) => !visible)}
-                    className="absolute bottom-3 right-3 text-content-subtle transition-colors hover:text-content-primary"
+                    className="absolute bottom-3 right-3 text-[#747b8e] transition-colors hover:text-white"
                   >
-                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-4 text-xs">
-                  <label className="flex cursor-pointer items-center gap-2 text-blue-100/55">
-                    <input type="checkbox" className="h-4 w-4 rounded border-theme-border bg-theme-elevated accent-cyan-400" />
+                <div className="mt-4 flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-wider">
+                  <label className="flex cursor-pointer items-center gap-2 text-[#747b8e]">
+                    <input type="checkbox" className="h-3.5 w-3.5 border-[#3b4357] bg-[#0d1018] accent-[#7964ff]" />
                     Rester connecté
                   </label>
-                  <button type="button" className="font-semibold text-cyan-300 hover:text-cyan-200">Mot de passe oublié ?</button>
+                  <button type="button" className="text-[#9586ff] hover:text-white">Accès perdu ?</button>
                 </div>
               </div>
 
-              {error && (
-                <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-                  {error}
-                </p>
-              )}
+              {error && <p role="alert" className="border-l-2 border-red-400 bg-red-400/10 px-4 py-3 text-xs text-red-200">{error}</p>}
 
               <Button type="submit" size="lg" fullWidth disabled={isLoading}>
-                {isLoading ? 'Connexion en cours…' : <>Se connecter <ArrowRight size={16} /></>}
+                {isLoading ? 'Connexion en cours…' : <>Entrer dans StageOps <ArrowRight size={15} /></>}
               </Button>
             </form>
 
-            <div className="my-7 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-100/30">
-              <span className="h-px flex-1 bg-white/10" /> ou <span className="h-px flex-1 bg-white/10" />
+            <div className="my-7 flex items-center gap-3 font-mono text-[8px] uppercase tracking-[0.2em] text-[#505767]">
+              <span className="h-px flex-1 bg-[#252b3a]" /> Accès temporaire <span className="h-px flex-1 bg-[#252b3a]" />
             </div>
 
-            <Link
-              to="/"
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-blue-50 transition-all hover:border-cyan-300/25 hover:bg-white/[0.07]"
-            >
-              Accéder sans compte <ArrowRight size={16} />
+            <Link to="/" className="flex w-full items-center justify-between border border-[#3b4357] px-5 py-3.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-[#7964ff] hover:bg-[#7964ff]/10">
+              Continuer en démonstration <ArrowRight size={15} />
             </Link>
 
-            <p className="mt-8 text-center text-xs text-blue-100/45">
-              Nouveau sur StageOps ? <Link to="/register" className="font-semibold text-cyan-300 hover:text-cyan-200">Créer un compte</Link>
+            <p className="mt-8 text-center font-mono text-[9px] uppercase tracking-wider text-[#505767]">
+              Nouveau profil ? <Link to="/register" className="text-[#9586ff] hover:text-white">Créer un accès</Link>
             </p>
           </div>
         </section>

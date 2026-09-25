@@ -33,15 +33,15 @@ export function Badge({ status, size = 'md', showLabel = true }: BadgeProps) {
   
   return (
     <div
-      className={`inline-flex items-center rounded-full font-medium ${sizeClasses[size]}`}
+      className={`inline-flex items-center font-mono font-bold uppercase tracking-wide ${sizeClasses[size]}`}
       style={{
         backgroundColor: `${color}15`,
         color: color,
-        border: `1px solid ${color}40`,
+        borderLeft: `2px solid ${color}`,
       }}
     >
       <div
-        className="w-1.5 h-1.5 rounded-full"
+        className="h-1.5 w-1.5"
         style={{ backgroundColor: color }}
       />
       {showLabel && <span>{label}</span>}

@@ -6,43 +6,46 @@
 @tailwind utilities;
 
 :root {
-  --bg-void: #070b1a;
-  --bg-deeper: #0a1025;
-  --bg-base: #0f1730;
-  --bg-elevated: #151f3d;
-  --border: #263356;
-  --border-hover: #384971;
-  --border-strong: #52638e;
-  --text-primary: #f7f8ff;
-  --text-muted: #aab2cf;
-  --text-subtle: #7e89ad;
-  --text-faint: #606b90;
-  --accent: #7885ff;
-  --accent-hover: #97a0ff;
-  --accent-violet: #7555f4;
-  --accent-soft: rgba(120, 133, 255, 0.12);
-  --panel-shadow: 0 18px 50px rgba(3, 7, 24, 0.2);
+  --bg-void: #05060a;
+  --bg-deeper: #080a10;
+  --bg-base: #0d1018;
+  --bg-elevated: #141824;
+  --border: #252b3a;
+  --border-hover: #3b4357;
+  --border-strong: #59647d;
+  --text-primary: #f3f1eb;
+  --text-muted: #a4a9b7;
+  --text-subtle: #747b8e;
+  --text-faint: #505767;
+  --accent: #7964ff;
+  --accent-hover: #9586ff;
+  --accent-violet: #7964ff;
+  --accent-blue: #3977ff;
+  --accent-soft: rgba(121, 100, 255, 0.11);
+  --signal: #c7ff4a;
+  --panel-shadow: 0 30px 80px rgba(0, 0, 0, 0.26);
 }
 
 .light {
-  --bg-void: #f3f5fc;
-  --bg-deeper: #e9edf8;
-  --bg-base: #ffffff;
-  --bg-elevated: #f6f7fc;
-  --border: #dde2f1;
-  --border-hover: #c9d0e6;
-  --border-strong: #a8b3d2;
-  --text-primary: #101735;
-  --text-muted: #596582;
-  --text-subtle: #74809c;
-  --text-faint: #929cb5;
-  --accent: #4b5fe9;
-  --accent-hover: #354ad7;
-  --accent-violet: #6d4de8;
-  --accent-soft: rgba(75, 95, 233, 0.08);
-  --panel-shadow: 0 16px 44px rgba(43, 55, 104, 0.08);
+  --bg-void: #e9e8e3;
+  --bg-deeper: #efeee9;
+  --bg-base: #f8f7f2;
+  --bg-elevated: #e2e1dc;
+  --border: #cac8c0;
+  --border-hover: #aba9a1;
+  --border-strong: #787a85;
+  --text-primary: #11131a;
+  --text-muted: #555b69;
+  --text-subtle: #747984;
+  --text-faint: #999b9e;
+  --accent: #5844e6;
+  --accent-hover: #4632d2;
+  --accent-violet: #5844e6;
+  --accent-blue: #205bdd;
+  --accent-soft: rgba(88, 68, 230, 0.08);
+  --signal: #547700;
+  --panel-shadow: 0 24px 60px rgba(24, 26, 35, 0.08);
 }
-
 
 @layer base {
   * {
@@ -57,36 +60,54 @@
     padding: 0;
   }
 
+  html {
+    background: var(--bg-void);
+  }
+
   body {
-    background:
-      radial-gradient(circle at 78% -10%, rgba(85, 93, 237, 0.13), transparent 34rem),
-      var(--bg-void);
+    background: var(--bg-void);
     color: var(--text-primary);
     font-family: "Manrope Variable", "Manrope", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  h1,
+  h2,
+  h3 {
+    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
+    font-variation-settings: "wdth" 85;
+    letter-spacing: -0.045em;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   *:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 1px solid var(--accent);
     outline-offset: 3px;
   }
 
+  ::selection {
+    background: var(--accent);
+    color: white;
+  }
+
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--bg-base);
+    background: var(--bg-deeper);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border-hover);
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
     background: var(--border-strong);
   }
 
@@ -106,32 +127,18 @@
     position: absolute;
     top: -100%;
     left: 1rem;
-    padding: 0.5rem 1rem;
-    background: var(--accent);
-    color: #000;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border-radius: 0 0 0.5rem 0.5rem;
     z-index: 9999;
-    transition: top 0.1s;
+    padding: 0.7rem 1rem;
+    background: var(--accent);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
+
   .skip-link:focus {
     top: 0;
-  }
-
-  h1,
-  h2,
-  h3 {
-    font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
-    letter-spacing: -0.025em;
-  }
-
-  button,
-  a,
-  input,
-  select,
-  textarea {
-    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -140,6 +147,10 @@
     position: relative;
     isolation: isolate;
     min-height: 100%;
+    background:
+      linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(121, 100, 255, 0.05) calc(100% - 1px)),
+      var(--bg-void);
+    background-size: 88px 100%;
   }
 
   .app-surface::before {
@@ -148,93 +159,163 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.42;
-    background-image:
-      linear-gradient(rgba(120, 133, 255, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(120, 133, 255, 0.035) 1px, transparent 1px);
-    background-size: 42px 42px;
-    mask-image: linear-gradient(to bottom, black, transparent 65%);
+    background:
+      linear-gradient(180deg, rgba(121, 100, 255, 0.08), transparent 13rem),
+      linear-gradient(90deg, transparent 49.9%, rgba(255, 255, 255, 0.018) 50%, transparent 50.1%);
+  }
+
+  .app-surface::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.18;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
   }
 
   .page-shell {
-    width: min(100%, 1600px);
+    width: min(100%, 1720px);
     margin-inline: auto;
     padding: 1.25rem;
-    animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: console-in 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .page-shell > header,
+  .page-shell > div:first-child {
+    position: relative;
   }
 
   .page-heading {
     font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
-    font-size: clamp(1.75rem, 2.4vw, 2.5rem);
-    font-weight: 650;
-    line-height: 1.08;
-    letter-spacing: -0.04em;
+    font-size: clamp(2.25rem, 4vw, 4.4rem);
+    font-weight: 580;
+    line-height: 0.94;
+    letter-spacing: -0.065em;
   }
 
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    color: var(--accent);
-    font-size: 0.7rem;
-    font-weight: 750;
-    letter-spacing: 0.14em;
+    gap: 0.5rem;
+    color: var(--accent-hover);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
-  .glass-panel {
-    background: color-mix(in srgb, var(--bg-base) 88%, transparent);
+  .eyebrow::before {
+    content: '';
+    width: 1.7rem;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .glass-panel,
+  .tech-panel {
+    position: relative;
+    background: color-mix(in srgb, var(--bg-base) 96%, transparent);
     border: 1px solid var(--border);
     box-shadow: var(--panel-shadow);
-    backdrop-filter: blur(18px);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  }
+
+  .tech-panel::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: 13px;
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+    transform: rotate(45deg);
+    transform-origin: right center;
   }
 
   .stageops-logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.72rem;
     min-width: 0;
   }
 
   .stageops-logo__mark {
-    position: relative;
     display: block;
-    width: 2.35rem;
-    height: 2.35rem;
+    width: 2.55rem;
+    height: 2.55rem;
     flex: none;
-    overflow: hidden;
-    border-radius: 0.78rem;
-    background: #fff;
-    box-shadow: 0 8px 28px rgba(57, 77, 220, 0.3);
   }
 
   .stageops-logo__mark img {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 215%;
-    max-width: none;
-    transform: translate(-50%, -50%);
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 18px rgba(121, 100, 255, 0.26));
   }
 
   .stageops-logo__wordmark {
     font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
     font-size: 1.2rem;
-    font-weight: 750;
-    letter-spacing: -0.055em;
+    font-weight: 720;
+    letter-spacing: -0.06em;
     line-height: 1;
   }
 
   .stageops-logo--compact .stageops-logo__mark {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2rem;
+    height: 2rem;
   }
+
+  .control-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .signal-dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    background: var(--signal);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--signal) 70%, transparent);
+  }
+}
+
+@keyframes console-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(900%); }
 }
 
 @media (min-width: 768px) {
   .page-shell {
-    padding: 2rem;
+    padding: 2rem 2.25rem 3rem;
   }
+}
+
+/* StageOps uses crisp control surfaces; only semantic pills remain circular. */
+:where(.app-surface, .auth-surface) .rounded-lg,
+:where(.app-surface, .auth-surface) .rounded-xl,
+:where(.app-surface, .auth-surface) .rounded-2xl,
+:where(.app-surface, .auth-surface) .rounded-3xl {
+  border-radius: 2px !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

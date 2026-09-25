@@ -84,7 +84,7 @@ export function Register() {
   }
 
   return (
-    <div id="main-content" className="relative min-h-dvh overflow-hidden bg-[#070b1a] px-4 py-8 text-white sm:px-6">
+    <div id="main-content" className="auth-surface relative min-h-dvh overflow-hidden bg-[#05060a] px-4 py-8 text-white sm:px-6">
       {/* Background grid */}
       <div className="pointer-events-none absolute inset-0 opacity-20">
         <div
