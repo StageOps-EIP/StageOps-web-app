@@ -1,108 +1,179 @@
-import { useEffect } from 'react';
-import { Card } from '@/components/design-system/Card';
-import { Button } from '@/components/design-system/Button';
-import { X, ChevronDown, CheckCircle2 } from 'lucide-react';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/design-system/Button'
+import { X, CheckCircle2 } from 'lucide-react'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
+import type { Event } from '@/lib/types'
 
-export function NewEventModal({ onClose }: { onClose: () => void }) {
-  const trapRef = useFocusTrap(true);
+export function NewEventModal({
+  onClose,
+  onCreate,
+}: {
+  onClose: () => void
+  onCreate: (event: Event) => void
+}) {
+  const trapRef = useFocusTrap<HTMLFormElement>(true)
+  const [form, setForm] = useState({
+    title: '',
+    start: '2026-02-11T20:00',
+    end: '2026-02-11T23:00',
+    venue: 'Théâtre National',
+    stage: 'Grande Salle',
+    status: 'planning' as Event['status'],
+  })
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    const startDate = new Date(form.start)
+    const endDate = new Date(form.end)
+    if (!form.title.trim() || !form.venue.trim() || !form.stage.trim())
+      return setError('Renseignez le titre, le lieu et la scène.')
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime()) ||
+      endDate <= startDate
+    )
+      return setError('La date de fin doit être postérieure au début.')
+    onCreate({
+      id: `evt-${Date.now()}`,
+      title: form.title.trim(),
+      startDate,
+      endDate,
+      venue: form.venue.trim(),
+      stage: form.stage.trim(),
+      status: form.status,
+      checklistProgress: 0,
+      equipmentIds: [],
+      teamMembers: [],
+    })
+  }
+
+  const set = (key: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }))
+    setError('')
+  }
 
   return (
     <div
-      ref={trapRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-labelledby="new-event-title" className="w-full max-w-lg">
-      <Card className="relative">
-        <button
-          aria-label="Fermer"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
-        >
-          <X size={16} />
-        </button>
-        <h2 id="new-event-title" className="text-xl text-content-primary mb-6">Nouvel événement</h2>
-
+      <form
+        ref={trapRef}
+        onSubmit={submit}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-event-title"
+        className="panel w-full max-w-lg p-5 shadow-2xl sm:p-6"
+      >
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 id="new-event-title" className="text-lg font-semibold text-content-primary">
+              Nouvel événement
+            </h2>
+            <p className="mt-1 text-sm text-content-subtle">
+              Ajouté au planning de démonstration local.
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="Fermer"
+            onClick={onClose}
+            className="rounded-md p-2 text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
+          >
+            <X size={17} />
+          </button>
+        </div>
         <div className="space-y-4">
-          <div>
-            <label htmlFor="event-title" className="block text-sm text-content-muted mb-1.5">Titre</label>
+          <Field label="Titre">
             <input
-              id="event-title"
-              type="text"
-              placeholder="Ex: Carmen - Répétition Générale"
-              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              className="form-control px-3"
+              value={form.title}
+              onChange={(event) => set('title', event.target.value)}
+              placeholder="Carmen — Répétition générale"
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="event-start" className="block text-sm text-content-muted mb-1.5">Date de début</label>
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Date de début">
               <input
-                id="event-start"
                 type="datetime-local"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]"
+                className="form-control px-3 [color-scheme:dark]"
+                value={form.start}
+                onChange={(event) => set('start', event.target.value)}
               />
-            </div>
-            <div>
-              <label htmlFor="event-end" className="block text-sm text-content-muted mb-1.5">Date de fin</label>
+            </Field>
+            <Field label="Date de fin">
               <input
-                id="event-end"
                 type="datetime-local"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary focus:outline-none focus:border-cyan-400/50 [color-scheme:dark]"
+                className="form-control px-3 [color-scheme:dark]"
+                value={form.end}
+                onChange={(event) => set('end', event.target.value)}
               />
-            </div>
+            </Field>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="event-venue" className="block text-sm text-content-muted mb-1.5">Lieu</label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Lieu">
               <input
-                id="event-venue"
-                type="text"
-                placeholder="Théâtre National"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+                className="form-control px-3"
+                value={form.venue}
+                onChange={(event) => set('venue', event.target.value)}
               />
-            </div>
-            <div>
-              <label htmlFor="event-stage" className="block text-sm text-content-muted mb-1.5">Scène</label>
+            </Field>
+            <Field label="Scène">
               <input
-                id="event-stage"
-                type="text"
-                placeholder="Grande Salle"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+                className="form-control px-3"
+                value={form.stage}
+                onChange={(event) => set('stage', event.target.value)}
               />
-            </div>
+            </Field>
           </div>
-          <div>
-            <label htmlFor="event-status" className="block text-sm text-content-muted mb-1.5">Statut</label>
-            <div className="relative">
-              <select
-                id="event-status"
-                className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
-                <option value="planning">Planification</option>
-                <option value="setup">Installation</option>
-                <option value="running">En cours</option>
-                <option value="strike">Démontage</option>
-              </select>
-              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" onClick={onClose}>
+          <Field label="Statut">
+            <select
+              className="form-control px-3"
+              value={form.status}
+              onChange={(event) => set('status', event.target.value)}
+            >
+              <option value="planning">Planification</option>
+              <option value="setup">Installation</option>
+              <option value="running">En cours</option>
+              <option value="strike">Démontage</option>
+            </select>
+          </Field>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+            >
+              {error}
+            </p>
+          )}
+          <div className="flex justify-end gap-2 border-t border-theme-border pt-4">
+            <Button type="button" variant="secondary" onClick={onClose}>
               Annuler
             </Button>
-            <Button variant="primary" onClick={onClose}>
-              <CheckCircle2 size={16} />
-              Créer l'événement
+            <Button type="submit">
+              <CheckCircle2 size={16} /> Créer l’événement
             </Button>
           </div>
         </div>
-      </Card>
-      </div>
+      </form>
     </div>
-  );
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-content-muted">{label}</span>
+      {children}
+    </label>
+  )
 }

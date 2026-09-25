@@ -1,112 +1,167 @@
-import { useEffect } from 'react';
-import { AlertCircle, ChevronDown, X } from "lucide-react";
-import { Card } from "../design-system/Card";
-import { Button } from "../design-system/Button";
-import { mockEquipment } from "../../lib/mockData";
-import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { useEffect, useState } from 'react'
+import { AlertCircle, X } from 'lucide-react'
+import { Button } from '../design-system/Button'
+import { mockEquipment } from '../../lib/mockData'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
+import type { Incident, IncidentSeverity } from '@/lib/types'
 
-export function NewIncidentModal({ onClose }: { onClose: () => void }) {
-  const trapRef = useFocusTrap(true);
+export function NewIncidentModal({
+  onClose,
+  onCreate,
+}: {
+  onClose: () => void
+  onCreate: (incident: Incident) => void
+}) {
+  const trapRef = useFocusTrap<HTMLFormElement>(true)
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    severity: 'medium' as IncidentSeverity,
+    equipmentId: '',
+    reportedBy: '',
+  })
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    if (!form.title.trim() || !form.description.trim() || !form.reportedBy.trim())
+      return setError('Renseignez le titre, la description et la personne qui signale l’incident.')
+    onCreate({
+      id: `inc-${Date.now()}`,
+      title: form.title.trim(),
+      description: form.description.trim(),
+      severity: form.severity,
+      status: 'open',
+      equipmentId: form.equipmentId || undefined,
+      reportedBy: form.reportedBy.trim(),
+      timestamp: new Date('2026-02-11T12:00:00'),
+    })
+  }
+
+  const set = (key: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }))
+    setError('')
+  }
 
   return (
     <div
-      ref={trapRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-labelledby="new-incident-title" className="w-full max-w-lg">
-      <Card className="relative">
-        <button
-          aria-label="Fermer"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
-        >
-          <X size={16} />
-        </button>
-        <h2 id="new-incident-title" className="text-xl text-content-primary mb-6">
-          Signaler un incident
-        </h2>
+      <form
+        ref={trapRef}
+        onSubmit={submit}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-incident-title"
+        className="panel w-full max-w-lg p-5 shadow-2xl sm:p-6"
+      >
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 id="new-incident-title" className="text-lg font-semibold text-content-primary">
+              Signaler un incident
+            </h2>
+            <p className="mt-1 text-sm text-content-subtle">
+              Le nouvel incident sera ajouté au scénario local.
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="Fermer"
+            onClick={onClose}
+            className="rounded-md p-2 text-content-subtle hover:bg-theme-elevated"
+          >
+            <X size={17} />
+          </button>
+        </div>
         <div className="space-y-4">
-          <div>
-            <label htmlFor="incident-title" className="block text-sm text-content-muted mb-1.5">
-              Titre
-            </label>
+          <Field label="Titre">
             <input
-              id="incident-title"
-              type="text"
-              placeholder="Ex: Panne projecteur perche 2"
-              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              className="form-control px-3"
+              value={form.title}
+              onChange={(event) => set('title', event.target.value)}
+              placeholder="Panne projecteur perche 2"
             />
-          </div>
-          <div>
-            <label htmlFor="incident-description" className="block text-sm text-content-muted mb-1.5">
-              Description
-            </label>
+          </Field>
+          <Field label="Description">
             <textarea
-              id="incident-description"
-              rows={3}
-              placeholder="Décrivez le problème en détail..."
-              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50 resize-none"
+              className="form-control min-h-24 resize-none px-3 py-2.5"
+              value={form.description}
+              onChange={(event) => set('description', event.target.value)}
+              placeholder="Décrivez le problème et son impact…"
             />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Priorité">
+              <select
+                className="form-control px-3"
+                value={form.severity}
+                onChange={(event) => set('severity', event.target.value)}
+              >
+                <option value="low">Faible</option>
+                <option value="medium">Moyenne</option>
+                <option value="high">Élevée</option>
+                <option value="critical">Critique</option>
+              </select>
+            </Field>
+            <Field label="Équipement">
+              <select
+                className="form-control px-3"
+                value={form.equipmentId}
+                onChange={(event) => set('equipmentId', event.target.value)}
+              >
+                <option value="">Aucun</option>
+                {mockEquipment.map((equipment) => (
+                  <option key={equipment.id} value={equipment.id}>
+                    {equipment.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="incident-severity" className="block text-sm text-content-muted mb-1.5">
-                Sévérité
-              </label>
-              <div className="relative">
-                <select
-                  id="incident-severity"
-                  className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
-                  <option value="low">Faible</option>
-                  <option value="medium">Moyenne</option>
-                  <option value="high">Élevée</option>
-                  <option value="critical">Critique</option>
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="incident-equipment" className="block text-sm text-content-muted mb-1.5">
-                Équipement
-              </label>
-              <div className="relative">
-                <select
-                  id="incident-equipment"
-                  className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
-                  <option value="">Aucun</option>
-                  {mockEquipment.map((eq) => (
-                    <option key={eq.id} value={eq.id}>
-                      {eq.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" onClick={onClose}>
+          <Field label="Signalé par">
+            <input
+              className="form-control px-3"
+              value={form.reportedBy}
+              onChange={(event) => set('reportedBy', event.target.value)}
+              placeholder="Prénom Nom"
+            />
+          </Field>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+            >
+              {error}
+            </p>
+          )}
+          <div className="flex justify-end gap-2 border-t border-theme-border pt-4">
+            <Button type="button" variant="secondary" onClick={onClose}>
               Annuler
             </Button>
-            <Button variant="danger" onClick={onClose}>
-              <AlertCircle size={16} /> Signaler l'incident
+            <Button type="submit" variant="danger">
+              <AlertCircle size={16} /> Signaler l’incident
             </Button>
           </div>
         </div>
-      </Card>
-      </div>
+      </form>
     </div>
-  );
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-content-muted">{label}</span>
+      {children}
+    </label>
+  )
 }

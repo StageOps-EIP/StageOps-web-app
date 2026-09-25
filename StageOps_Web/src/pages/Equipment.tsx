@@ -1,241 +1,293 @@
-import { useState } from 'react';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { Button } from '@/components/design-system/Button';
-import { SearchInput } from '@/components/design-system/Input';
-import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Badge';
-import { mockEquipment as initialEquipment } from '@/lib/mockData';
-import { getCategoryLabel, formatRelativeTime } from '@/lib/utils';
-import { Plus, Filter, Download, QrCode, ChevronDown } from 'lucide-react';
-import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types';
-import { EquipmentDetailModal } from '@/components/equipment/EquipmentDetailModal';
-import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal';
+import { useState } from 'react'
+import { useSearchParams } from 'react-router'
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { Button } from '@/components/design-system/Button'
+import { SearchInput } from '@/components/design-system/Input'
+import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Badge'
+import { EmptyState } from '@/components/design-system/EmptyState'
+import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { mockEquipment as initialEquipment } from '@/lib/mockData'
+import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
+import { Plus, Filter, ChevronDown, PackageSearch } from 'lucide-react'
+import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
+import { EquipmentDetailModal } from '@/components/equipment/EquipmentDetailModal'
+import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal'
 
 export function Equipment() {
-  usePageTitle('Inventaire');
-  const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all');
-  const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all');
-  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
+  usePageTitle('Parc matériel')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all')
+  const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all')
+  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
-  const filteredEquipment = equipmentList.filter(eq => {
-    const matchesSearch = eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         eq.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         eq.qrCode.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || eq.category === filterCategory;
-    const matchesStatus = filterStatus === 'all' || eq.status === filterStatus;
+  const requestedEquipment =
+    equipmentList.find((item) => item.id === searchParams.get('equipment')) ?? null
+  const activeEquipment = selectedEquipment ?? requestedEquipment
 
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const filteredEquipment = equipmentList.filter((eq) => {
+    const query = searchQuery.toLowerCase()
+    const matchesSearch =
+      eq.name.toLowerCase().includes(query) ||
+      eq.location.toLowerCase().includes(query) ||
+      eq.qrCode.toLowerCase().includes(query)
+    return (
+      matchesSearch &&
+      (filterCategory === 'all' || eq.category === filterCategory) &&
+      (filterStatus === 'all' || eq.status === filterStatus)
+    )
+  })
+
+  function closeDetail() {
+    setSelectedEquipment(null)
+    if (searchParams.has('equipment')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('equipment')
+      setSearchParams(next, { replace: true })
+    }
+  }
 
   return (
-    <div className="page-shell">
-      {/* Header */}
-      <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="eyebrow mb-2">Parc technique</p>
-          <h1 className="page-heading text-content-primary">Inventaire</h1>
-          <p className="text-content-muted">{equipmentList.length} équipements au total</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" className="hidden sm:inline-flex">
-            <QrCode size={18} />
-            Scanner QR
+    <div className="page-shell space-y-5">
+      <PageHeader
+        context="Théâtre National"
+        title="Parc matériel"
+        description={`${equipmentList.length} équipements référencés`}
+        actions={
+          <Button onClick={() => setShowAddModal(true)}>
+            <Plus size={16} /> Ajouter un équipement
           </Button>
-          <Button variant="secondary" className="hidden sm:inline-flex">
-            <Download size={18} />
-            Exporter
-          </Button>
-          <Button variant="primary" onClick={() => setShowAddModal(true)}>
-            <Plus size={18} />
-            Ajouter équipement
-          </Button>
-        </div>
-      </div>
+        }
+      />
+      <DemoNotice />
 
-      {/* Filters */}
-      <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-center">
-        <div className="w-full max-w-xl flex-1">
+      <div className="toolbar">
+        <div className="min-w-[16rem] flex-1">
           <SearchInput
             aria-label="Rechercher par nom, QR code ou emplacement"
-            placeholder="Rechercher par nom, QR code, emplacement..."
+            placeholder="Nom, QR code ou emplacement"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(event) => setSearchQuery(event.target.value)}
           />
         </div>
-
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0">
-          <Filter size={18} className="shrink-0 text-content-subtle" />
-          <div className="relative">
-            <select
-              aria-label="Filtrer par catégorie"
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value as EquipmentCategory | 'all')}
-              className="px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9"
-            >
-              <option value="all">Toutes catégories</option>
-              <option value="sound">Son</option>
-              <option value="light">Lumière</option>
-              <option value="video">Vidéo</option>
-              <option value="set">Plateau</option>
-              <option value="safety">Sécurité</option>
-              <option value="rigging">Accroche</option>
-            </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
-          </div>
-
-          <div className="relative">
-            <select
-              aria-label="Filtrer par statut"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as EquipmentStatus | 'all')}
-              className="px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9"
-            >
-              <option value="all">Tous statuts</option>
-              <option value="ok">OK</option>
-              <option value="to-check">À vérifier</option>
-              <option value="hs">HS</option>
-              <option value="repair">En réparation</option>
-            </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
-          </div>
-        </div>
+        <Filter size={16} className="hidden text-content-subtle sm:block" aria-hidden="true" />
+        <Select
+          value={filterCategory}
+          onChange={(value) => setFilterCategory(value as EquipmentCategory | 'all')}
+          label="Filtrer par catégorie"
+        >
+          <option value="all">Toutes les catégories</option>
+          <option value="sound">Son</option>
+          <option value="light">Lumière</option>
+          <option value="video">Vidéo</option>
+          <option value="set">Plateau</option>
+          <option value="safety">Sécurité</option>
+          <option value="rigging">Accroche</option>
+        </Select>
+        <Select
+          value={filterStatus}
+          onChange={(value) => setFilterStatus(value as EquipmentStatus | 'all')}
+          label="Filtrer par statut"
+        >
+          <option value="all">Tous les statuts</option>
+          <option value="ok">Opérationnel</option>
+          <option value="to-check">À vérifier</option>
+          <option value="hs">Hors service</option>
+          <option value="repair">En réparation</option>
+        </Select>
       </div>
 
-      {/* Results count */}
-      <div className="mb-4">
-        <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-content-muted">
-          {filteredEquipment.length} équipement{filteredEquipment.length !== 1 ? 's' : ''} trouvé{filteredEquipment.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+      <p role="status" aria-live="polite" className="text-sm text-content-muted">
+        {filteredEquipment.length} résultat{filteredEquipment.length !== 1 ? 's' : ''}
+      </p>
 
-      {/* Table */}
-      <div className="glass-panel overflow-hidden rounded-2xl">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-theme-elevated border-b border-theme-border">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Équipement
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Catégorie
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  QR Code
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Emplacement
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Statut
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Responsable
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Dernière vérif.
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-content-muted uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-theme-border">
-              {filteredEquipment.map((eq) => (
-                <tr
-                  key={eq.id}
-                  className="hover:bg-theme-elevated transition-colors"
-                >
-                  <td className="px-6 py-3">
-                    <div>
-                      <p className="text-sm font-medium text-content-primary">{eq.name}</p>
-                      {eq.notes && (
-                        <p className="text-xs text-content-subtle mt-0.5 line-clamp-1">{eq.notes}</p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <CategoryChip
-                      category={eq.category}
-                      label={getCategoryLabel(eq.category)}
-                      icon={<CategoryIcon category={eq.category} />}
-                    />
-                  </td>
-                  <td className="px-6 py-3">
-                    <code className="text-xs text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded font-mono whitespace-nowrap block">
-                      {eq.qrCode}
-                    </code>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div>
-                      <p className="text-sm text-content-primary">{eq.location}</p>
-                      {eq.zone && (
-                        <p className="text-xs text-content-subtle mt-0.5">{eq.zone}</p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <Badge status={eq.status} />
-                  </td>
-                  <td className="px-6 py-3">
-                    <p className="text-sm text-content-primary">{eq.responsiblePerson || '-'}</p>
-                  </td>
-                  <td className="px-6 py-3">
-                    <p className="text-sm text-content-muted">
-                      {eq.lastCheck ? formatRelativeTime(eq.lastCheck) : '-'}
+      {filteredEquipment.length > 0 ? (
+        <>
+          <div className="panel hidden overflow-hidden lg:block">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[980px]">
+                <thead className="border-b border-theme-border bg-theme-deeper">
+                  <tr>
+                    {[
+                      'Équipement',
+                      'Catégorie',
+                      'Identifiant',
+                      'Emplacement',
+                      'Statut',
+                      'Responsable',
+                      'Dernier contrôle',
+                      '',
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        className="px-4 py-3 text-left text-xs font-semibold text-content-subtle last:text-right"
+                      >
+                        {heading}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-theme-border">
+                  {filteredEquipment.map((equipment) => (
+                    <tr key={equipment.id} className="hover:bg-theme-elevated">
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-medium text-content-primary">{equipment.name}</p>
+                        {equipment.notes && (
+                          <p className="mt-0.5 max-w-xs truncate text-xs text-content-subtle">
+                            {equipment.notes}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <CategoryChip
+                          category={equipment.category}
+                          label={getCategoryLabel(equipment.category)}
+                          icon={<CategoryIcon category={equipment.category} />}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <code className="whitespace-nowrap text-xs text-[var(--brand-violet-hover)]">
+                          {equipment.qrCode}
+                        </code>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-content-primary">{equipment.location}</p>
+                        {equipment.zone && (
+                          <p className="text-xs text-content-subtle">{equipment.zone}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge status={equipment.status} />
+                      </td>
+                      <td className="px-4 py-3 text-sm text-content-muted">
+                        {equipment.responsiblePerson || 'Non affecté'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-content-muted">
+                        {equipment.lastCheck
+                          ? formatRelativeTime(equipment.lastCheck)
+                          : 'Non renseigné'}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedEquipment(equipment)}
+                        >
+                          Détails
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="grid gap-3 lg:hidden sm:grid-cols-2">
+            {filteredEquipment.map((equipment) => (
+              <button
+                key={equipment.id}
+                onClick={() => setSelectedEquipment(equipment)}
+                className="panel p-4 text-left transition-colors hover:border-theme-border-hover"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-content-primary">
+                      {equipment.name}
                     </p>
-                  </td>
-                  <td className="px-6 py-3 text-right">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedEquipment(eq)}>
-                      Détails
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {filteredEquipment.length === 0 && (
-        <div className="text-center py-16">
-          <p className="text-content-subtle mb-4">Aucun équipement trouvé</p>
-          <Button variant="secondary" onClick={() => {
-            setSearchQuery('');
-            setFilterCategory('all');
-            setFilterStatus('all');
-          }}>
-            Réinitialiser les filtres
-          </Button>
-        </div>
-      )}
-
-      {/* Modal détail équipement */}
-      {selectedEquipment && (
-        <EquipmentDetailModal
-          equipment={selectedEquipment}
-          onClose={() => setSelectedEquipment(null)}
-          onSave={(updated) => {
-            setEquipmentList((prev) =>
-              prev.map((eq) => (eq.id === updated.id ? updated : eq))
-            );
-            setSelectedEquipment(null);
-          }}
+                    <p className="mt-1 text-xs text-content-subtle">
+                      {equipment.location}
+                      {equipment.zone ? ` · ${equipment.zone}` : ''}
+                    </p>
+                  </div>
+                  <Badge status={equipment.status} size="sm" />
+                </div>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-theme-border pt-3">
+                  <CategoryChip
+                    category={equipment.category}
+                    label={getCategoryLabel(equipment.category)}
+                    icon={<CategoryIcon category={equipment.category} />}
+                  />
+                  <code className="text-xs text-[var(--brand-violet-hover)]">
+                    {equipment.qrCode}
+                  </code>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <EmptyState
+          icon={PackageSearch}
+          title="Aucun équipement trouvé"
+          description="Modifiez les critères de recherche ou réinitialisez les filtres."
+          action={
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setSearchQuery('')
+                setFilterCategory('all')
+                setFilterStatus('all')
+              }}
+            >
+              Réinitialiser les filtres
+            </Button>
+          }
         />
       )}
 
-      {/* Modal ajout équipement */}
+      {activeEquipment && (
+        <EquipmentDetailModal
+          equipment={activeEquipment}
+          onClose={closeDetail}
+          onSave={(updated) => {
+            setEquipmentList((prev) =>
+              prev.map((item) => (item.id === updated.id ? updated : item)),
+            )
+            closeDetail()
+          }}
+        />
+      )}
       {showAddModal && (
         <AddEquipmentModal
           onClose={() => setShowAddModal(false)}
           onAdd={(newEquipment) => {
-            setEquipmentList((prev) => [newEquipment, ...prev]);
-            setShowAddModal(false);
+            setEquipmentList((prev) => [newEquipment, ...prev])
+            setShowAddModal(false)
           }}
         />
       )}
     </div>
-  );
+  )
+}
+
+function Select({
+  value,
+  onChange,
+  label,
+  children,
+}: {
+  value: string
+  onChange: (value: string) => void
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="relative min-w-44 flex-1 sm:flex-none">
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="form-control appearance-none px-3 pr-9"
+      >
+        {children}
+      </select>
+      <ChevronDown
+        size={14}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle"
+      />
+    </div>
+  )
 }

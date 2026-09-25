@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { Card, CardHeader } from '@/components/design-system/Card';
-import { Button } from '@/components/design-system/Button';
-import { mockTeamMembers } from '@/lib/mockData';
+import { useEffect, useState } from 'react'
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { Button } from '@/components/design-system/Button'
+import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { mockTeamMembers } from '@/lib/mockData'
 
-import type { TeamMember } from '@/lib/types';
-import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants';
-import { useTeamFilter } from '@/hooks/useTeamFilter';
-import { EditMemberModal } from '@/components/team/EditMemberModal';
+import type { TeamMember } from '@/lib/types'
+import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants'
+import { useTeamFilter } from '@/hooks/useTeamFilter'
+import { EditMemberModal } from '@/components/team/EditMemberModal'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import {
   Users,
   Mail,
@@ -20,40 +22,41 @@ import {
   ChevronRight,
   ChevronDown,
   UserCircle,
-} from 'lucide-react';
+} from 'lucide-react'
 
 export function Team() {
-  usePageTitle('Équipe');
-  const [teamList, setTeamList] = useState<TeamMember[]>(mockTeamMembers);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-  const [showNewForm, setShowNewForm] = useState(false);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  usePageTitle('Équipe')
+  const [teamList, setTeamList] = useState<TeamMember[]>(mockTeamMembers)
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(mockTeamMembers[0])
+  const [showNewForm, setShowNewForm] = useState(false)
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
 
-  const { search, setSearch, filtered } = useTeamFilter(teamList);
+  const { search, setSearch, filtered } = useTeamFilter(teamList)
 
   // Group by role
-  const roles = [...new Set(teamList.map((m) => m.role))];
+  const roles = [...new Set(teamList.map((m) => m.role))]
 
   return (
-    <div className="page-shell space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="eyebrow mb-2">Organisation</p>
-          <h1 className="page-heading text-content-primary">Équipe & Rôles</h1>
-          <p className="text-content-muted">
-            {teamList.length} membres · {roles.length} rôles
-          </p>
-        </div>
-        <Button variant="primary" onClick={() => setShowNewForm(true)}>
-          <Plus size={16} />
-          Ajouter un membre
-        </Button>
-      </div>
+    <div className="page-shell space-y-5">
+      <PageHeader
+        context="Théâtre National"
+        title="Équipe et droits"
+        description={`${teamList.length} membres · ${roles.length} rôles`}
+        actions={
+          <Button variant="primary" onClick={() => setShowNewForm(true)}>
+            <Plus size={16} />
+            Ajouter un membre
+          </Button>
+        }
+      />
+      <DemoNotice />
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle" />
+        <Search
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
+        />
         <input
           type="text"
           placeholder="Rechercher un membre ou un rôle..."
@@ -67,31 +70,6 @@ export function Team() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* Team grid */}
         <div className="space-y-6">
-          {/* role summary */}
-          <div className="flex gap-3 flex-wrap">
-            {roles.map((role) => {
-              const count = teamList.filter((m) => m.role === role).length;
-              const color = ROLE_COLORS[role] || '#71717a';
-              return (
-                <div
-                  key={role}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl border"
-                  style={{
-                    backgroundColor: `${color}08`,
-                    borderColor: `${color}25`,
-                  }}
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                  <span className="text-sm text-content-primary">{role}</span>
-                  <span className="text-xs text-content-subtle">({count})</span>
-                </div>
-              );
-            })}
-          </div>
-
           {/* Members list */}
           <Card>
             <CardHeader
@@ -100,8 +78,8 @@ export function Team() {
             />
             <div className="space-y-2">
               {filtered.map((member) => {
-                const color = ROLE_COLORS[member.role] || '#71717a';
-                const isSelected = selectedMember?.id === member.id;
+                const color = ROLE_COLORS[member.role] || '#71717a'
+                const isSelected = selectedMember?.id === member.id
 
                 return (
                   <button
@@ -142,7 +120,7 @@ export function Team() {
 
                     <ChevronRight size={14} className="text-content-subtle shrink-0" />
                   </button>
-                );
+                )
               })}
               {filtered.length === 0 && (
                 <div className="flex flex-col items-center py-12 text-content-subtle">
@@ -174,7 +152,16 @@ export function Team() {
       </div>
 
       {/* New member modal */}
-      {showNewForm && <NewMemberModal onClose={() => setShowNewForm(false)} />}
+      {showNewForm && (
+        <NewMemberModal
+          onClose={() => setShowNewForm(false)}
+          onAdd={(member) => {
+            setTeamList((current) => [...current, member])
+            setSelectedMember(member)
+            setShowNewForm(false)
+          }}
+        />
+      )}
 
       {/* Edit member modal */}
       {editingMember && (
@@ -182,14 +169,14 @@ export function Team() {
           member={editingMember}
           onClose={() => setEditingMember(null)}
           onSave={(updated) => {
-            setTeamList((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-            setSelectedMember(updated);
-            setEditingMember(null);
+            setTeamList((prev) => prev.map((m) => (m.id === updated.id ? updated : m)))
+            setSelectedMember(updated)
+            setEditingMember(null)
           }}
         />
       )}
     </div>
-  );
+  )
 }
 
 function MemberDetail({
@@ -197,11 +184,11 @@ function MemberDetail({
   onClose,
   onEdit,
 }: {
-  member: TeamMember;
-  onClose: () => void;
-  onEdit: () => void;
+  member: TeamMember
+  onClose: () => void
+  onEdit: () => void
 }) {
-  const color = ROLE_COLORS[member.role] || '#71717a';
+  const color = ROLE_COLORS[member.role] || '#71717a'
 
   return (
     <Card className="sticky top-8">
@@ -279,51 +266,120 @@ function MemberDetail({
             <Edit3 size={14} />
             Modifier
           </Button>
-          <Button variant="ghost" aria-label="Envoyer un email">
+          <a
+            href={`mailto:${member.email}`}
+            aria-label="Envoyer un email"
+            className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-content-muted hover:border-theme-border hover:bg-theme-elevated hover:text-content-primary"
+          >
             <Mail size={14} />
-          </Button>
+          </a>
           {member.phone && (
-            <Button variant="ghost" aria-label="Appeler">
+            <a
+              href={`tel:${member.phone.replace(/\s/g, '')}`}
+              aria-label="Appeler"
+              className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-content-muted hover:border-theme-border hover:bg-theme-elevated hover:text-content-primary"
+            >
               <Phone size={14} />
-            </Button>
+            </a>
           )}
         </div>
       </div>
     </Card>
-  );
+  )
 }
 
-function NewMemberModal({ onClose }: { onClose: () => void }) {
+function NewMemberModal({
+  onClose,
+  onAdd,
+}: {
+  onClose: () => void
+  onAdd: (member: TeamMember) => void
+}) {
+  const trapRef = useFocusTrap<HTMLFormElement>(true)
+  const [form, setForm] = useState({ name: '', role: 'Régisseur Son', email: '', phone: '' })
+  const [permissions, setPermissions] = useState<string[]>([])
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    if (!form.name.trim() || !form.email.trim())
+      return setError('Le nom et l’adresse e-mail sont requis.')
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) return setError('L’adresse e-mail n’est pas valide.')
+    onAdd({
+      id: `tm-${Date.now()}`,
+      name: form.name.trim(),
+      role: form.role,
+      email: form.email.trim(),
+      phone: form.phone.trim() || undefined,
+      permissions,
+    })
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div role="dialog" aria-modal="true" aria-labelledby="new-member-title" className="w-full max-w-lg">
-      <Card className="relative">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+    >
+      <form
+        ref={trapRef}
+        onSubmit={submit}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-member-title"
+        className="panel relative w-full max-w-lg p-5 shadow-2xl sm:p-6"
+      >
         <button
+          type="button"
           aria-label="Fermer"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
+          className="absolute right-4 top-4 rounded-md p-2 text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
         >
           <X size={16} />
         </button>
-        <h2 id="new-member-title" className="text-xl text-content-primary mb-6">Ajouter un membre</h2>
+        <h2 id="new-member-title" className="mb-1 text-lg font-semibold text-content-primary">
+          Ajouter un membre
+        </h2>
+        <p className="mb-5 text-sm text-content-subtle">Le membre sera ajouté à l’équipe locale.</p>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="new-member-name" className="block text-sm text-content-muted mb-1.5">Nom complet</label>
+              <label htmlFor="new-member-name" className="block text-sm text-content-muted mb-1.5">
+                Nom complet
+              </label>
               <input
                 id="new-member-name"
                 type="text"
                 placeholder="Prénom Nom"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+                value={form.name}
+                onChange={(event) => {
+                  setForm((current) => ({ ...current, name: event.target.value }))
+                  setError('')
+                }}
+                className="form-control px-3"
               />
             </div>
             <div>
-              <label htmlFor="new-member-role" className="block text-sm text-content-muted mb-1.5">Rôle</label>
+              <label htmlFor="new-member-role" className="block text-sm text-content-muted mb-1.5">
+                Rôle
+              </label>
               <div className="relative">
                 <select
                   id="new-member-role"
-                  className="w-full px-4 py-2.5 bg-theme-elevated border border-theme-border rounded-xl text-content-primary text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent cursor-pointer hover:border-[#52525b] transition-colors appearance-none pr-9 [color-scheme:dark]">
+                  value={form.role}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, role: event.target.value }))
+                  }
+                  className="form-control appearance-none px-3 pr-9"
+                >
                   <option>Régisseur Son</option>
                   <option>Régisseur Lumière</option>
                   <option>Régisseur Vidéo</option>
@@ -332,26 +388,42 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
                   <option>Machiniste</option>
                   <option>Cintrier</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
+                <ChevronDown
+                  size={14}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
+                />
               </div>
             </div>
           </div>
           <div>
-            <label htmlFor="new-member-email" className="block text-sm text-content-muted mb-1.5">Email</label>
+            <label htmlFor="new-member-email" className="block text-sm text-content-muted mb-1.5">
+              Email
+            </label>
             <input
               id="new-member-email"
               type="email"
               placeholder="nom@theatre.fr"
-              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              value={form.email}
+              onChange={(event) => {
+                setForm((current) => ({ ...current, email: event.target.value }))
+                setError('')
+              }}
+              className="form-control px-3"
             />
           </div>
           <div>
-            <label htmlFor="new-member-phone" className="block text-sm text-content-muted mb-1.5">Téléphone</label>
+            <label htmlFor="new-member-phone" className="block text-sm text-content-muted mb-1.5">
+              Téléphone
+            </label>
             <input
               id="new-member-phone"
               type="tel"
               placeholder="+33 6 00 00 00 00"
-              className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
+              value={form.phone}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, phone: event.target.value }))
+              }
+              className="form-control px-3"
             />
           </div>
           <div>
@@ -360,26 +432,44 @@ function NewMemberModal({ onClose }: { onClose: () => void }) {
               {Object.entries(PERMISSION_LABELS).map(([key, label]) => (
                 <label
                   key={key}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-elevated border border-theme-border rounded-lg text-xs text-content-muted cursor-pointer hover:border-cyan-400/30 transition-colors"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-md border border-theme-border bg-theme-elevated px-2.5 py-1.5 text-xs text-content-muted hover:border-theme-border-hover"
                 >
-                  <input type="checkbox" className="accent-cyan-400" />
+                  <input
+                    type="checkbox"
+                    checked={permissions.includes(key)}
+                    onChange={() =>
+                      setPermissions((current) =>
+                        current.includes(key)
+                          ? current.filter((permission) => permission !== key)
+                          : [...current, key],
+                      )
+                    }
+                    className="accent-[var(--brand-violet)]"
+                  />
                   {label}
                 </label>
               ))}
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" onClick={onClose}>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+            >
+              {error}
+            </p>
+          )}
+          <div className="flex justify-end gap-3 border-t border-theme-border pt-4">
+            <Button type="button" variant="secondary" onClick={onClose}>
               Annuler
             </Button>
-            <Button variant="primary" onClick={onClose}>
+            <Button type="submit" variant="primary">
               <Plus size={16} />
               Ajouter
             </Button>
           </div>
         </div>
-      </Card>
-      </div>
+      </form>
     </div>
-  );
+  )
 }

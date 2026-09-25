@@ -1,26 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/design-system/Button';
-import { CategoryIcon } from '@/components/design-system/Badge';
-import type { Equipment, EquipmentStatus, EquipmentCategory } from '@/lib/types';
-import { getStatusColor } from '@/lib/utils';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
-import {
-  X,
-  MapPin,
-  User,
-  FileText,
-  QrCode,
-  Plus,
-  AlertCircle,
-  Wrench,
-} from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/design-system/Button'
+import { CategoryIcon } from '@/components/design-system/Badge'
+import type { Equipment, EquipmentStatus, EquipmentCategory } from '@/lib/types'
+import { getStatusColor } from '@/lib/utils'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { BRAND_COLORS, STATUS_COLORS, TEXT_COLORS } from '@/lib/design-tokens'
+import { X, MapPin, User, FileText, QrCode, Plus, AlertCircle, Wrench } from 'lucide-react'
 
 const statusOptions: { value: EquipmentStatus; label: string; color: string }[] = [
-  { value: 'ok', label: 'OK', color: '#22c55e' },
-  { value: 'to-check', label: 'À vérifier', color: '#f59e0b' },
-  { value: 'hs', label: 'HS', color: '#ef4444' },
-  { value: 'repair', label: 'En réparation', color: '#8b5cf6' },
-];
+  { value: 'ok', label: 'Opérationnel', color: STATUS_COLORS.success },
+  { value: 'to-check', label: 'À vérifier', color: STATUS_COLORS.warning },
+  { value: 'hs', label: 'Hors service', color: STATUS_COLORS.danger },
+  { value: 'repair', label: 'En réparation', color: STATUS_COLORS.warning },
+]
 
 const categoryOptions: { value: EquipmentCategory; label: string }[] = [
   { value: 'sound', label: 'Son' },
@@ -29,17 +21,17 @@ const categoryOptions: { value: EquipmentCategory; label: string }[] = [
   { value: 'set', label: 'Plateau' },
   { value: 'safety', label: 'Sécurité' },
   { value: 'rigging', label: 'Accroche' },
-];
+]
 
 interface FormState {
-  name: string;
-  category: EquipmentCategory;
-  status: EquipmentStatus;
-  location: string;
-  zone: string;
-  responsiblePerson: string;
-  notes: string;
-  qrCode: string;
+  name: string
+  category: EquipmentCategory
+  status: EquipmentStatus
+  location: string
+  zone: string
+  responsiblePerson: string
+  notes: string
+  qrCode: string
 }
 
 const emptyForm: FormState = {
@@ -51,53 +43,55 @@ const emptyForm: FormState = {
   responsiblePerson: '',
   notes: '',
   qrCode: '',
-};
+}
 
 function generateQrCode(name: string, category: EquipmentCategory): string {
-  const prefix = category.slice(0, 3).toUpperCase();
-  const rand = Math.floor(Math.random() * 900) + 100;
-  return `QR-${prefix}-${rand}`;
+  const prefix = category.slice(0, 3).toUpperCase()
+  const rand = Math.floor(Math.random() * 900) + 100
+  return `QR-${prefix}-${rand}`
 }
 
 function generateId(): string {
-  return `eq-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  return `eq-${Date.now()}-${Math.floor(Math.random() * 1000)}`
 }
 
 export function AddEquipmentModal({
   onClose,
   onAdd,
 }: {
-  onClose: () => void;
-  onAdd: (equipment: Equipment) => void;
+  onClose: () => void
+  onAdd: (equipment: Equipment) => void
 }) {
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const trapRef = useFocusTrap(true);
+  const [form, setForm] = useState<FormState>(emptyForm)
+  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
+  const trapRef = useFocusTrap(true)
 
-  const statusColor = getStatusColor(form.status);
+  const statusColor = getStatusColor(form.status)
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+    setForm((prev) => ({ ...prev, [key]: value }))
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
   function validate(): boolean {
-    const newErrors: Partial<Record<keyof FormState, string>> = {};
-    if (!form.name.trim()) newErrors.name = 'Le nom est requis';
-    if (!form.location.trim()) newErrors.location = "L'emplacement est requis";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const newErrors: Partial<Record<keyof FormState, string>> = {}
+    if (!form.name.trim()) newErrors.name = 'Le nom est requis'
+    if (!form.location.trim()) newErrors.location = "L'emplacement est requis"
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   function handleSubmit() {
-    if (!validate()) return;
-    const qrCode = form.qrCode.trim() || generateQrCode(form.name, form.category);
+    if (!validate()) return
+    const qrCode = form.qrCode.trim() || generateQrCode(form.name, form.category)
     const newEquipment: Equipment = {
       id: generateId(),
       name: form.name.trim(),
@@ -109,15 +103,15 @@ export function AddEquipmentModal({
       notes: form.notes.trim() || undefined,
       qrCode,
       lastCheck: new Date(),
-    };
-    onAdd(newEquipment);
+    }
+    onAdd(newEquipment)
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) onClose()
       }}
     >
       <div
@@ -127,7 +121,6 @@ export function AddEquipmentModal({
         aria-labelledby="add-equipment-title"
         className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
       >
-
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
           <div className="flex items-center gap-3">
@@ -136,7 +129,9 @@ export function AddEquipmentModal({
               style={{ backgroundColor: statusColor }}
             />
             <div>
-              <h2 id="add-equipment-title" className="text-lg font-semibold text-content-primary">Ajouter un équipement</h2>
+              <h2 id="add-equipment-title" className="text-lg font-semibold text-content-primary">
+                Ajouter un équipement
+              </h2>
               <p className="text-xs text-content-subtle">Nouvel équipement dans l'inventaire</p>
             </div>
           </div>
@@ -150,10 +145,14 @@ export function AddEquipmentModal({
         </div>
 
         <div className="px-8 py-6 space-y-6">
-
           {/* Nom */}
           <div>
-            <label htmlFor="equipment-name" className="text-xs text-content-subtle uppercase tracking-wider mb-3 block">Nom de l'équipement *</label>
+            <label
+              htmlFor="equipment-name"
+              className="text-xs text-content-subtle uppercase tracking-wider mb-3 block"
+            >
+              Nom de l'équipement *
+            </label>
             <input
               id="equipment-name"
               type="text"
@@ -183,14 +182,14 @@ export function AddEquipmentModal({
                   style={
                     form.category === opt.value
                       ? {
-                          backgroundColor: 'rgba(0,255,255,0.08)',
-                          borderColor: 'rgba(0,255,255,0.4)',
-                          color: '#00ffff',
+                          backgroundColor: `${BRAND_COLORS.violet}14`,
+                          borderColor: `${BRAND_COLORS.violet}66`,
+                          color: BRAND_COLORS.violetHover,
                         }
                       : {
                           backgroundColor: 'transparent',
                           borderColor: '#27272e',
-                          color: '#71717a',
+                          color: TEXT_COLORS.subtle,
                         }
                   }
                 >
@@ -203,7 +202,9 @@ export function AddEquipmentModal({
 
           {/* Statut */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Statut initial</p>
+            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
+              Statut initial
+            </p>
             <div className="flex gap-2 flex-wrap">
               {statusOptions.map((opt) => (
                 <button
@@ -226,7 +227,9 @@ export function AddEquipmentModal({
                 >
                   <div
                     className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: form.status === opt.value ? opt.color : '#71717a' }}
+                    style={{
+                      backgroundColor: form.status === opt.value ? opt.color : TEXT_COLORS.subtle,
+                    }}
                   />
                   {opt.label}
                 </button>
@@ -236,12 +239,16 @@ export function AddEquipmentModal({
 
           {/* Emplacement & Zone */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Localisation</p>
+            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
+              Localisation
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="p-4 bg-theme-elevated rounded-xl">
                 <div className="flex items-center gap-1.5 mb-2">
                   <MapPin size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Emplacement *</p>
+                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">
+                    Emplacement *
+                  </p>
                 </div>
                 <input
                   id="equipment-location"
@@ -251,7 +258,9 @@ export function AddEquipmentModal({
                   placeholder="Ex : Régie Son"
                   aria-label="Emplacement"
                   className={`w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b focus:outline-none pb-0.5 transition-colors ${
-                    errors.location ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400'
+                    errors.location
+                      ? 'border-red-500/60'
+                      : 'border-theme-border focus:border-cyan-400'
                   }`}
                 />
                 {errors.location && (
@@ -280,7 +289,10 @@ export function AddEquipmentModal({
           <div>
             <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Responsable</p>
             <div className="relative">
-              <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
+              <User
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
+              />
               <input
                 type="text"
                 value={form.responsiblePerson}
@@ -296,7 +308,10 @@ export function AddEquipmentModal({
           <div>
             <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">QR Code</p>
             <div className="relative">
-              <QrCode size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
+              <QrCode
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none"
+              />
               <input
                 type="text"
                 value={form.qrCode}
@@ -322,7 +337,10 @@ export function AddEquipmentModal({
                 rows={3}
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 resize-none transition-colors"
               />
-              <FileText size={14} className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none" />
+              <FileText
+                size={14}
+                className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none"
+              />
             </div>
           </div>
 
@@ -339,10 +357,10 @@ export function AddEquipmentModal({
             </div>
           )}
           {form.status === 'repair' && (
-            <div className="flex items-start gap-3 p-4 bg-violet-500/5 border border-violet-500/20 rounded-xl">
-              <Wrench size={16} className="text-violet-400 mt-0.5 shrink-0" />
+            <div className="flex items-start gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+              <Wrench size={16} className="text-amber-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm text-violet-400 font-medium">En cours de réparation</p>
+                <p className="text-sm text-amber-400 font-medium">En cours de réparation</p>
                 <p className="text-xs text-content-muted mt-1">
                   Cet équipement ne sera pas disponible jusqu'à sa remise en service.
                 </p>
@@ -360,9 +378,8 @@ export function AddEquipmentModal({
               Annuler
             </Button>
           </div>
-
         </div>
       </div>
     </div>
-  );
+  )
 }

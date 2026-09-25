@@ -1,27 +1,27 @@
-import { Card, CardHeader } from '@/components/design-system/Card';
-import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatTime } from '@/lib/utils';
-import { EVENT_STATUS_CONFIG, DAYS_FR, MONTHS_FR } from '@/lib/constants';
-import { EventDetail } from './EventDetail';
-import type { Event } from '@/lib/types';
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react'
+import { formatTime, getProgressColor } from '@/lib/utils'
+import { EVENT_STATUS_CONFIG, DAYS_FR, MONTHS_FR } from '@/lib/constants'
+import { EventDetail } from './EventDetail'
+import type { Event } from '@/lib/types'
 
 interface CalendarViewProps {
-  days: (number | null)[];
-  month: number;
-  year: number;
-  today: Date;
-  eventsThisMonth: Event[];
-  selectedEvent: Event | null;
-  onSelectEvent: (evt: Event | null) => void;
-  onPrevMonth: () => void;
-  onNextMonth: () => void;
+  days: (number | null)[]
+  month: number
+  year: number
+  today: Date
+  eventsThisMonth: Event[]
+  selectedEvent: Event | null
+  onSelectEvent: (evt: Event | null) => void
+  onPrevMonth: () => void
+  onNextMonth: () => void
 }
 
 function getEventsForDay(events: Event[], day: number, month: number, year: number): Event[] {
   return events.filter((e) => {
-    const d = e.startDate;
-    return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
-  });
+    const d = e.startDate
+    return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year
+  })
 }
 
 export function CalendarView({
@@ -40,7 +40,7 @@ export function CalendarView({
       {/* Calendar */}
       <Card className="overflow-x-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl text-content-primary">
+          <h2 className="text-lg font-semibold text-content-primary">
             {MONTHS_FR[month]} {year}
           </h2>
           <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export function CalendarView({
         {/* Day headers */}
         <div className="mb-1 grid min-w-[650px] grid-cols-7">
           {DAYS_FR.map((d) => (
-            <div key={d} className="text-center text-[11px] font-medium text-content-faint uppercase tracking-wider py-2">
+            <div key={d} className="py-2 text-center text-xs font-semibold text-content-subtle">
               {d}
             </div>
           ))}
@@ -79,21 +79,17 @@ export function CalendarView({
                   key={`empty-${idx}`}
                   className="min-h-[7rem] border-r border-b border-theme-border bg-theme-deeper"
                 />
-              );
+              )
 
-            const dayEvents = getEventsForDay(eventsThisMonth, day, month, year);
+            const dayEvents = getEventsForDay(eventsThisMonth, day, month, year)
             const isToday =
-              day === today.getDate() &&
-              month === today.getMonth() &&
-              year === today.getFullYear();
+              day === today.getDate() && month === today.getMonth() && year === today.getFullYear()
 
             return (
               <div
                 key={`day-${day}`}
                 className={`min-h-[7rem] p-2 border-r border-b border-theme-border transition-colors ${
-                  isToday
-                    ? 'bg-cyan-400/5'
-                    : 'bg-transparent hover:bg-theme-elevated'
+                  isToday ? 'bg-[var(--brand-soft)]' : 'bg-transparent hover:bg-theme-elevated'
                 }`}
               >
                 {/* Day number */}
@@ -101,7 +97,7 @@ export function CalendarView({
                   <span
                     className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
                       isToday
-                        ? 'bg-cyan-400 text-black font-bold'
+                        ? 'bg-[var(--brand-violet)] text-white font-bold'
                         : 'text-content-subtle'
                     }`}
                   >
@@ -112,17 +108,17 @@ export function CalendarView({
                 {/* Events */}
                 <div className="space-y-0.5">
                   {dayEvents.slice(0, 3).map((evt) => {
-                    const sc = EVENT_STATUS_CONFIG[evt.status];
+                    const sc = EVENT_STATUS_CONFIG[evt.status]
                     return (
                       <button
                         key={evt.id}
                         onClick={() => onSelectEvent(evt)}
-                        className="w-full text-left px-1.5 py-[3px] rounded-md text-[10px] truncate transition-all hover:brightness-125 leading-tight"
+                        className="w-full truncate rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-125"
                         style={{ backgroundColor: sc.bg, color: sc.color }}
                       >
                         {evt.title}
                       </button>
-                    );
+                    )
                   })}
                   {dayEvents.length > 3 && (
                     <span className="text-[10px] text-content-faint pl-1 block">
@@ -131,7 +127,7 @@ export function CalendarView({
                   )}
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       </Card>
@@ -142,21 +138,24 @@ export function CalendarView({
           <CardHeader title="Prochains événements" subtitle={`${MONTHS_FR[month]} ${year}`} />
           <div className="space-y-3">
             {eventsThisMonth
+              .slice()
               .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
               .map((evt) => {
-                const sc = EVENT_STATUS_CONFIG[evt.status];
+                const sc = EVENT_STATUS_CONFIG[evt.status]
                 return (
                   <button
                     key={evt.id}
                     onClick={() => onSelectEvent(evt)}
                     className={`w-full text-left p-3 rounded-xl transition-colors ${
                       selectedEvent?.id === evt.id
-                        ? 'bg-cyan-400/10 border border-cyan-400/20'
+                        ? 'bg-[var(--brand-soft)] border border-[var(--brand-border)]'
                         : 'bg-theme-elevated hover:bg-theme-border border border-transparent'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-content-primary truncate pr-2">{evt.title}</span>
+                      <span className="text-sm text-content-primary truncate pr-2">
+                        {evt.title}
+                      </span>
                       <span
                         className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0"
                         style={{ backgroundColor: sc.bg, color: sc.color }}
@@ -167,7 +166,10 @@ export function CalendarView({
                     <div className="flex items-center gap-2 text-xs text-content-subtle">
                       <Calendar size={12} />
                       <span>
-                        {evt.startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                        {evt.startDate.toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
                       </span>
                       <Clock size={12} />
                       <span>
@@ -180,21 +182,19 @@ export function CalendarView({
                         className="h-full rounded-full transition-all"
                         style={{
                           width: `${evt.checklistProgress}%`,
-                          backgroundColor: evt.checklistProgress > 75 ? '#22c55e' : evt.checklistProgress > 40 ? '#f59e0b' : '#ef4444',
+                          backgroundColor: getProgressColor(evt.checklistProgress),
                         }}
                       />
                     </div>
                   </button>
-                );
+                )
               })}
           </div>
         </Card>
 
         {/* Selected event detail */}
-        {selectedEvent && (
-          <EventDetail event={selectedEvent} onClose={() => onSelectEvent(null)} />
-        )}
+        {selectedEvent && <EventDetail event={selectedEvent} onClose={() => onSelectEvent(null)} />}
       </div>
     </div>
-  );
+  )
 }

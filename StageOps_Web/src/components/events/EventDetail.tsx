@@ -1,22 +1,23 @@
-import { Card } from '@/components/design-system/Card';
-import { mockEquipment, mockTeamMembers } from '@/lib/mockData';
-import { formatTime } from '@/lib/utils';
-import { EVENT_STATUS_CONFIG } from '@/lib/constants';
-import { Calendar, Clock, MapPin, Users, Box, X } from 'lucide-react';
-import type { Event } from '@/lib/types';
+import { Card } from '@/components/design-system/Card'
+import { mockEquipment, mockTeamMembers } from '@/lib/mockData'
+import { formatTime, getProgressColor } from '@/lib/utils'
+import { EVENT_STATUS_CONFIG } from '@/lib/constants'
+import { Calendar, Clock, MapPin, Users, Box, X } from 'lucide-react'
+import type { Event } from '@/lib/types'
 
 export function EventDetail({ event, onClose }: { event: Event; onClose: () => void }) {
-  const sc = EVENT_STATUS_CONFIG[event.status];
+  const sc = EVENT_STATUS_CONFIG[event.status]
   const team = event.teamMembers
     .map((id) => mockTeamMembers.find((t) => t.id === id))
-    .filter(Boolean);
+    .filter(Boolean)
   const equipment = event.equipmentIds
     .map((id) => mockEquipment.find((e) => e.id === id))
-    .filter(Boolean);
+    .filter(Boolean)
 
   return (
     <Card className="relative">
       <button
+        aria-label="Fermer"
         onClick={onClose}
         className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
       >
@@ -71,7 +72,7 @@ export function EventDetail({ event, onClose }: { event: Event; onClose: () => v
               className="h-full rounded-full transition-all"
               style={{
                 width: `${event.checklistProgress}%`,
-                backgroundColor: event.checklistProgress > 75 ? '#22c55e' : event.checklistProgress > 40 ? '#f59e0b' : '#ef4444',
+                backgroundColor: getProgressColor(event.checklistProgress),
               }}
             />
           </div>
@@ -91,7 +92,7 @@ export function EventDetail({ event, onClose }: { event: Event; onClose: () => v
                 >
                   {m.name}
                 </span>
-              ) : null
+              ) : null,
             )}
           </div>
         </div>
@@ -110,11 +111,11 @@ export function EventDetail({ event, onClose }: { event: Event; onClose: () => v
                 >
                   {e.name}
                 </span>
-              ) : null
+              ) : null,
             )}
           </div>
         </div>
       </div>
     </Card>
-  );
+  )
 }

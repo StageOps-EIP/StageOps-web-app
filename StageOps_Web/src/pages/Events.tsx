@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { Card } from '@/components/design-system/Card';
-import { Button } from '@/components/design-system/Button';
-import { mockEvents } from '@/lib/mockData';
-import { AlertTriangle, Plus, List, CalendarDays } from 'lucide-react';
-import type { Event } from '@/lib/types';
-import { CalendarView, EventListView, NewEventModal, EventDetail } from '@/components/events';
+import { useState } from 'react'
+import { usePageTitle } from '@/hooks/usePageTitle'
+import { Card } from '@/components/design-system/Card'
+import { Button } from '@/components/design-system/Button'
+import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { mockEvents } from '@/lib/mockData'
+import { AlertTriangle, Plus, List, CalendarDays } from 'lucide-react'
+import type { Event } from '@/lib/types'
+import { CalendarView, EventListView, NewEventModal, EventDetail } from '@/components/events'
 
 // Extra mock events for a richer calendar
 const allEvents: Event[] = [
@@ -58,115 +59,106 @@ const allEvents: Event[] = [
     teamMembers: ['tm-002', 'tm-005'],
     status: 'strike',
   },
-];
+]
 
 function getCalendarDays(year: number, month: number): (number | null)[] {
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
+  const firstDay = new Date(year, month, 1)
+  const lastDay = new Date(year, month + 1, 0)
+  const daysInMonth = lastDay.getDate()
 
-  let startOffset = firstDay.getDay() - 1;
-  if (startOffset < 0) startOffset = 6;
+  let startOffset = firstDay.getDay() - 1
+  if (startOffset < 0) startOffset = 6
 
-  const days: (number | null)[] = [];
-  for (let i = 0; i < startOffset; i++) days.push(null);
-  for (let i = 1; i <= daysInMonth; i++) days.push(i);
-  while (days.length % 7 !== 0) days.push(null);
-  return days;
+  const days: (number | null)[] = []
+  for (let i = 0; i < startOffset; i++) days.push(null)
+  for (let i = 1; i <= daysInMonth; i++) days.push(i)
+  while (days.length % 7 !== 0) days.push(null)
+  return days
 }
 
 // Detect conflicts (overlapping events on same stage)
-function getConflicts(): { a: Event; b: Event }[] {
-  const conflicts: { a: Event; b: Event }[] = [];
-  for (let i = 0; i < allEvents.length; i++) {
-    for (let j = i + 1; j < allEvents.length; j++) {
-      const a = allEvents[i];
-      const b = allEvents[j];
+function getConflicts(events: Event[]): { a: Event; b: Event }[] {
+  const conflicts: { a: Event; b: Event }[] = []
+  for (let i = 0; i < events.length; i++) {
+    for (let j = i + 1; j < events.length; j++) {
+      const a = events[i]
+      const b = events[j]
       if (
         a.stage === b.stage &&
         a.venue === b.venue &&
         a.startDate < b.endDate &&
         b.startDate < a.endDate
       ) {
-        conflicts.push({ a, b });
+        conflicts.push({ a, b })
       }
     }
   }
-  return conflicts;
+  return conflicts
 }
 
 export function Events() {
-  usePageTitle('Événements');
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)); // Feb 2026
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [showNewForm, setShowNewForm] = useState(false);
+  usePageTitle('Conducteur')
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)) // Feb 2026
+  const [events, setEvents] = useState<Event[]>(allEvents)
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [showNewForm, setShowNewForm] = useState(false)
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const days = getCalendarDays(year, month);
-  const conflicts = getConflicts();
-  const today = new Date();
+  const year = currentDate.getFullYear()
+  const month = currentDate.getMonth()
+  const days = getCalendarDays(year, month)
+  const conflicts = getConflicts(events)
+  const today = new Date(2026, 1, 11)
 
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1))
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1))
 
-  const eventsThisMonth = allEvents.filter(
-    (e) => e.startDate.getMonth() === month && e.startDate.getFullYear() === year
-  );
+  const eventsThisMonth = events.filter(
+    (e) => e.startDate.getMonth() === month && e.startDate.getFullYear() === year,
+  )
 
   return (
-    <div className="page-shell space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="eyebrow mb-2">Planification</p>
-          <h1 className="page-heading text-content-primary">Événements & Planning</h1>
-          <p className="text-content-muted">{eventsThisMonth.length} événements ce mois-ci</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* View toggle */}
-          <div className="flex bg-theme-elevated rounded-xl p-1 border border-theme-border">
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
-                viewMode === 'calendar'
-                  ? 'bg-cyan-400/15 text-cyan-400'
-                  : 'text-content-muted hover:text-content-primary'
-              }`}
-            >
-              <CalendarDays size={16} />
-              Calendrier
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
-                viewMode === 'list'
-                  ? 'bg-cyan-400/15 text-cyan-400'
-                  : 'text-content-muted hover:text-content-primary'
-              }`}
-            >
-              <List size={16} />
-              Liste
-            </button>
-          </div>
-          <Button variant="primary" onClick={() => setShowNewForm(true)}>
-            <Plus size={16} />
-            Nouvel événement
-          </Button>
-        </div>
-      </div>
+    <div className="page-shell space-y-5">
+      <PageHeader
+        context="Théâtre National"
+        title="Conducteur et planning"
+        description={`${eventsThisMonth.length} événements en février 2026`}
+        actions={
+          <>
+            {/* View toggle */}
+            <div className="segmented-control">
+              <button
+                onClick={() => setViewMode('calendar')}
+                aria-pressed={viewMode === 'calendar'}
+              >
+                <CalendarDays size={16} />
+                Calendrier
+              </button>
+              <button onClick={() => setViewMode('list')} aria-pressed={viewMode === 'list'}>
+                <List size={16} />
+                Liste
+              </button>
+            </div>
+            <Button variant="primary" onClick={() => setShowNewForm(true)}>
+              <Plus size={16} />
+              Nouvel événement
+            </Button>
+          </>
+        }
+      />
+      <DemoNotice />
 
       {/* Conflicts warning */}
       {conflicts.length > 0 && (
-        <Card className="bg-gradient-to-r from-amber-500/10 to-red-500/10 border-amber-500/30">
+        <Card className="border-amber-500/30 bg-amber-500/[0.06]">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-amber-500/20 rounded-lg">
               <AlertTriangle size={20} className="text-amber-500" />
             </div>
             <div>
               <p className="text-sm text-content-primary mb-1">
-                {conflicts.length} conflit{conflicts.length > 1 ? 's' : ''} détecté{conflicts.length > 1 ? 's' : ''}
+                {conflicts.length} conflit{conflicts.length > 1 ? 's' : ''} détecté
+                {conflicts.length > 1 ? 's' : ''}
               </p>
               {conflicts.map((c, i) => (
                 <p key={i} className="text-xs text-amber-400">
@@ -191,20 +183,34 @@ export function Events() {
           onNextMonth={nextMonth}
         />
       ) : (
-        <EventListView allEvents={allEvents} onSelectEvent={setSelectedEvent} />
+        <EventListView allEvents={events} onSelectEvent={setSelectedEvent} />
       )}
 
       {/* New event modal */}
-      {showNewForm && <NewEventModal onClose={() => setShowNewForm(false)} />}
+      {showNewForm && (
+        <NewEventModal
+          onClose={() => setShowNewForm(false)}
+          onCreate={(event) => {
+            setEvents((current) => [...current, event])
+            setCurrentDate(new Date(event.startDate.getFullYear(), event.startDate.getMonth(), 1))
+            setShowNewForm(false)
+          }}
+        />
+      )}
 
       {/* Event detail modal on list view */}
       {selectedEvent && viewMode === 'list' && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Détail de l’événement"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+        >
           <div className="w-full max-w-lg">
             <EventDetail event={selectedEvent} onClose={() => setSelectedEvent(null)} />
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }

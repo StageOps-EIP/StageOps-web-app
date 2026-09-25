@@ -1,48 +1,47 @@
-import { useEffect } from 'react';
-import { Button } from '@/components/design-system/Button';
-import { mockEquipment } from '@/lib/mockData';
-import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '@/lib/utils';
-import type { Incident } from '@/lib/types';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
-import {
-  CheckCircle2,
-  Wrench,
-  X,
-  ArrowUpRight,
-} from 'lucide-react';
+import { useEffect } from 'react'
+import { Button } from '@/components/design-system/Button'
+import { mockEquipment } from '@/lib/mockData'
+import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '@/lib/utils'
+import type { Incident } from '@/lib/types'
+import type { IncidentStatus } from '@/lib/types'
+import { STATUS_COLORS } from '@/lib/design-tokens'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { CheckCircle2, Wrench, X, ArrowUpRight } from 'lucide-react'
 
 const statusLabels: Record<string, { label: string; color: string }> = {
-  open: { label: 'Ouvert', color: '#ef4444' },
-  'in-progress': { label: 'En cours', color: '#f59e0b' },
-  resolved: { label: 'Résolu', color: '#22c55e' },
-  closed: { label: 'Clos', color: '#71717a' },
-};
+  open: { label: 'Ouvert', color: STATUS_COLORS.danger },
+  'in-progress': { label: 'En cours', color: STATUS_COLORS.warning },
+  resolved: { label: 'Résolu', color: STATUS_COLORS.success },
+  closed: { label: 'Clos', color: STATUS_COLORS.neutral },
+}
 
 export function IncidentDetailModal({
   incident,
   onClose,
+  onStatusChange,
 }: {
-  incident: Incident;
-  onClose: () => void;
+  incident: Incident
+  onClose: () => void
+  onStatusChange?: (status: IncidentStatus) => void
 }) {
-  const trapRef = useFocusTrap(true);
-  const sevColor = getSeverityColor(incident.severity);
-  const statusCol = statusLabels[incident.status];
-  const eq = incident.equipmentId
-    ? mockEquipment.find((e) => e.id === incident.equipmentId)
-    : null;
+  const trapRef = useFocusTrap(true)
+  const sevColor = getSeverityColor(incident.severity)
+  const statusCol = statusLabels[incident.status]
+  const eq = incident.equipmentId ? mockEquipment.find((e) => e.id === incident.equipmentId) : null
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) onClose()
       }}
     >
       <div
@@ -55,11 +54,10 @@ export function IncidentDetailModal({
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
           <div className="flex items-center gap-3">
-            <div
-              className="w-2 h-8 rounded-full"
-              style={{ backgroundColor: sevColor }}
-            />
-            <h2 id="incident-modal-title" className="text-lg text-content-primary">Détail de l'incident</h2>
+            <div className="w-2 h-8 rounded-full" style={{ backgroundColor: sevColor }} />
+            <h2 id="incident-modal-title" className="text-lg text-content-primary">
+              Détail de l'incident
+            </h2>
           </div>
           <button
             aria-label="Fermer"
@@ -100,12 +98,8 @@ export function IncidentDetailModal({
 
           {/* Description */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-2">
-              Description
-            </p>
-            <p className="text-sm text-content-muted leading-relaxed">
-              {incident.description}
-            </p>
+            <p className="text-xs text-content-subtle uppercase tracking-wider mb-2">Description</p>
+            <p className="text-sm text-content-muted leading-relaxed">{incident.description}</p>
           </div>
 
           {/* Info grid */}
@@ -119,9 +113,7 @@ export function IncidentDetailModal({
                 <p className="text-sm text-content-primary">{incident.reportedBy}</p>
               </div>
               <div className="p-4 bg-theme-elevated rounded-xl">
-                <p className="text-[10px] text-content-subtle mb-1">
-                  Date du signalement
-                </p>
+                <p className="text-[10px] text-content-subtle mb-1">Date du signalement</p>
                 <p className="text-sm text-content-primary">
                   {formatRelativeTime(incident.timestamp)}
                 </p>
@@ -135,14 +127,10 @@ export function IncidentDetailModal({
                     </p>
                   </div>
                   <div className="p-4 bg-theme-elevated rounded-xl">
-                    <p className="text-[10px] text-content-subtle mb-1">
-                      Durée de résolution
-                    </p>
+                    <p className="text-[10px] text-content-subtle mb-1">Durée de résolution</p>
                     <p className="text-sm text-content-primary">
                       {Math.round(
-                        (incident.resolvedAt.getTime() -
-                          incident.timestamp.getTime()) /
-                          3600000
+                        (incident.resolvedAt.getTime() - incident.timestamp.getTime()) / 3600000,
                       )}
                       h
                     </p>
@@ -193,9 +181,7 @@ export function IncidentDetailModal({
 
           {/* Timeline */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
-              Historique
-            </p>
+            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Historique</p>
             <div className="space-y-0">
               <TimelineItem
                 color={sevColor}
@@ -204,14 +190,14 @@ export function IncidentDetailModal({
               />
               {incident.status === 'in-progress' && (
                 <TimelineItem
-                  color="#f59e0b"
+                  color={STATUS_COLORS.warning}
                   label="Prise en charge"
                   time="En cours"
                 />
               )}
               {incident.resolvedAt && (
                 <TimelineItem
-                  color="#22c55e"
+                  color={STATUS_COLORS.success}
                   label="Incident résolu"
                   time={formatRelativeTime(incident.resolvedAt)}
                 />
@@ -222,21 +208,23 @@ export function IncidentDetailModal({
           {/* Actions */}
           <div className="flex gap-3 pt-4 border-t border-theme-border">
             {incident.status === 'open' && (
-              <Button variant="primary" className="flex-1" onClick={onClose}>
+              <Button
+                variant="primary"
+                className="flex-1"
+                onClick={() => onStatusChange?.('in-progress')}
+              >
                 <ArrowUpRight size={16} />
                 Prendre en charge
               </Button>
             )}
             {incident.status === 'in-progress' && (
-              <Button variant="primary" className="flex-1" onClick={onClose}>
+              <Button
+                variant="primary"
+                className="flex-1"
+                onClick={() => onStatusChange?.('resolved')}
+              >
                 <CheckCircle2 size={16} />
                 Marquer résolu
-              </Button>
-            )}
-            {(incident.status === 'open' ||
-              incident.status === 'in-progress') && (
-              <Button variant="secondary" onClick={onClose}>
-                Escalader
               </Button>
             )}
             <Button variant="ghost" onClick={onClose}>
@@ -246,25 +234,14 @@ export function IncidentDetailModal({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function TimelineItem({
-  color,
-  label,
-  time,
-}: {
-  color: string;
-  label: string;
-  time: string;
-}) {
+function TimelineItem({ color, label, time }: { color: string; label: string; time: string }) {
   return (
     <div className="flex items-start gap-3 py-2">
       <div className="flex flex-col items-center mt-1">
-        <div
-          className="w-2.5 h-2.5 rounded-full"
-          style={{ backgroundColor: color }}
-        />
+        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
         <div className="w-px h-6 bg-[#27272e]" />
       </div>
       <div className="flex-1">
@@ -272,5 +249,5 @@ function TimelineItem({
         <p className="text-xs text-content-subtle">{time}</p>
       </div>
     </div>
-  );
+  )
 }

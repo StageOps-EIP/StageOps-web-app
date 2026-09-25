@@ -1,13 +1,13 @@
-import { Card, CardHeader } from '@/components/design-system/Card';
-import { Clock, MapPin, Users } from 'lucide-react';
-import { mockTeamMembers } from '@/lib/mockData';
-import { formatTime } from '@/lib/utils';
-import { EVENT_STATUS_CONFIG } from '@/lib/constants';
-import type { Event } from '@/lib/types';
+import { Card, CardHeader } from '@/components/design-system/Card'
+import { Clock, MapPin, Users } from 'lucide-react'
+import { mockTeamMembers } from '@/lib/mockData'
+import { formatTime, getProgressColor } from '@/lib/utils'
+import { EVENT_STATUS_CONFIG } from '@/lib/constants'
+import type { Event } from '@/lib/types'
 
 interface EventListViewProps {
-  allEvents: Event[];
-  onSelectEvent: (evt: Event | null) => void;
+  allEvents: Event[]
+  onSelectEvent: (evt: Event | null) => void
 }
 
 export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) {
@@ -16,18 +16,19 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
       <CardHeader title="Tous les événements" subtitle={`${allEvents.length} événements`} />
       <div className="space-y-2">
         {allEvents
+          .slice()
           .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
           .map((evt) => {
-            const sc = EVENT_STATUS_CONFIG[evt.status];
+            const sc = EVENT_STATUS_CONFIG[evt.status]
             const team = evt.teamMembers
               .map((id) => mockTeamMembers.find((t) => t.id === id)?.name)
-              .filter(Boolean);
+              .filter(Boolean)
 
             return (
               <button
                 key={evt.id}
                 onClick={() => onSelectEvent(evt)}
-                className="w-full text-left flex items-center gap-4 p-4 bg-theme-elevated rounded-xl hover:bg-theme-border transition-colors"
+                className="flex w-full items-center gap-4 rounded-md border border-transparent bg-theme-elevated p-4 text-left transition-colors hover:border-theme-border-hover hover:bg-[var(--bg-hover)]"
               >
                 {/* Date block */}
                 <div className="flex flex-col items-center justify-center w-14 shrink-0">
@@ -73,15 +74,15 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
                       className="h-full rounded-full"
                       style={{
                         width: `${evt.checklistProgress}%`,
-                        backgroundColor: evt.checklistProgress > 75 ? '#22c55e' : evt.checklistProgress > 40 ? '#f59e0b' : '#ef4444',
+                        backgroundColor: getProgressColor(evt.checklistProgress),
                       }}
                     />
                   </div>
                 </div>
               </button>
-            );
+            )
           })}
       </div>
     </Card>
-  );
+  )
 }

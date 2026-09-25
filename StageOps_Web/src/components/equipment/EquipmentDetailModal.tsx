@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/design-system/Button';
-import { CategoryIcon } from '@/components/design-system/Badge';
-import { getStatusColor, getCategoryLabel, formatRelativeTime, formatDateTime } from '@/lib/utils';
-import type { Equipment, EquipmentStatus } from '@/lib/types';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/design-system/Button'
+import { CategoryIcon } from '@/components/design-system/Badge'
+import { getStatusColor, getCategoryLabel, formatRelativeTime, formatDateTime } from '@/lib/utils'
+import type { Equipment, EquipmentStatus } from '@/lib/types'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { STATUS_COLORS, TEXT_COLORS } from '@/lib/design-tokens'
 import {
   X,
   MapPin,
@@ -15,45 +16,47 @@ import {
   AlertCircle,
   Wrench,
   Tag,
-} from 'lucide-react';
+} from 'lucide-react'
 
 const statusOptions: { value: EquipmentStatus; label: string; color: string }[] = [
-  { value: 'ok', label: 'OK', color: '#22c55e' },
-  { value: 'to-check', label: 'À vérifier', color: '#f59e0b' },
-  { value: 'hs', label: 'HS', color: '#ef4444' },
-  { value: 'repair', label: 'En réparation', color: '#8b5cf6' },
-];
+  { value: 'ok', label: 'Opérationnel', color: STATUS_COLORS.success },
+  { value: 'to-check', label: 'À vérifier', color: STATUS_COLORS.warning },
+  { value: 'hs', label: 'Hors service', color: STATUS_COLORS.danger },
+  { value: 'repair', label: 'En réparation', color: STATUS_COLORS.warning },
+]
 
 export function EquipmentDetailModal({
   equipment,
   onClose,
   onSave,
 }: {
-  equipment: Equipment;
-  onClose: () => void;
-  onSave?: (updated: Equipment) => void;
+  equipment: Equipment
+  onClose: () => void
+  onSave?: (updated: Equipment) => void
 }) {
-  const [editedStatus, setEditedStatus] = useState<EquipmentStatus>(equipment.status);
-  const [editedLocation, setEditedLocation] = useState(equipment.location);
-  const [editedZone, setEditedZone] = useState(equipment.zone ?? '');
-  const [editedResponsible, setEditedResponsible] = useState(equipment.responsiblePerson ?? '');
-  const [editedNotes, setEditedNotes] = useState(equipment.notes ?? '');
-  const [isSaved, setIsSaved] = useState(false);
-  const trapRef = useFocusTrap(true);
+  const [editedStatus, setEditedStatus] = useState<EquipmentStatus>(equipment.status)
+  const [editedLocation, setEditedLocation] = useState(equipment.location)
+  const [editedZone, setEditedZone] = useState(equipment.zone ?? '')
+  const [editedResponsible, setEditedResponsible] = useState(equipment.responsiblePerson ?? '')
+  const [editedNotes, setEditedNotes] = useState(equipment.notes ?? '')
+  const [isSaved, setIsSaved] = useState(false)
+  const trapRef = useFocusTrap(true)
 
-  const statusColor = getStatusColor(editedStatus);
+  const statusColor = getStatusColor(editedStatus)
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
   const hasChanges =
     editedStatus !== equipment.status ||
     editedLocation !== equipment.location ||
     editedZone !== (equipment.zone ?? '') ||
     editedResponsible !== (equipment.responsiblePerson ?? '') ||
-    editedNotes !== (equipment.notes ?? '');
+    editedNotes !== (equipment.notes ?? '')
 
   function handleSave() {
     const updated: Equipment = {
@@ -64,17 +67,17 @@ export function EquipmentDetailModal({
       responsiblePerson: editedResponsible || undefined,
       notes: editedNotes || undefined,
       lastCheck: new Date(),
-    };
-    onSave?.(updated);
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
+    }
+    onSave?.(updated)
+    setIsSaved(true)
+    setTimeout(() => setIsSaved(false), 2000)
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) onClose()
       }}
     >
       <div
@@ -84,7 +87,6 @@ export function EquipmentDetailModal({
         aria-labelledby="equipment-detail-title"
         className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
       >
-
         {/* Header */}
         <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
           <div className="flex items-center gap-3">
@@ -93,7 +95,12 @@ export function EquipmentDetailModal({
               style={{ backgroundColor: statusColor }}
             />
             <div>
-              <h2 id="equipment-detail-title" className="text-lg font-semibold text-content-primary">Détail équipement</h2>
+              <h2
+                id="equipment-detail-title"
+                className="text-lg font-semibold text-content-primary"
+              >
+                Détail équipement
+              </h2>
               <p className="text-xs text-content-subtle">{equipment.qrCode}</p>
             </div>
           </div>
@@ -107,7 +114,6 @@ export function EquipmentDetailModal({
         </div>
 
         <div className="px-8 py-6 space-y-6">
-
           {/* Nom & catégorie */}
           <div className="flex items-start gap-4">
             <div className="p-3 bg-theme-elevated rounded-xl flex items-center justify-center text-cyan-400">
@@ -117,7 +123,9 @@ export function EquipmentDetailModal({
               <h3 className="text-xl font-semibold text-content-primary">{equipment.name}</h3>
               <div className="flex items-center gap-2 mt-1">
                 <Tag size={12} className="text-content-subtle" />
-                <span className="text-sm text-content-muted">{getCategoryLabel(equipment.category)}</span>
+                <span className="text-sm text-content-muted">
+                  {getCategoryLabel(equipment.category)}
+                </span>
               </div>
             </div>
           </div>
@@ -147,7 +155,9 @@ export function EquipmentDetailModal({
                 >
                   <div
                     className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: editedStatus === opt.value ? opt.color : '#71717a' }}
+                    style={{
+                      backgroundColor: editedStatus === opt.value ? opt.color : TEXT_COLORS.subtle,
+                    }}
                   />
                   {opt.label}
                 </button>
@@ -157,14 +167,17 @@ export function EquipmentDetailModal({
 
           {/* Informations */}
           <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Informations</p>
+            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
+              Informations
+            </p>
             <div className="grid grid-cols-2 gap-3">
-
               {/* Emplacement */}
               <div className="p-4 bg-theme-elevated rounded-xl">
                 <div className="flex items-center gap-1.5 mb-2">
                   <MapPin size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Emplacement</p>
+                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">
+                    Emplacement
+                  </p>
                 </div>
                 <input
                   type="text"
@@ -195,7 +208,9 @@ export function EquipmentDetailModal({
               <div className="p-4 bg-theme-elevated rounded-xl">
                 <div className="flex items-center gap-1.5 mb-2">
                   <User size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Responsable</p>
+                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">
+                    Responsable
+                  </p>
                 </div>
                 <input
                   type="text"
@@ -211,7 +226,9 @@ export function EquipmentDetailModal({
               <div className="p-4 bg-theme-elevated rounded-xl">
                 <div className="flex items-center gap-1.5 mb-2">
                   <Clock size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Dernière vérif.</p>
+                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">
+                    Dernière vérif.
+                  </p>
                 </div>
                 <p className="text-sm text-content-primary">
                   {equipment.lastCheck ? formatRelativeTime(equipment.lastCheck) : '—'}
@@ -222,7 +239,6 @@ export function EquipmentDetailModal({
                   </p>
                 )}
               </div>
-
             </div>
           </div>
 
@@ -249,7 +265,10 @@ export function EquipmentDetailModal({
                 aria-label="Notes"
                 className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 resize-none transition-colors"
               />
-              <FileText size={14} className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none" />
+              <FileText
+                size={14}
+                className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none"
+              />
             </div>
           </div>
 
@@ -260,7 +279,8 @@ export function EquipmentDetailModal({
               <div>
                 <p className="text-sm text-red-400 font-medium">Équipement hors service</p>
                 <p className="text-xs text-content-muted mt-1">
-                  Cet équipement est marqué HS. Pensez à créer un incident et à notifier le responsable.
+                  Cet équipement est marqué HS. Pensez à créer un incident et à notifier le
+                  responsable.
                 </p>
               </div>
             </div>
@@ -268,12 +288,13 @@ export function EquipmentDetailModal({
 
           {/* Avertissement En réparation */}
           {editedStatus === 'repair' && (
-            <div className="flex items-start gap-3 p-4 bg-violet-500/5 border border-violet-500/20 rounded-xl">
-              <Wrench size={16} className="text-violet-400 mt-0.5 shrink-0" />
+            <div className="flex items-start gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+              <Wrench size={16} className="text-amber-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm text-violet-400 font-medium">En cours de réparation</p>
+                <p className="text-sm text-amber-400 font-medium">En cours de réparation</p>
                 <p className="text-xs text-content-muted mt-1">
-                  Cet équipement est en maintenance. Il ne sera pas disponible jusqu'à sa remise en service.
+                  Cet équipement est en maintenance. Il ne sera pas disponible jusqu'à sa remise en
+                  service.
                 </p>
               </div>
             </div>
@@ -303,9 +324,8 @@ export function EquipmentDetailModal({
               Annuler
             </Button>
           </div>
-
         </div>
       </div>
     </div>
-  );
+  )
 }
