@@ -12,7 +12,7 @@ export function StageOpsLogo({ compact = false, className = '', inverse = false 
       aria-label="StageOps"
     >
       <span className="stageops-logo__mark" aria-hidden="true">
-        <img src="/brand/stageops-mark.png" alt="" />
+        <img src="/brand/stageops-mark-transparent.png" alt="" />
       </span>
       {!compact && (
         <span className="stageops-logo__wordmark" aria-hidden="true">
