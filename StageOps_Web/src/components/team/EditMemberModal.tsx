@@ -98,7 +98,7 @@ export function EditMemberModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div

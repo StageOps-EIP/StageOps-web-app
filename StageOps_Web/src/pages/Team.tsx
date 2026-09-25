@@ -35,11 +35,12 @@ export function Team() {
   const roles = [...new Set(teamList.map((m) => m.role))];
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="page-shell space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl text-content-primary mb-2">Équipe & Rôles</h1>
+          <p className="eyebrow mb-2">Organisation</p>
+          <h1 className="page-heading text-content-primary">Équipe & Rôles</h1>
           <p className="text-content-muted">
             {teamList.length} membres · {roles.length} rôles
           </p>
@@ -63,7 +64,7 @@ export function Team() {
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_400px] gap-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* Team grid */}
         <div className="space-y-6">
           {/* role summary */}

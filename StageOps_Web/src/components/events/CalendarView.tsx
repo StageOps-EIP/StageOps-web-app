@@ -36,9 +36,9 @@ export function CalendarView({
   onNextMonth,
 }: CalendarViewProps) {
   return (
-    <div className="grid grid-cols-[1fr_360px] gap-6">
+    <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
       {/* Calendar */}
-      <Card>
+      <Card className="overflow-x-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl text-content-primary">
             {MONTHS_FR[month]} {year}
@@ -62,7 +62,7 @@ export function CalendarView({
         </div>
 
         {/* Day headers */}
-        <div className="grid grid-cols-7 mb-1">
+        <div className="mb-1 grid min-w-[650px] grid-cols-7">
           {DAYS_FR.map((d) => (
             <div key={d} className="text-center text-[11px] font-medium text-content-faint uppercase tracking-wider py-2">
               {d}
@@ -71,13 +71,13 @@ export function CalendarView({
         </div>
 
         {/* Calendar grid — no gap, borders provide separation */}
-        <div className="grid grid-cols-7 border-l border-t border-theme-border rounded-xl overflow-hidden">
+        <div className="grid min-w-[650px] grid-cols-7 overflow-hidden rounded-xl border-l border-t border-theme-border">
           {days.map((day, idx) => {
             if (day === null)
               return (
                 <div
                   key={`empty-${idx}`}
-                  className="min-h-[7rem] border-r border-b border-theme-border bg-theme-deeper/40"
+                  className="min-h-[7rem] border-r border-b border-theme-border bg-theme-deeper"
                 />
               );
 
@@ -93,7 +93,7 @@ export function CalendarView({
                 className={`min-h-[7rem] p-2 border-r border-b border-theme-border transition-colors ${
                   isToday
                     ? 'bg-cyan-400/5'
-                    : 'bg-transparent hover:bg-theme-elevated/60'
+                    : 'bg-transparent hover:bg-theme-elevated'
                 }`}
               >
                 {/* Day number */}

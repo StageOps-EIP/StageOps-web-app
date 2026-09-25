@@ -18,31 +18,32 @@ export function Equipment() {
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all');
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  
+
   const filteredEquipment = equipmentList.filter(eq => {
     const matchesSearch = eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          eq.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          eq.qrCode.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || eq.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || eq.status === filterStatus;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
-  
+
   return (
-    <div className="p-8">
+    <div className="page-shell">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-content-primary mb-2">Inventaire</h1>
+          <p className="eyebrow mb-2">Parc technique</p>
+          <h1 className="page-heading text-content-primary">Inventaire</h1>
           <p className="text-content-muted">{equipmentList.length} équipements au total</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="secondary">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" className="hidden sm:inline-flex">
             <QrCode size={18} />
             Scanner QR
           </Button>
-          <Button variant="secondary">
+          <Button variant="secondary" className="hidden sm:inline-flex">
             <Download size={18} />
             Exporter
           </Button>
@@ -52,10 +53,10 @@ export function Equipment() {
           </Button>
         </div>
       </div>
-      
+
       {/* Filters */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 max-w-md">
+      <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-center">
+        <div className="w-full max-w-xl flex-1">
           <SearchInput
             aria-label="Rechercher par nom, QR code ou emplacement"
             placeholder="Rechercher par nom, QR code, emplacement..."
@@ -63,9 +64,9 @@ export function Equipment() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Filter size={18} className="text-content-subtle" />
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0">
+          <Filter size={18} className="shrink-0 text-content-subtle" />
           <div className="relative">
             <select
               aria-label="Filtrer par catégorie"
@@ -83,7 +84,7 @@ export function Equipment() {
             </select>
             <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none" />
           </div>
-          
+
           <div className="relative">
             <select
               aria-label="Filtrer par statut"
@@ -101,16 +102,16 @@ export function Equipment() {
           </div>
         </div>
       </div>
-      
+
       {/* Results count */}
       <div className="mb-4">
         <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-content-muted">
           {filteredEquipment.length} équipement{filteredEquipment.length !== 1 ? 's' : ''} trouvé{filteredEquipment.length !== 1 ? 's' : ''}
         </p>
       </div>
-      
+
       {/* Table */}
-      <div className="bg-theme-base border border-theme-border rounded-2xl overflow-hidden">
+      <div className="glass-panel overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-theme-elevated border-b border-theme-border">
@@ -197,7 +198,7 @@ export function Equipment() {
           </table>
         </div>
       </div>
-      
+
       {filteredEquipment.length === 0 && (
         <div className="text-center py-16">
           <p className="text-content-subtle mb-4">Aucun équipement trouvé</p>

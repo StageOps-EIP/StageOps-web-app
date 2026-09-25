@@ -116,14 +116,15 @@ export function Events() {
   );
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="page-shell space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl text-content-primary mb-2">Événements & Planning</h1>
+          <p className="eyebrow mb-2">Planification</p>
+          <h1 className="page-heading text-content-primary">Événements & Planning</h1>
           <p className="text-content-muted">{eventsThisMonth.length} événements ce mois-ci</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {/* View toggle */}
           <div className="flex bg-theme-elevated rounded-xl p-1 border border-theme-border">
             <button

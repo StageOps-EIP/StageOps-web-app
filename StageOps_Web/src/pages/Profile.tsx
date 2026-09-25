@@ -7,6 +7,7 @@ import {
   Shield,
   Calendar,
   LogOut,
+  LogIn,
   Bell,
   Key,
   ChevronRight,
@@ -30,18 +31,20 @@ export function Profile() {
     navigate('/login');
   }
 
-  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : '';
-  const initials = user?.email.slice(0, 2).toUpperCase() ?? '??';
+  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : 'Accès invité';
+  const displayName = user?.email ?? 'Session de démonstration';
+  const initials = user?.email.slice(0, 2).toUpperCase() ?? 'SO';
 
   return (
-    <div className="p-8 space-y-6 max-w-5xl">
+    <div className="page-shell max-w-6xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-content-primary mb-2">Mon profil</h1>
+        <p className="eyebrow mb-2">Compte</p>
+        <h1 className="page-heading text-content-primary">Mon profil</h1>
         <p className="text-content-muted">Gérez vos informations personnelles et préférences</p>
       </div>
 
-      <div className="grid grid-cols-[1fr_360px] gap-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         {/* Left column */}
         <div className="space-y-6">
 
@@ -57,7 +60,7 @@ export function Profile() {
                   {initials}
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-content-primary">{user?.email ?? '—'}</h2>
+                  <h2 className="text-xl font-semibold text-content-primary">{displayName}</h2>
                   <p className="text-sm mt-0.5" style={{ color: ROLE_COLOR }}>
                     {roleLabel}
                   </p>
@@ -73,7 +76,7 @@ export function Profile() {
                   <Mail size={12} className="text-content-subtle" />
                   <p className="text-[10px] text-content-subtle uppercase tracking-wider">Email</p>
                 </div>
-                <p className="text-sm text-content-primary">{user?.email ?? '—'}</p>
+                <p className="text-sm text-content-primary">{user?.email ?? 'Aucun compte connecté'}</p>
               </div>
             </div>
           </div>
@@ -86,7 +89,7 @@ export function Profile() {
             </div>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
-                {roleLabel || '—'}
+                {roleLabel}
               </span>
             </div>
             <p className="text-xs text-content-subtle">
@@ -163,12 +166,12 @@ export function Profile() {
 
           {/* Logout */}
           <Button
-            variant="danger"
+            variant={user ? 'danger' : 'primary'}
             fullWidth
             onClick={handleLogout}
           >
-            <LogOut size={16} />
-            Se déconnecter
+            {user ? <LogOut size={16} /> : <LogIn size={16} />}
+            {user ? 'Se déconnecter' : 'Se connecter'}
           </Button>
         </div>
       </div>

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { Button } from '@/components/design-system/Button';
+import { StageOpsLogo } from '@/components/brand/StageOpsLogo';
 import { useAuth } from '@/contexts/auth.context';
-import { Layers, Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, Phone, Briefcase, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const roleOptions = [
   'Régisseur Général',
@@ -83,29 +84,27 @@ export function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#0a0a0b] via-[#131316] to-[#1c1c21]">
+    <div id="main-content" className="relative min-h-dvh overflow-hidden bg-[#070b1a] px-4 py-8 text-white sm:px-6">
       {/* Background grid */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
+      <div className="pointer-events-none absolute inset-0 opacity-20">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, #00ffff 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 2px 2px, #7885ff 1px, transparent 0)`,
             backgroundSize: '48px 48px',
           }}
         />
       </div>
 
-      <div className="w-full max-w-md relative">
+      <div className="relative mx-auto w-full max-w-lg">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-3xl mb-4 shadow-2xl shadow-cyan-400/20">
-            <Layers size={40} className="text-black" />
-          </div>
-          <h1 className="text-4xl font-bold text-[#f5f5f7] mb-2">StageOps</h1>
-          <p className="text-[#a1a1aa]">Créer votre compte</p>
+        <div className="mb-8 text-center">
+          <StageOpsLogo inverse className="mb-6" />
+          <h1 className="mb-2 text-3xl font-semibold text-white">Créer votre espace</h1>
+          <p className="text-sm text-blue-100/55">Configurez votre profil de régie en quelques instants.</p>
         </div>
 
-        <div className="bg-[#131316] border border-[#27272e] rounded-3xl p-8 shadow-2xl">
+        <div className="rounded-3xl border border-white/10 bg-[#0f1730]/90 p-5 shadow-2xl backdrop-blur-xl sm:p-8">
           {/* Step indicator */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex items-center gap-2">

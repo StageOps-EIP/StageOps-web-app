@@ -93,11 +93,12 @@ export function Incidents() {
   ).length;
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="page-shell space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h1 className="text-3xl text-content-primary mb-2">
+          <p className="eyebrow mb-2">Centre d’alertes</p>
+          <h1 className="page-heading text-content-primary">
             Incidents & Maintenance
           </h1>
           <p className="text-content-muted">
@@ -106,7 +107,7 @@ export function Incidents() {
             critique{criticalCount > 1 ? "s" : ""}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex bg-theme-elevated rounded-xl p-1 border border-theme-border">
             <button
               onClick={() => setViewMode("kanban")}
@@ -172,7 +173,7 @@ export function Incidents() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-4">
         {columns.map((col) => {
           const count = allIncidents.filter(
             (i) => i.status === col.key,
@@ -203,7 +204,7 @@ export function Incidents() {
       </div>
 
       {viewMode === "kanban" ? (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
           {columns.map((col) => {
             const items = getByStatus(col.key);
             const Icon = col.icon;
