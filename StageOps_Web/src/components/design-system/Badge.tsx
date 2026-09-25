@@ -54,13 +54,13 @@ export function Badge({ status, size = 'md', showLabel = true }: BadgeProps) {
           : Clock3
 
   const sizeClasses = {
-    sm: 'px-2 py-0.5 text-xs gap-1',
-    md: 'px-2.5 py-1 text-xs gap-1.5',
+    sm: 'px-1.5 py-0.5 text-[11px] gap-1',
+    md: 'px-2 py-0.5 text-xs gap-1.5',
   }
 
   return (
     <div
-      className={`inline-flex items-center rounded-md border font-semibold ${sizeClasses[size]}`}
+      className={`inline-flex items-center rounded-[2px] border font-semibold ${sizeClasses[size]}`}
       style={{
         backgroundColor: `${color}15`,
         color: color,
@@ -82,7 +82,7 @@ interface CategoryChipProps {
 
 export function CategoryChip({ category, label, icon, onRemove }: CategoryChipProps) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-md border border-theme-border bg-theme-elevated px-2.5 py-1 text-sm text-content-primary">
+    <div className="inline-flex items-center gap-1.5 rounded-[2px] border border-theme-border bg-theme-elevated px-2 py-0.5 text-xs text-content-primary">
       {icon && <span className="text-base">{icon}</span>}
       <span>{label || category}</span>
       {onRemove && (

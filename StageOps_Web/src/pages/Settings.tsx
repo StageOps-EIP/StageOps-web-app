@@ -43,9 +43,9 @@ export function Settings() {
         Les réglages sont conservés uniquement dans cet environnement de démonstration.
       </DemoNotice>
 
-      <div className="grid gap-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6">
+      <div className="grid gap-4 lg:grid-cols-[230px_minmax(0,1fr)]">
         {/* Sidebar */}
-        <div className="flex gap-1 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
+        <div className="flex overflow-x-auto border border-theme-border bg-theme-base lg:block lg:overflow-visible">
           {sections.map((section) => {
             const Icon = section.icon
             const isActive = activeSection === section.key
@@ -53,10 +53,10 @@ export function Settings() {
               <button
                 key={section.key}
                 onClick={() => setActiveSection(section.key)}
-                className={`flex shrink-0 items-center gap-3 rounded-md px-4 py-3 text-left transition-colors lg:w-full ${
+                className={`flex shrink-0 items-center gap-3 border-b-2 px-4 py-3 text-left transition-colors lg:w-full lg:border-b lg:border-l-2 ${
                   isActive
-                    ? 'bg-[var(--brand-soft)] text-[var(--brand-violet-hover)]'
-                    : 'text-content-muted hover:text-content-primary hover:bg-theme-elevated'
+                    ? 'border-b-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary lg:border-b-theme-border lg:border-l-[var(--brand-violet)]'
+                    : 'border-b-transparent text-content-muted hover:bg-theme-elevated hover:text-content-primary lg:border-b-theme-border lg:border-l-transparent'
                 }`}
               >
                 <Icon size={18} />

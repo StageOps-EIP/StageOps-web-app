@@ -36,25 +36,25 @@ export function CalendarView({
   onNextMonth,
 }: CalendarViewProps) {
   return (
-    <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_340px]">
       {/* Calendar */}
       <Card className="overflow-x-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-content-primary">
+        <div className="mb-4 flex items-center justify-between border-b border-theme-border pb-3">
+          <h2 className="text-sm font-semibold text-content-primary">
             {MONTHS_FR[month]} {year}
           </h2>
           <div className="flex items-center gap-2">
             <button
               aria-label="Mois précédent"
               onClick={onPrevMonth}
-              className="p-2 rounded-lg hover:bg-theme-elevated text-content-muted hover:text-content-primary transition-colors"
+              className="p-1.5 text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
             >
               <ChevronLeft size={20} />
             </button>
             <button
               aria-label="Mois suivant"
               onClick={onNextMonth}
-              className="p-2 rounded-lg hover:bg-theme-elevated text-content-muted hover:text-content-primary transition-colors"
+              className="p-1.5 text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
             >
               <ChevronRight size={20} />
             </button>
@@ -71,7 +71,7 @@ export function CalendarView({
         </div>
 
         {/* Calendar grid — no gap, borders provide separation */}
-        <div className="grid min-w-[650px] grid-cols-7 overflow-hidden rounded-xl border-l border-t border-theme-border">
+        <div className="grid min-w-[650px] grid-cols-7 overflow-hidden border-l border-t border-theme-border">
           {days.map((day, idx) => {
             if (day === null)
               return (
@@ -95,7 +95,7 @@ export function CalendarView({
                 {/* Day number */}
                 <div className="flex justify-end mb-1.5">
                   <span
-                    className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
+                    className={`flex h-6 w-6 items-center justify-center text-xs font-medium ${
                       isToday
                         ? 'bg-[var(--brand-violet)] text-white font-bold'
                         : 'text-content-subtle'
@@ -113,7 +113,7 @@ export function CalendarView({
                       <button
                         key={evt.id}
                         onClick={() => onSelectEvent(evt)}
-                        className="w-full truncate rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-125"
+                        className="w-full truncate border-l-2 px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-125"
                         style={{ backgroundColor: sc.bg, color: sc.color }}
                       >
                         {evt.title}
@@ -136,7 +136,7 @@ export function CalendarView({
       <div className="space-y-4">
         <Card>
           <CardHeader title="Prochains événements" subtitle={`${MONTHS_FR[month]} ${year}`} />
-          <div className="space-y-3">
+          <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">
             {eventsThisMonth
               .slice()
               .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
@@ -146,10 +146,10 @@ export function CalendarView({
                   <button
                     key={evt.id}
                     onClick={() => onSelectEvent(evt)}
-                    className={`w-full text-left p-3 rounded-xl transition-colors ${
+                    className={`w-full border-b p-3 text-left transition-colors ${
                       selectedEvent?.id === evt.id
-                        ? 'bg-[var(--brand-soft)] border border-[var(--brand-border)]'
-                        : 'bg-theme-elevated hover:bg-theme-border border border-transparent'
+                        ? 'border-l-2 border-l-[var(--brand-violet)] border-b-theme-border bg-[var(--brand-soft)]'
+                        : 'border-l-2 border-l-transparent border-b-theme-border hover:bg-theme-elevated'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -157,7 +157,7 @@ export function CalendarView({
                         {evt.title}
                       </span>
                       <span
-                        className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0"
+                        className="shrink-0 border-l border-theme-border px-1.5 py-0.5 text-[10px]"
                         style={{ backgroundColor: sc.bg, color: sc.color }}
                       >
                         {sc.label}
@@ -177,9 +177,9 @@ export function CalendarView({
                       </span>
                     </div>
                     {/* Progress bar */}
-                    <div className="mt-2 h-1 bg-[#27272e] rounded-full overflow-hidden">
+                    <div className="mt-2 h-1 overflow-hidden bg-theme-raised">
                       <div
-                        className="h-full rounded-full transition-all"
+                        className="h-full transition-all"
                         style={{
                           width: `${evt.checklistProgress}%`,
                           backgroundColor: getProgressColor(evt.checklistProgress),

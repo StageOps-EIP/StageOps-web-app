@@ -14,7 +14,7 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
   return (
     <Card>
       <CardHeader title="Tous les événements" subtitle={`${allEvents.length} événements`} />
-      <div className="space-y-2">
+      <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">
         {allEvents
           .slice()
           .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
@@ -28,7 +28,7 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
               <button
                 key={evt.id}
                 onClick={() => onSelectEvent(evt)}
-                className="flex w-full items-center gap-4 rounded-md border border-transparent bg-theme-elevated p-4 text-left transition-colors hover:border-theme-border-hover hover:bg-[var(--bg-hover)]"
+                className="flex w-full items-center gap-4 border-b border-theme-border p-4 text-left transition-colors hover:bg-theme-elevated"
               >
                 {/* Date block */}
                 <div className="flex flex-col items-center justify-center w-14 shrink-0">
@@ -44,7 +44,7 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm text-content-primary truncate">{evt.title}</span>
                     <span
-                      className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
+                      className="shrink-0 border-l border-theme-border px-2 py-0.5 text-[10px]"
                       style={{ backgroundColor: sc.bg, color: sc.color }}
                     >
                       {sc.label}
@@ -69,9 +69,9 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
                 {/* Progress */}
                 <div className="flex flex-col items-end shrink-0">
                   <span className="text-xs text-content-muted mb-1">{evt.checklistProgress}%</span>
-                  <div className="w-20 h-1.5 bg-[#27272e] rounded-full overflow-hidden">
+                  <div className="h-1 w-20 overflow-hidden bg-theme-raised">
                     <div
-                      className="h-full rounded-full"
+                      className="h-full"
                       style={{
                         width: `${evt.checklistProgress}%`,
                         backgroundColor: getProgressColor(evt.checklistProgress),

@@ -51,23 +51,27 @@ export function Team() {
       />
       <DemoNotice />
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
-        />
-        <input
-          type="text"
-          placeholder="Rechercher un membre ou un rôle..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Rechercher un membre ou un rôle"
-          className="w-full bg-theme-base border border-theme-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:border-cyan-400/50"
-        />
+      <div className="toolbar">
+        <div className="relative min-w-[16rem] max-w-xl flex-1">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
+          />
+          <input
+            type="text"
+            placeholder="Rechercher un membre ou un rôle..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Rechercher un membre ou un rôle"
+            className="form-control w-full py-2 pl-10 pr-4 text-sm placeholder:text-content-subtle"
+          />
+        </div>
+        <span className="text-xs text-content-subtle">
+          {filtered.length} membre{filtered.length > 1 ? 's' : ''}
+        </span>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_380px]">
         {/* Team grid */}
         <div className="space-y-6">
           {/* Members list */}
@@ -76,7 +80,7 @@ export function Team() {
               title="Membres de l'équipe"
               subtitle={`${filtered.length} membre${filtered.length > 1 ? 's' : ''}`}
             />
-            <div className="space-y-2">
+            <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">
               {filtered.map((member) => {
                 const color = ROLE_COLORS[member.role] || '#71717a'
                 const isSelected = selectedMember?.id === member.id
@@ -85,18 +89,18 @@ export function Team() {
                   <button
                     key={member.id}
                     onClick={() => setSelectedMember(member)}
-                    className={`w-full text-left flex items-center gap-4 p-4 rounded-xl transition-all ${
+                    className={`flex w-full items-center gap-4 border-b px-4 py-3 text-left transition-colors sm:px-5 ${
                       isSelected
-                        ? 'bg-cyan-400/10 border border-cyan-400/20'
-                        : 'hover:bg-theme-elevated border border-transparent'
+                        ? 'border-l-2 border-l-[var(--brand-violet)] border-b-theme-border bg-[var(--brand-soft)]'
+                        : 'border-l-2 border-l-transparent border-b-theme-border hover:bg-theme-elevated'
                     }`}
                   >
                     {/* Avatar */}
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px]"
                       style={{ backgroundColor: `${color}20` }}
                     >
-                      <span className="text-lg" style={{ color }}>
+                      <span className="text-xs font-semibold" style={{ color }}>
                         {member.name
                           .split(' ')
                           .map((n) => n[0])
@@ -112,7 +116,7 @@ export function Team() {
                     {/* Permissions badges */}
                     <div className="flex gap-1 shrink-0">
                       {member.permissions.includes('admin') && (
-                        <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 rounded text-[10px]">
+                        <span className="border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500">
                           Admin
                         </span>
                       )}
@@ -191,16 +195,16 @@ function MemberDetail({
   const color = ROLE_COLORS[member.role] || '#71717a'
 
   return (
-    <Card className="sticky top-8">
+    <Card className="sticky top-4">
       <div className="space-y-5">
         {/* Avatar + name */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              className="flex h-12 w-12 items-center justify-center rounded-[2px]"
               style={{ backgroundColor: `${color}20` }}
             >
-              <span className="text-2xl" style={{ color }}>
+              <span className="text-base font-semibold" style={{ color }}>
                 {member.name
                   .split(' ')
                   .map((n) => n[0])
@@ -226,12 +230,12 @@ function MemberDetail({
         {/* Contact */}
         <div className="space-y-2">
           <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
-          <div className="flex items-center gap-2 p-3 bg-theme-elevated rounded-xl">
+          <div className="flex items-center gap-2 border-b border-theme-border py-2.5">
             <Mail size={14} className="text-content-muted" />
             <span className="text-sm text-content-primary">{member.email}</span>
           </div>
           {member.phone && (
-            <div className="flex items-center gap-2 p-3 bg-theme-elevated rounded-xl">
+            <div className="flex items-center gap-2 py-2.5">
               <Phone size={14} className="text-content-muted" />
               <span className="text-sm text-content-primary">{member.phone}</span>
             </div>
@@ -248,7 +252,7 @@ function MemberDetail({
             {member.permissions.map((perm) => (
               <span
                 key={perm}
-                className={`px-2.5 py-1 rounded-lg text-xs ${
+                className={`border px-2 py-0.5 text-xs ${
                   perm === 'admin'
                     ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                     : 'bg-theme-elevated text-content-muted border border-theme-border'

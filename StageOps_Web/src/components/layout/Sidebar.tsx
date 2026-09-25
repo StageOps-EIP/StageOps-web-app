@@ -38,7 +38,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation()
 
   return (
-    <nav aria-label="Navigation principale" className="space-y-1">
+    <nav aria-label="Navigation principale" className="space-y-px">
       {navigation.map((item) => {
         const isActive = isCurrentPath(location.pathname, item.href)
         const Icon = item.icon
@@ -48,10 +48,10 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
             to={item.href}
             onClick={onNavigate}
             aria-current={isActive ? 'page' : undefined}
-            className={`group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`group relative flex items-center gap-3 border-l-2 px-4 py-2.5 text-[13px] font-medium transition-colors ${
               isActive
-                ? 'bg-[var(--brand-soft)] text-[var(--brand-violet-hover)]'
-                : 'text-content-muted hover:bg-theme-elevated hover:text-content-primary'
+                ? 'border-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary'
+                : 'border-transparent text-content-muted hover:border-theme-border-hover hover:bg-theme-elevated hover:text-content-primary'
             }`}
           >
             <Icon size={18} strokeWidth={isActive ? 2 : 1.7} aria-hidden="true" />
@@ -70,32 +70,35 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navigation principale"
-      className="hidden h-dvh w-[15rem] shrink-0 flex-col border-r border-theme-border bg-theme-deeper lg:flex"
+      className="hidden h-dvh w-[13.5rem] shrink-0 flex-col border-r border-theme-border bg-theme-deeper lg:flex"
     >
-      <div className="border-b border-theme-border px-5 py-5">
+      <div className="border-b border-theme-border px-4 py-4">
         <StageOpsLogo />
-        <div className="mt-4 rounded-md border border-theme-border bg-theme-base px-3 py-2.5">
-          <p className="text-xs font-semibold text-content-primary">Théâtre National</p>
-          <p className="mt-0.5 text-xs text-content-subtle">Grande Salle</p>
+        <div className="mt-4 border-l-2 border-[var(--brand-blue)] pl-3">
+          <p className="text-[11px] text-content-subtle">Lieu de travail</p>
+          <p className="mt-0.5 text-xs font-semibold text-content-primary">Théâtre National</p>
+          <p className="mt-0.5 text-[11px] text-content-muted">Grande Salle</p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <p className="mb-2 px-3 text-xs font-semibold text-content-subtle">Navigation</p>
+      <div className="flex-1 overflow-y-auto py-4">
+        <p className="mb-2 px-4 text-[10px] font-semibold text-content-subtle">
+          Espaces de travail
+        </p>
         <NavigationLinks />
       </div>
 
-      <div className="border-t border-theme-border p-3">
+      <div className="border-t border-theme-border py-2">
         <button
           onClick={toggle}
-          className="mb-1 flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
+          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
         >
           {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
           {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
         </button>
         <Link
           to="/profile"
-          className="flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-theme-elevated"
+          className="flex items-center gap-3 border-t border-theme-border px-4 py-3 transition-colors hover:bg-theme-elevated"
         >
           <UserCircle size={19} className="text-content-subtle" />
           <span className="min-w-0 flex-1">
@@ -117,12 +120,18 @@ export function MobileHeader() {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-theme-border bg-theme-deeper px-4 lg:hidden">
-        <StageOpsLogo compact />
+        <div className="flex min-w-0 items-center gap-3">
+          <StageOpsLogo compact />
+          <div className="hidden min-w-0 border-l border-theme-border pl-3 sm:block">
+            <p className="truncate text-[11px] font-semibold text-content-primary">Hamlet</p>
+            <p className="truncate text-[10px] text-content-subtle">Grande Salle</p>
+          </div>
+        </div>
         <button
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          className="grid h-10 w-10 place-items-center rounded-md border border-theme-border text-content-muted"
+          className="grid h-9 w-9 place-items-center border border-theme-border text-content-muted"
         >
           {open ? <X size={19} /> : <Menu size={19} />}
         </button>

@@ -10,7 +10,7 @@ export function Card({ children, className = '', hover = false, onClick, ...prop
 
   return (
     <div
-      className={`panel p-4 sm:p-5 ${
+      className={`work-panel p-4 sm:p-5 ${
         interactive
           ? 'cursor-pointer transition-colors duration-150 hover:border-theme-border-hover hover:bg-theme-elevated'
           : ''
@@ -31,10 +31,10 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action }: CardHeaderProps) {
   return (
-    <div className="mb-5 flex items-start justify-between gap-4">
+    <div className="mb-4 flex items-start justify-between gap-4 border-b border-theme-border pb-3">
       <div className="min-w-0">
-        <h3 className="text-base font-semibold text-content-primary sm:text-lg">{title}</h3>
-        {subtitle && <p className="mt-1 text-sm text-content-muted">{subtitle}</p>}
+        <h3 className="text-sm font-semibold text-content-primary">{title}</h3>
+        {subtitle && <p className="mt-0.5 text-xs text-content-muted">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

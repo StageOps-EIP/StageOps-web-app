@@ -38,28 +38,49 @@ export function Login() {
   return (
     <main
       id="main-content"
-      className="auth-surface grid min-h-dvh bg-theme-void text-content-primary lg:grid-cols-[minmax(22rem,.8fr)_minmax(32rem,1.2fr)]"
+      className="auth-surface grid min-h-dvh bg-theme-void text-content-primary lg:grid-cols-[22rem_minmax(32rem,1fr)]"
     >
-      <section className="flex flex-col border-b border-theme-border bg-theme-deeper p-6 lg:border-b-0 lg:border-r lg:p-10 xl:p-14">
+      <section className="flex flex-col border-b border-theme-border bg-theme-deeper p-6 lg:border-b-0 lg:border-r lg:p-8">
         <StageOpsLogo inverse />
-        <div className="my-auto max-w-lg py-12 lg:py-16">
-          <p className="page-kicker mb-3">Gestion technique du spectacle</p>
-          <h1 className="text-3xl font-semibold leading-tight text-content-primary sm:text-4xl">
-            Les opérations de régie réunies dans un même espace de travail.
-          </h1>
-          <p className="mt-5 text-base leading-7 text-content-muted">
-            Suivez les productions, le parc matériel, les incidents, l’équipe et le plateau 3D sans
-            perdre le contexte du spectacle.
+        <div className="my-auto py-10">
+          <p className="text-[11px] font-semibold text-[var(--brand-violet-hover)]">
+            Poste de travail
           </p>
+          <h1 className="mt-2 text-2xl font-semibold leading-tight text-content-primary">
+            Régie générale
+          </h1>
+          <div className="mt-8 border-y border-theme-border">
+            <div className="border-b border-theme-border py-3">
+              <p className="text-[10px] text-content-subtle">Production active</p>
+              <p className="mt-1 text-sm font-semibold text-content-primary">
+                Hamlet — Représentation
+              </p>
+            </div>
+            <div className="grid grid-cols-[5rem_1fr] gap-2 border-b border-theme-border py-3 text-xs">
+              <span className="text-content-subtle">Lieu</span>
+              <span className="text-right text-content-primary">Théâtre National</span>
+            </div>
+            <div className="grid grid-cols-[5rem_1fr] gap-2 border-b border-theme-border py-3 text-xs">
+              <span className="text-content-subtle">Plateau</span>
+              <span className="text-right text-content-primary">Grande Salle</span>
+            </div>
+            <div className="grid grid-cols-[5rem_1fr] gap-2 py-3 text-xs">
+              <span className="text-content-subtle">Scénario</span>
+              <span className="text-right text-content-primary">11 février 2026</span>
+            </div>
+          </div>
         </div>
         <p className="text-xs text-content-subtle">StageOps · Projet EIP</p>
       </section>
 
-      <section className="flex items-center justify-center px-5 py-10 sm:px-10">
-        <div className="w-full max-w-md">
+      <section className="flex items-center justify-center px-5 py-10 lg:justify-start lg:px-20">
+        <div className="w-full max-w-sm">
           <div className="mb-7">
-            <h2 className="text-2xl font-semibold text-content-primary">Connexion</h2>
-            <p className="mt-2 text-sm text-content-muted">Accédez à votre espace StageOps.</p>
+            <p className="text-[11px] text-content-subtle">Identification</p>
+            <h2 className="mt-1 text-xl font-semibold text-content-primary">Ouvrir une session</h2>
+            <p className="mt-2 text-xs text-content-muted">
+              Utilisez votre compte ou accédez directement au scénario de démonstration.
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -99,7 +120,7 @@ export function Login() {
             {error && (
               <p
                 role="alert"
-                className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+                className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
               >
                 {error}
               </p>
@@ -122,7 +143,7 @@ export function Login() {
 
           <Link
             to="/"
-            className="flex w-full items-center justify-between rounded-md border border-theme-border bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-border)] hover:bg-[var(--brand-soft)]"
+            className="flex w-full items-center justify-between border border-theme-border bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-border)] hover:bg-[var(--brand-soft)]"
           >
             Ouvrir la démonstration sans compte <ArrowRight size={16} />
           </Link>

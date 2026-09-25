@@ -127,20 +127,20 @@ export function Incidents() {
       </div>
 
       {viewMode === 'kanban' ? (
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
           {columns.map((col) => {
             const items = getByStatus(col.key)
             const Icon = col.icon
             return (
-              <div key={col.key} className="space-y-3">
-                <div className="flex items-center gap-2 px-2 py-2">
+              <section key={col.key} className="work-register min-w-0">
+                <div className="flex min-h-10 items-center gap-2 border-b border-theme-border bg-theme-deeper px-3 py-2">
                   <Icon size={16} style={{ color: col.color }} />
-                  <span className="text-sm text-content-primary">{col.label}</span>
-                  <span className="ml-auto text-xs text-content-subtle bg-theme-elevated px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold text-content-primary">{col.label}</span>
+                  <span className="ml-auto border-l border-theme-border pl-2 text-xs text-content-subtle">
                     {items.length}
                   </span>
                 </div>
-                <div className="space-y-2">
+                <div>
                   {items.map((inc) => (
                     <IncidentCard
                       key={inc.id}
@@ -155,7 +155,7 @@ export function Incidents() {
                     </div>
                   )}
                 </div>
-              </div>
+              </section>
             )
           })}
         </div>
@@ -177,12 +177,9 @@ export function Incidents() {
                   <button
                     key={inc.id}
                     onClick={() => setSelectedIncident(inc)}
-                    className="w-full text-left flex items-center gap-4 p-4 rounded-xl hover:bg-theme-elevated transition-colors"
+                    className="work-row flex w-full items-center gap-4 p-3 text-left transition-colors hover:bg-theme-elevated"
                   >
-                    <div
-                      className="w-1.5 h-10 rounded-full shrink-0"
-                      style={{ backgroundColor: sevColor }}
-                    />
+                    <div className="h-10 w-0.5 shrink-0" style={{ backgroundColor: sevColor }} />
                     <div className="flex-1 min-w-0">
                       <span className="text-sm text-content-primary truncate block">
                         {inc.title}
@@ -198,7 +195,7 @@ export function Incidents() {
                       </div>
                     </div>
                     <span
-                      className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
+                      className="shrink-0 border-l border-theme-border px-2 py-0.5 text-[10px]"
                       style={{
                         backgroundColor: `${sevColor}15`,
                         color: sevColor,
@@ -207,7 +204,7 @@ export function Incidents() {
                       {getSeverityLabel(inc.severity)}
                     </span>
                     <span
-                      className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
+                      className="shrink-0 border-l border-theme-border px-2 py-0.5 text-[10px]"
                       style={{
                         backgroundColor: `${statusCol?.color}15`,
                         color: statusCol?.color,

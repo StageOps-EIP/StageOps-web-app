@@ -90,7 +90,7 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
             {/* Hint overlay when nothing selected */}
             {!selectedId && (
               <div className="absolute inset-0 flex items-end justify-center pb-8 pointer-events-none z-10">
-                <div className="flex items-center gap-4 rounded-md border border-theme-border bg-theme-base/95 px-4 py-2 text-xs text-content-subtle">
+                <div className="flex items-center gap-4 border border-theme-border bg-theme-base px-4 py-2 text-xs text-content-subtle">
                   <span>
                     <Mouse size={11} className="inline mr-0.5" /> Orbiter
                   </span>

@@ -150,9 +150,9 @@ export function Events() {
 
       {/* Conflicts warning */}
       {conflicts.length > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/[0.06]">
+        <Card className="border-amber-500/30 bg-amber-500/[0.04]">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-amber-500/20 rounded-lg">
+            <div className="border-l-2 border-amber-500 py-1 pl-2">
               <AlertTriangle size={20} className="text-amber-500" />
             </div>
             <div>

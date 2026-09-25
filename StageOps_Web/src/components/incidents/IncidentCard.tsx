@@ -10,12 +10,12 @@ export function IncidentCard({ incident, onClick }: { incident: Incident; onClic
   return (
     <button
       onClick={onClick}
-      className="w-full rounded-md border border-theme-border bg-theme-base p-3 text-left transition-colors hover:border-theme-border-hover hover:bg-theme-elevated"
+      className="w-full border-b border-theme-border bg-theme-base p-3 text-left transition-colors last:border-b-0 hover:bg-theme-elevated"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <span className="text-sm text-content-primary line-clamp-2">{incident.title}</span>
         <span
-          className="mt-0.5 shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold"
+          className="mt-0.5 shrink-0 border px-1.5 py-0.5 text-[10px] font-semibold"
           style={{
             backgroundColor: `${sevColor}15`,
             color: sevColor,

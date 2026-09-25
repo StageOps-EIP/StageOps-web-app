@@ -101,7 +101,7 @@ export function Register() {
           </p>
         </div>
 
-        <div className="panel p-5 shadow-xl sm:p-8">
+        <div className="panel p-5 sm:p-8">
           {/* Step indicator */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex items-center gap-2">

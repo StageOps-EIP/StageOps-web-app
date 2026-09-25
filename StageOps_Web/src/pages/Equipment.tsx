@@ -97,18 +97,21 @@ export function Equipment() {
           <option value="hs">Hors service</option>
           <option value="repair">En réparation</option>
         </Select>
+        <span className="ml-auto whitespace-nowrap border-l border-theme-border pl-3 text-xs text-content-subtle">
+          {filteredEquipment.length} résultat{filteredEquipment.length !== 1 ? 's' : ''}
+        </span>
       </div>
 
-      <p role="status" aria-live="polite" className="text-sm text-content-muted">
+      <span role="status" aria-live="polite" className="sr-only">
         {filteredEquipment.length} résultat{filteredEquipment.length !== 1 ? 's' : ''}
-      </p>
+      </span>
 
       {filteredEquipment.length > 0 ? (
         <>
-          <div className="panel hidden overflow-hidden lg:block">
+          <div className="work-register hidden overflow-hidden lg:block">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px]">
-                <thead className="border-b border-theme-border bg-theme-deeper">
+              <table className="work-table w-full min-w-[980px]">
+                <thead>
                   <tr>
                     {[
                       'Équipement',

@@ -27,7 +27,7 @@ export function Profile() {
   }
 
   return (
-    <div className="page-shell max-w-5xl space-y-5">
+    <div className="page-shell space-y-5">
       <PageHeader
         context="Compte"
         title="Profil"
@@ -42,14 +42,14 @@ export function Profile() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <Card>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-[var(--brand-soft)] text-lg font-bold text-[var(--brand-violet-hover)]">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-[2px] bg-[var(--brand-soft)] text-sm font-bold text-[var(--brand-violet-hover)]">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-lg font-semibold text-content-primary">{displayName}</h2>
               <p className="mt-1 text-sm text-content-muted">{roleLabel}</p>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-md border border-theme-border bg-theme-elevated p-3">
+                <div className="border-l-2 border-theme-border py-1 pl-3">
                   <p className="flex items-center gap-2 text-xs text-content-subtle">
                     <Mail size={13} /> Adresse e-mail
                   </p>
@@ -57,7 +57,7 @@ export function Profile() {
                     {user?.email ?? 'Aucun compte connecté'}
                   </p>
                 </div>
-                <div className="rounded-md border border-theme-border bg-theme-elevated p-3">
+                <div className="border-l-2 border-theme-border py-1 pl-3">
                   <p className="flex items-center gap-2 text-xs text-content-subtle">
                     <Shield size={13} /> Niveau d’accès
                   </p>
