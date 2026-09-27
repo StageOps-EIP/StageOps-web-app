@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/design-system/EmptyState'
 import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
 import { mockEquipment as initialEquipment } from '@/lib/mockData'
 import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
-import { Plus, Filter, ChevronDown, PackageSearch } from 'lucide-react'
+import { ChevronDown, PackageSearch } from 'lucide-react'
 import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
 import { EquipmentDetailModal } from '@/components/equipment/EquipmentDetailModal'
 import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal'
@@ -55,11 +55,7 @@ export function Equipment() {
         context="Théâtre National"
         title="Parc matériel"
         description={`${equipmentList.length} équipements référencés`}
-        actions={
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus size={16} /> Ajouter un équipement
-          </Button>
-        }
+        actions={<Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>}
       />
       <DemoNotice />
 
@@ -72,7 +68,6 @@ export function Equipment() {
             onChange={(event) => setSearchQuery(event.target.value)}
           />
         </div>
-        <Filter size={16} className="hidden text-content-subtle sm:block" aria-hidden="true" />
         <Select
           value={filterCategory}
           onChange={(value) => setFilterCategory(value as EquipmentCategory | 'all')}

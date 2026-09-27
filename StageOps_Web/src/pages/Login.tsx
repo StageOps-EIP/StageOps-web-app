@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { StageOpsLogo } from '@/components/brand/StageOpsLogo'
 import { Button } from '@/components/design-system/Button'
@@ -46,13 +46,13 @@ export function Login() {
           <p className="text-[11px] font-semibold text-[var(--brand-violet-hover)]">
             Poste de travail
           </p>
-          <h1 className="mt-2 text-2xl font-semibold leading-tight text-content-primary">
+          <h1 className="font-editorial mt-2 text-4xl font-medium leading-none text-content-primary">
             Régie générale
           </h1>
           <div className="mt-8 border-y border-theme-border">
             <div className="border-b border-theme-border py-3">
               <p className="text-[10px] text-content-subtle">Production active</p>
-              <p className="mt-1 text-sm font-semibold text-content-primary">
+              <p className="font-editorial mt-1 text-xl font-medium text-content-primary">
                 Hamlet — Représentation
               </p>
             </div>
@@ -77,7 +77,9 @@ export function Login() {
         <div className="w-full max-w-sm">
           <div className="mb-7">
             <p className="text-[11px] text-content-subtle">Identification</p>
-            <h2 className="mt-1 text-xl font-semibold text-content-primary">Ouvrir une session</h2>
+            <h2 className="font-editorial mt-1 text-3xl font-medium text-content-primary">
+              Ouvrir une session
+            </h2>
             <p className="mt-2 text-xs text-content-muted">
               Utilisez votre compte ou accédez directement au scénario de démonstration.
             </p>
@@ -90,7 +92,6 @@ export function Login() {
               placeholder="prenom@organisation.fr"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              icon={<Mail size={16} />}
               autoComplete="email"
               required
             />
@@ -102,7 +103,6 @@ export function Login() {
                   placeholder="Votre mot de passe"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  icon={<Lock size={16} />}
                   autoComplete="current-password"
                   className="pr-12"
                   required
@@ -126,13 +126,7 @@ export function Login() {
               </p>
             )}
             <Button type="submit" size="lg" fullWidth disabled={isLoading}>
-              {isLoading ? (
-                'Connexion en cours…'
-              ) : (
-                <>
-                  Se connecter <ArrowRight size={16} />
-                </>
-              )}
+              {isLoading ? 'Connexion en cours…' : <>Se connecter</>}
             </Button>
           </form>
 
@@ -145,7 +139,7 @@ export function Login() {
             to="/"
             className="flex w-full items-center justify-between border border-theme-border bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-border)] hover:bg-[var(--brand-soft)]"
           >
-            Ouvrir la démonstration sans compte <ArrowRight size={16} />
+            Ouvrir la démonstration sans compte <span aria-hidden="true">→</span>
           </Link>
           <p className="mt-6 text-center text-sm text-content-subtle">
             Pas encore de compte ?{' '}

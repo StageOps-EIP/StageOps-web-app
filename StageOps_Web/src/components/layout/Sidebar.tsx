@@ -1,31 +1,18 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
-import {
-  AlertTriangle,
-  Box,
-  Boxes,
-  Calendar,
-  LayoutDashboard,
-  Menu,
-  Moon,
-  Settings,
-  Sun,
-  UserCircle,
-  Users,
-  X,
-} from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { StageOpsLogo } from '@/components/brand/StageOpsLogo'
 import { useAuth } from '@/contexts/auth.context'
 import { useTheme } from '@/lib/use-theme'
 
 const navigation = [
-  { name: 'Vue générale', mobileName: 'Accueil', href: '/', icon: LayoutDashboard },
-  { name: 'Plateau 3D', mobileName: 'Plateau', href: '/stage', icon: Boxes },
-  { name: 'Parc matériel', mobileName: 'Matériel', href: '/equipment', icon: Box },
-  { name: 'Conducteur', mobileName: 'Planning', href: '/events', icon: Calendar },
-  { name: 'Incidents', mobileName: 'Incidents', href: '/incidents', icon: AlertTriangle },
-  { name: 'Équipe', mobileName: 'Équipe', href: '/team', icon: Users },
-  { name: 'Paramètres', mobileName: 'Réglages', href: '/settings', icon: Settings },
+  { name: 'Vue générale', mobileName: 'Accueil', href: '/' },
+  { name: 'Plateau 3D', mobileName: 'Plateau', href: '/stage' },
+  { name: 'Parc matériel', mobileName: 'Matériel', href: '/equipment' },
+  { name: 'Conducteur', mobileName: 'Planning', href: '/events' },
+  { name: 'Incidents', mobileName: 'Incidents', href: '/incidents' },
+  { name: 'Équipe', mobileName: 'Équipe', href: '/team' },
+  { name: 'Paramètres', mobileName: 'Réglages', href: '/settings' },
 ]
 
 const mobileNavigation = navigation.slice(0, 5)
@@ -41,20 +28,17 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
     <nav aria-label="Navigation principale" className="space-y-px">
       {navigation.map((item) => {
         const isActive = isCurrentPath(location.pathname, item.href)
-        const Icon = item.icon
         return (
           <Link
             key={item.name}
             to={item.href}
             onClick={onNavigate}
             aria-current={isActive ? 'page' : undefined}
-            className={`group relative flex items-center gap-3 border-l-2 px-4 py-2.5 text-[13px] font-medium transition-colors ${
-              isActive
-                ? 'border-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary'
-                : 'border-transparent text-content-muted hover:border-theme-border-hover hover:bg-theme-elevated hover:text-content-primary'
+            className={`stage-nav-link ${
+              isActive ? 'stage-nav-link--active' : 'text-content-muted hover:text-content-primary'
             }`}
           >
-            <Icon size={18} strokeWidth={isActive ? 2 : 1.7} aria-hidden="true" />
+            <span className="stage-nav-mark" aria-hidden="true" />
             <span>{item.name}</span>
           </Link>
         )
@@ -70,42 +54,48 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navigation principale"
-      className="hidden h-dvh w-[13.5rem] shrink-0 flex-col border-r border-theme-border bg-theme-deeper lg:flex"
+      className="hidden h-dvh w-[13.75rem] shrink-0 flex-col bg-theme-deeper lg:flex"
     >
-      <div className="border-b border-theme-border px-4 py-4">
+      <div className="px-5 pb-7 pt-5">
         <StageOpsLogo />
-        <div className="mt-4 border-l-2 border-[var(--brand-blue)] pl-3">
-          <p className="text-[11px] text-content-subtle">Lieu de travail</p>
-          <p className="mt-0.5 text-xs font-semibold text-content-primary">Théâtre National</p>
-          <p className="mt-0.5 text-[11px] text-content-muted">Grande Salle</p>
+        <div className="stage-production-context mt-9">
+          <p className="text-[10px] font-semibold text-[var(--brand-violet-hover)]">À l’affiche</p>
+          <p className="mt-2 font-editorial text-[1.7rem] leading-none text-content-primary">
+            Hamlet
+          </p>
+          <p className="mt-2 text-[11px] leading-4 text-content-muted">
+            Représentation
+            <br />
+            Théâtre National · Grande Salle
+          </p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4">
-        <p className="mb-2 px-4 text-[10px] font-semibold text-content-subtle">
-          Espaces de travail
-        </p>
+      <div className="flex-1 overflow-y-auto py-3">
         <NavigationLinks />
       </div>
 
-      <div className="border-t border-theme-border py-2">
+      <div className="px-5 pb-5 pt-3">
         <button
           onClick={toggle}
-          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
+          className="mb-4 text-left text-[11px] text-content-subtle transition-colors hover:text-content-primary"
         >
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-          {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+          {theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
         </button>
         <Link
           to="/profile"
-          className="flex items-center gap-3 border-t border-theme-border px-4 py-3 transition-colors hover:bg-theme-elevated"
+          className="group flex items-center gap-3 border-t border-theme-border/70 pt-4"
         >
-          <UserCircle size={19} className="text-content-subtle" />
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--brand-soft)] text-[10px] font-semibold text-[var(--brand-violet-hover)]">
+            SO
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-medium text-content-primary">
               {user?.email ?? 'Mode démonstration'}
             </span>
-            <span className="block text-xs text-content-subtle">Profil et accès</span>
+            <span className="block text-[10px] text-content-subtle group-hover:text-content-muted">
+              Profil et accès
+            </span>
           </span>
         </Link>
       </div>
@@ -115,7 +105,7 @@ export function Sidebar() {
 
 export function MobileHeader() {
   const [open, setOpen] = useState(false)
-  const { theme, toggle } = useTheme()
+  const { toggle } = useTheme()
 
   return (
     <>
@@ -144,7 +134,6 @@ export function MobileHeader() {
               onClick={toggle}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-content-muted hover:bg-theme-elevated"
             >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
               Apparence
             </button>
             <Link
@@ -152,7 +141,7 @@ export function MobileHeader() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-content-muted hover:bg-theme-elevated"
             >
-              <UserCircle size={16} /> Profil
+              Profil
             </Link>
           </div>
         </div>
@@ -170,18 +159,19 @@ export function MobileNav() {
       className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-theme-border bg-theme-deeper lg:hidden"
     >
       {mobileNavigation.map((item) => {
-        const Icon = item.icon
         const isActive = isCurrentPath(location.pathname, item.href)
         return (
           <Link
             key={item.href}
             to={item.href}
             aria-current={isActive ? 'page' : undefined}
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-2 text-[10px] font-medium ${
+            className={`relative flex min-w-0 items-center justify-center px-1 py-3 text-[10px] font-medium ${
               isActive ? 'text-[var(--brand-violet-hover)]' : 'text-content-subtle'
             }`}
           >
-            <Icon size={17} strokeWidth={isActive ? 2 : 1.6} />
+            {isActive && (
+              <span className="absolute inset-x-3 top-0 h-0.5 bg-[var(--brand-violet)]" />
+            )}
             <span className="max-w-full truncate">{item.mobileName}</span>
           </Link>
         )

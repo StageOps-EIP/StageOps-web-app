@@ -10,19 +10,7 @@ import { ROLE_COLORS, PERMISSION_LABELS } from '@/lib/constants'
 import { useTeamFilter } from '@/hooks/useTeamFilter'
 import { EditMemberModal } from '@/components/team/EditMemberModal'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import {
-  Users,
-  Mail,
-  Phone,
-  Shield,
-  Plus,
-  Search,
-  X,
-  Edit3,
-  ChevronRight,
-  ChevronDown,
-  UserCircle,
-} from 'lucide-react'
+import { Mail, Phone, Search, X, ChevronDown } from 'lucide-react'
 
 export function Team() {
   usePageTitle('Équipe')
@@ -44,7 +32,6 @@ export function Team() {
         description={`${teamList.length} membres · ${roles.length} rôles`}
         actions={
           <Button variant="primary" onClick={() => setShowNewForm(true)}>
-            <Plus size={16} />
             Ajouter un membre
           </Button>
         }
@@ -95,10 +82,9 @@ export function Team() {
                         : 'border-l-2 border-l-transparent border-b-theme-border hover:bg-theme-elevated'
                     }`}
                   >
-                    {/* Avatar */}
                     <div
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px]"
-                      style={{ backgroundColor: `${color}20` }}
+                      className="font-data flex h-9 w-9 shrink-0 items-center justify-center border-l"
+                      style={{ borderColor: color }}
                     >
                       <span className="text-xs font-semibold" style={{ color }}>
                         {member.name
@@ -122,13 +108,14 @@ export function Team() {
                       )}
                     </div>
 
-                    <ChevronRight size={14} className="text-content-subtle shrink-0" />
+                    <span className="shrink-0 text-content-faint" aria-hidden="true">
+                      →
+                    </span>
                   </button>
                 )
               })}
               {filtered.length === 0 && (
                 <div className="flex flex-col items-center py-12 text-content-subtle">
-                  <Users size={32} className="mb-3 opacity-30" />
                   <p className="text-sm">Aucun membre trouvé</p>
                 </div>
               )}
@@ -146,7 +133,6 @@ export function Team() {
             />
           ) : (
             <Card className="flex flex-col items-center justify-center py-16">
-              <UserCircle size={48} className="text-[#27272e] mb-4" />
               <p className="text-sm text-content-subtle">
                 Sélectionnez un membre pour voir ses détails
               </p>
@@ -200,10 +186,7 @@ function MemberDetail({
         {/* Avatar + name */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-[2px]"
-              style={{ backgroundColor: `${color}20` }}
-            >
+            <div className="font-data border-l-2 py-1 pl-3" style={{ borderColor: color }}>
               <span className="text-base font-semibold" style={{ color }}>
                 {member.name
                   .split(' ')
@@ -229,14 +212,14 @@ function MemberDetail({
 
         {/* Contact */}
         <div className="space-y-2">
-          <p className="text-xs text-content-subtle uppercase tracking-wider">Contact</p>
-          <div className="flex items-center gap-2 border-b border-theme-border py-2.5">
-            <Mail size={14} className="text-content-muted" />
+          <p className="text-xs text-content-subtle">Contact</p>
+          <div className="grid grid-cols-[4rem_minmax(0,1fr)] gap-2 border-b border-theme-border py-2.5">
+            <span className="text-[11px] text-content-subtle">Email</span>
             <span className="text-sm text-content-primary">{member.email}</span>
           </div>
           {member.phone && (
-            <div className="flex items-center gap-2 py-2.5">
-              <Phone size={14} className="text-content-muted" />
+            <div className="grid grid-cols-[4rem_minmax(0,1fr)] gap-2 py-2.5">
+              <span className="text-[11px] text-content-subtle">Téléphone</span>
               <span className="text-sm text-content-primary">{member.phone}</span>
             </div>
           )}
@@ -244,10 +227,7 @@ function MemberDetail({
 
         {/* Permissions */}
         <div className="space-y-2">
-          <p className="text-xs text-content-subtle uppercase tracking-wider flex items-center gap-1">
-            <Shield size={12} />
-            Permissions
-          </p>
+          <p className="text-xs text-content-subtle">Permissions</p>
           <div className="flex flex-wrap gap-2">
             {member.permissions.map((perm) => (
               <span
@@ -267,7 +247,6 @@ function MemberDetail({
         {/* Actions */}
         <div className="flex gap-3 pt-2">
           <Button variant="secondary" className="flex-1" onClick={onEdit}>
-            <Edit3 size={14} />
             Modifier
           </Button>
           <a
@@ -468,7 +447,6 @@ function NewMemberModal({
               Annuler
             </Button>
             <Button type="submit" variant="primary">
-              <Plus size={16} />
               Ajouter
             </Button>
           </div>

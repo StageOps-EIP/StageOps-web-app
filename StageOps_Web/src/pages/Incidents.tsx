@@ -8,7 +8,6 @@ import { mockIncidents, mockEquipment } from '../lib/mockData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../lib/utils'
 import { IncidentDetailModal } from '../components/incidents/IncidentDetailModal'
 import type { Incident, IncidentStatus } from '../lib/types'
-import { CheckCircle2, Plus, LayoutGrid, List, ChevronRight, Wrench } from 'lucide-react'
 import { INCIDENT_COLUMNS, SEVERITY_ORDER } from '../lib/constants'
 import { IncidentCard } from '../components/incidents/IncidentCard'
 import { NewIncidentModal } from '../components/incidents/NewIncidentModal'
@@ -90,15 +89,15 @@ export function Incidents() {
           <>
             <div className="segmented-control">
               <button onClick={() => setViewMode('kanban')} aria-pressed={viewMode === 'kanban'}>
-                <LayoutGrid size={16} /> Kanban
+                Kanban
               </button>
               <button onClick={() => setViewMode('list')} aria-pressed={viewMode === 'list'}>
-                <List size={16} /> Liste
+                Liste
               </button>
             </div>
 
             <Button variant="primary" onClick={() => setShowNewForm(true)}>
-              <Plus size={16} /> Signaler
+              Signaler un incident
             </Button>
           </>
         }
@@ -130,11 +129,14 @@ export function Incidents() {
         <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
           {columns.map((col) => {
             const items = getByStatus(col.key)
-            const Icon = col.icon
             return (
               <section key={col.key} className="work-register min-w-0">
-                <div className="flex min-h-10 items-center gap-2 border-b border-theme-border bg-theme-deeper px-3 py-2">
-                  <Icon size={16} style={{ color: col.color }} />
+                <div className="flex min-h-10 items-center gap-2 border-b border-theme-border px-3 py-2">
+                  <span
+                    className="h-3 w-0.5"
+                    style={{ backgroundColor: col.color }}
+                    aria-hidden="true"
+                  />
                   <span className="text-xs font-semibold text-content-primary">{col.label}</span>
                   <span className="ml-auto border-l border-theme-border pl-2 text-xs text-content-subtle">
                     {items.length}
@@ -150,7 +152,6 @@ export function Incidents() {
                   ))}
                   {items.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-8 text-content-subtle">
-                      <CheckCircle2 size={24} className="mb-2 opacity-40" />
                       <p className="text-xs">Aucun incident</p>
                     </div>
                   )}
@@ -186,11 +187,7 @@ export function Incidents() {
                       </span>
                       <div className="flex items-center gap-3 text-xs text-content-subtle mt-0.5">
                         <span>{formatRelativeTime(inc.timestamp)}</span>
-                        {eq && (
-                          <span className="flex items-center gap-1">
-                            <Wrench size={10} /> {eq.name}
-                          </span>
-                        )}
+                        {eq && <span>Matériel · {eq.name}</span>}
                         <span>Par {inc.reportedBy}</span>
                       </div>
                     </div>
@@ -212,7 +209,9 @@ export function Incidents() {
                     >
                       {statusCol?.label}
                     </span>
-                    <ChevronRight size={14} className="text-content-subtle shrink-0" />
+                    <span className="shrink-0 text-content-faint" aria-hidden="true">
+                      →
+                    </span>
                   </button>
                 )
               })}

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Database } from 'lucide-react'
 
 export function PageHeader({
   title,
@@ -13,12 +12,12 @@ export function PageHeader({
   actions?: ReactNode
 }) {
   return (
-    <header className="workspace-page-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <div className="flex min-w-0 items-start gap-4">
-        {context && <p className="page-kicker mt-1.5 hidden shrink-0 xl:block">{context}</p>}
+    <header className="workspace-page-header flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="min-w-0">
+        {context && <p className="page-kicker mb-2">{context}</p>}
         <div className="min-w-0">
           <h1 className="page-heading">{title}</h1>
-          {description && <div className="mt-0.5 text-xs text-content-muted">{description}</div>}
+          {description && <div className="mt-2 text-xs text-content-muted">{description}</div>}
         </div>
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
@@ -33,7 +32,7 @@ export function DemoNotice({
 }) {
   return (
     <div className="demo-notice" role="note">
-      <Database size={14} aria-hidden="true" />
+      <span className="h-1.5 w-1.5 rotate-45 bg-[var(--brand-violet)]" aria-hidden="true" />
       <span>{children}</span>
     </div>
   )

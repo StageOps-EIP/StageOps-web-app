@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import {
-  Settings as SettingsIcon,
-  Bell,
-  Shield,
-  Palette,
-  Database,
-  ChevronRight,
-} from 'lucide-react'
-import {
   GeneralSettings,
   NotificationSettings,
   AppearanceSettings,
@@ -19,14 +11,13 @@ import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
 
 type SettingsSection = 'general' | 'notifications' | 'appearance' | 'security' | 'export'
 
-const sections: { key: SettingsSection; label: string; icon: typeof SettingsIcon; desc: string }[] =
-  [
-    { key: 'general', label: 'Général', icon: SettingsIcon, desc: 'Lieu, langue, fuseau horaire' },
-    { key: 'notifications', label: 'Notifications', icon: Bell, desc: 'Alertes, emails, push' },
-    { key: 'appearance', label: 'Apparence', icon: Palette, desc: 'Thème clair ou sombre' },
-    { key: 'security', label: 'Sécurité', icon: Shield, desc: 'Mot de passe, sessions' },
-    { key: 'export', label: 'Export & Données', icon: Database, desc: 'PDF, Excel, sauvegarde' },
-  ]
+const sections: { key: SettingsSection; label: string; desc: string }[] = [
+  { key: 'general', label: 'Général', desc: 'Lieu, langue, fuseau horaire' },
+  { key: 'notifications', label: 'Notifications', desc: 'Alertes, emails, push' },
+  { key: 'appearance', label: 'Apparence', desc: 'Thème clair ou sombre' },
+  { key: 'security', label: 'Sécurité', desc: 'Mot de passe, sessions' },
+  { key: 'export', label: 'Export et données', desc: 'PDF, Excel, sauvegarde' },
+]
 
 export function Settings() {
   usePageTitle('Paramètres')
@@ -43,30 +34,35 @@ export function Settings() {
         Les réglages sont conservés uniquement dans cet environnement de démonstration.
       </DemoNotice>
 
-      <div className="grid gap-4 lg:grid-cols-[230px_minmax(0,1fr)]">
+      <div className="grid gap-8 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-12">
         {/* Sidebar */}
-        <div className="flex overflow-x-auto border border-theme-border bg-theme-base lg:block lg:overflow-visible">
-          {sections.map((section) => {
-            const Icon = section.icon
+        <div className="flex overflow-x-auto border-y border-theme-border lg:block lg:overflow-visible lg:border-b-0">
+          {sections.map((section, index) => {
             const isActive = activeSection === section.key
             return (
               <button
                 key={section.key}
                 onClick={() => setActiveSection(section.key)}
-                className={`flex shrink-0 items-center gap-3 border-b-2 px-4 py-3 text-left transition-colors lg:w-full lg:border-b lg:border-l-2 ${
+                className={`flex shrink-0 items-center gap-3 border-b-2 px-3 py-3 text-left transition-colors lg:w-full lg:border-b lg:border-l-0 ${
                   isActive
-                    ? 'border-b-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary lg:border-b-theme-border lg:border-l-[var(--brand-violet)]'
-                    : 'border-b-transparent text-content-muted hover:bg-theme-elevated hover:text-content-primary lg:border-b-theme-border lg:border-l-transparent'
+                    ? 'border-b-[var(--brand-violet)] text-content-primary lg:border-b-theme-border'
+                    : 'border-b-transparent text-content-muted hover:text-content-primary lg:border-b-theme-border'
                 }`}
               >
-                <Icon size={18} />
+                <span className="font-data text-[10px] text-content-faint">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">{section.label}</p>
                   <p className="hidden truncate text-[10px] text-content-subtle lg:block">
                     {section.desc}
                   </p>
                 </div>
-                {isActive && <ChevronRight size={14} />}
+                {isActive && (
+                  <span className="text-[var(--brand-violet-hover)]" aria-hidden="true">
+                    →
+                  </span>
+                )}
               </button>
             )
           })}

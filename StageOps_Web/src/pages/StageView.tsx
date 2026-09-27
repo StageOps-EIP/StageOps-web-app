@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router'
 import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider'
 import { useSceneEditor } from '@/components/scene-editor/scene-editor.store'
 import { EditorCanvas } from '@/components/scene-editor/EditorCanvas'
-import { Box, Lightbulb, MousePointer2, Pencil } from 'lucide-react'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { Button } from '@/components/design-system/Button'
 
@@ -27,18 +26,12 @@ function StageWorkspace() {
           </p>
         </div>
         <div className="hidden items-center gap-4 text-xs text-content-muted sm:flex">
-          <span className="flex items-center gap-1.5">
-            <Box size={14} /> {state.objects.length} objet{state.objects.length !== 1 ? 's' : ''}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Lightbulb size={14} /> {state.lights.length} sources
-          </span>
-          <span className="flex items-center gap-1.5">
-            <MousePointer2 size={14} /> Glisser pour orbiter
-          </span>
+          <span>{state.objects.length} objets</span>
+          <span>{state.lights.length} sources</span>
+          <span>Glisser pour orbiter</span>
         </div>
         <Button size="sm" onClick={() => navigate('/editor')}>
-          <Pencil size={14} /> Modifier la scène
+          Modifier la scène
         </Button>
       </div>
 

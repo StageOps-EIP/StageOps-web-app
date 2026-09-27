@@ -4,7 +4,7 @@ import { Card } from '@/components/design-system/Card'
 import { Button } from '@/components/design-system/Button'
 import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
 import { mockEvents } from '@/lib/mockData'
-import { AlertTriangle, Plus, List, CalendarDays } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import type { Event } from '@/lib/types'
 import { CalendarView, EventListView, NewEventModal, EventDetail } from '@/components/events'
 
@@ -131,16 +131,13 @@ export function Events() {
                 onClick={() => setViewMode('calendar')}
                 aria-pressed={viewMode === 'calendar'}
               >
-                <CalendarDays size={16} />
                 Calendrier
               </button>
               <button onClick={() => setViewMode('list')} aria-pressed={viewMode === 'list'}>
-                <List size={16} />
                 Liste
               </button>
             </div>
             <Button variant="primary" onClick={() => setShowNewForm(true)}>
-              <Plus size={16} />
               Nouvel événement
             </Button>
           </>

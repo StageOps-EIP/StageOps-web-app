@@ -1,5 +1,6 @@
 @import '@fontsource-variable/manrope';
 @import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/newsreader';
 
 @tailwind base;
 @tailwind components;
@@ -38,6 +39,9 @@
   --radius-md: 8px;
   --radius-lg: 10px;
   --panel-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
+  --font-ui: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+  --font-editorial: 'Newsreader Variable', 'Newsreader', serif;
+  --font-data: 'Manrope Variable', 'Manrope', sans-serif;
 }
 
 .light {
@@ -81,7 +85,7 @@
 
   body {
     color: var(--text-primary);
-    font-family: 'Manrope Variable', 'Manrope', sans-serif;
+    font-family: var(--font-ui);
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -90,8 +94,8 @@
   h1,
   h2,
   h3 {
-    font-family: 'Manrope Variable', 'Manrope', sans-serif;
-    letter-spacing: -0.025em;
+    font-family: var(--font-ui);
+    letter-spacing: -0.035em;
   }
 
   button,
@@ -147,7 +151,7 @@
     padding: 0.7rem 1rem;
     border-radius: var(--radius-sm);
     background: var(--brand-violet);
-    color: white;
+    color: #080a10;
     font-size: 0.8rem;
     font-weight: 700;
   }
@@ -165,22 +169,33 @@
 
   .page-shell {
     width: 100%;
-    padding: 1rem;
+    max-width: 104rem;
+    padding: 1.25rem 1rem 4rem;
   }
 
   .page-heading {
     color: var(--text-primary);
-    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
-    font-weight: 680;
-    line-height: 1.25;
-    letter-spacing: -0.025em;
+    font-family: var(--font-editorial);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 520;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
   }
 
   .page-kicker,
   .eyebrow {
-    color: var(--text-subtle);
-    font-size: 0.68rem;
-    font-weight: 650;
+    color: var(--brand-violet-hover);
+    font-size: 0.67rem;
+    font-weight: 700;
+  }
+
+  .font-editorial {
+    font-family: var(--font-editorial);
+  }
+
+  .font-data {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
   }
 
   .control-label {
@@ -193,9 +208,10 @@
   .tech-panel,
   .panel,
   .work-panel {
-    background: var(--bg-base);
-    border: 1px solid var(--border);
-    border-radius: 2px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--border-strong);
+    border-radius: 0;
     box-shadow: none;
   }
 
@@ -205,17 +221,19 @@
     align-items: center;
     gap: 0.6rem;
     min-height: 3.25rem;
-    padding: 0.55rem 0.75rem;
-    background: var(--bg-base);
-    border: 1px solid var(--border);
-    border-radius: 2px;
+    padding: 0.65rem 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
   }
 
   .form-control {
     width: 100%;
     min-height: 2.5rem;
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 0;
     background: var(--bg-elevated);
     color: var(--text-primary);
     font-size: 0.875rem;
@@ -237,7 +255,7 @@
     gap: 0;
     padding: 0;
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 0;
     background: var(--bg-base);
   }
 
@@ -279,59 +297,35 @@
     font-size: 0.68rem;
   }
 
-  .workspace-context-bar {
-    min-height: 2.25rem;
-    align-items: center;
-    gap: 1rem;
-    padding: 0 1rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-base);
-    color: var(--text-muted);
-    font-size: 0.7rem;
-  }
-
-  .workspace-context-bar strong {
-    color: var(--text-primary);
-    font-size: 0.72rem;
-    font-weight: 650;
-  }
-
-  .workspace-context-label {
-    padding-right: 0.75rem;
-    border-right: 1px solid var(--border);
-    color: var(--brand-violet-hover);
-    font-size: 0.64rem;
-    font-weight: 700;
-  }
-
   .workspace-page-header {
-    min-height: 4rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--border);
+    min-height: 5.5rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border-strong);
   }
 
   .work-register {
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    background: var(--bg-base);
+    overflow: visible;
+    border: 0;
+    border-top: 1px solid var(--border-strong);
+    border-radius: 0;
+    background: transparent;
   }
 
   .work-register-header {
     display: flex;
-    min-height: 2.65rem;
+    min-height: 3rem;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-deeper);
+    padding: 0.7rem 0;
+    border-bottom: 0;
+    background: transparent;
   }
 
   .work-register-title {
     color: var(--text-primary);
-    font-size: 0.78rem;
-    font-weight: 680;
+    font-size: 0.82rem;
+    font-weight: 700;
   }
 
   .work-row {
@@ -343,7 +337,8 @@
   }
 
   .work-table thead {
-    background: var(--bg-deeper);
+    background: transparent;
+    border-top: 1px solid var(--border-strong);
   }
 
   .work-table th {
@@ -363,6 +358,102 @@
 
   .work-table tbody tr:hover {
     background: var(--bg-elevated);
+  }
+
+  .stage-production-context {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .stage-production-context::before {
+    position: absolute;
+    top: 0.15rem;
+    bottom: 0.15rem;
+    left: 0;
+    width: 2px;
+    background: var(--brand-violet);
+    content: '';
+  }
+
+  .stage-nav-link {
+    display: flex;
+    min-height: 2.55rem;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.82rem;
+    transition:
+      color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .stage-nav-link:hover {
+    transform: translateX(2px);
+  }
+
+  .stage-nav-link--active {
+    color: var(--text-primary);
+    font-weight: 700;
+    transform: translateX(4px);
+  }
+
+  .stage-nav-mark {
+    width: 0.38rem;
+    height: 0.38rem;
+    flex: none;
+    border: 1px solid var(--text-faint);
+    transform: rotate(45deg);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .stage-nav-link--active .stage-nav-mark {
+    border-color: var(--brand-violet);
+    background: var(--brand-violet);
+  }
+
+  .editorial-section {
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .editorial-section-heading {
+    display: flex;
+    min-height: 3.2rem;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 0;
+  }
+
+  .editorial-row {
+    border-top: 1px solid var(--border);
+  }
+
+  .editorial-row:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .call-time {
+    font-family: var(--font-editorial);
+    font-size: clamp(3.75rem, 8vw, 7.5rem);
+    font-weight: 430;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.075em;
+    line-height: 0.76;
+  }
+
+  .dashboard-state-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .dashboard-state-line:last-child {
+    border-bottom: 1px solid var(--border);
   }
 
   .stageops-logo {
@@ -402,7 +493,7 @@
 
 @media (min-width: 768px) {
   .page-shell {
-    padding: 1rem 1.25rem 1.5rem;
+    padding: 1.75rem 2rem 4rem;
   }
 }
 
@@ -412,9 +503,9 @@
   }
 }
 
-/* Legacy screens inherit the same restrained geometry and label casing. */
+/* Legacy screens inherit the same editorial geometry and label casing. */
 :where(.app-surface, .auth-surface) :is(.rounded-xl, .rounded-2xl, .rounded-3xl) {
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 :where(.app-surface, .auth-surface) .uppercase {

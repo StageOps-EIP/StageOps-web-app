@@ -1,5 +1,4 @@
 import { Card, CardHeader } from '@/components/design-system/Card'
-import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatTime, getProgressColor } from '@/lib/utils'
 import { EVENT_STATUS_CONFIG, DAYS_FR, MONTHS_FR } from '@/lib/constants'
 import { EventDetail } from './EventDetail'
@@ -49,14 +48,14 @@ export function CalendarView({
               onClick={onPrevMonth}
               className="p-1.5 text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
             >
-              <ChevronLeft size={20} />
+              <span aria-hidden="true">←</span>
             </button>
             <button
               aria-label="Mois suivant"
               onClick={onNextMonth}
               className="p-1.5 text-content-muted transition-colors hover:bg-theme-elevated hover:text-content-primary"
             >
-              <ChevronRight size={20} />
+              <span aria-hidden="true">→</span>
             </button>
           </div>
         </div>
@@ -97,7 +96,7 @@ export function CalendarView({
                   <span
                     className={`flex h-6 w-6 items-center justify-center text-xs font-medium ${
                       isToday
-                        ? 'bg-[var(--brand-violet)] text-white font-bold'
+                        ? 'bg-[var(--brand-violet)] text-[#080a10] font-bold'
                         : 'text-content-subtle'
                     }`}
                   >
@@ -164,14 +163,13 @@ export function CalendarView({
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-content-subtle">
-                      <Calendar size={12} />
                       <span>
                         {evt.startDate.toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'short',
                         })}
                       </span>
-                      <Clock size={12} />
+                      <span aria-hidden="true">·</span>
                       <span>
                         {formatTime(evt.startDate)} – {formatTime(evt.endDate)}
                       </span>

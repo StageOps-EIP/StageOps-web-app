@@ -121,7 +121,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
               onClick={() => dispatch({ type: 'SET_TRANSFORM_MODE', mode })}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                 transformMode === mode
-                  ? 'bg-[var(--brand-violet)] text-white'
+                  ? 'bg-[var(--brand-violet)] text-[#080a10]'
                   : 'bg-theme-elevated text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary'
               } ${i > 0 ? 'border-l border-theme-border' : ''}`}
             >

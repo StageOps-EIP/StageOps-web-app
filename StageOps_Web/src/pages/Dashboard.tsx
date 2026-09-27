@@ -1,14 +1,3 @@
-import {
-  AlertTriangle,
-  ArrowRight,
-  Box,
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
-  MapPin,
-  Users,
-  Wrench,
-} from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { Badge } from '@/components/design-system/Badge'
 import { Button } from '@/components/design-system/Button'
@@ -31,192 +20,194 @@ export function Dashboard() {
   const availableEquipment = mockEquipment.filter((equipment) => equipment.status === 'ok').length
 
   return (
-    <div className="page-shell space-y-4">
+    <div className="page-shell space-y-5">
       <PageHeader
         context="Vue générale"
         title={activeEvent.title}
         description={`Mercredi 11 février 2026 · ${activeEvent.venue}, ${activeEvent.stage}`}
         actions={
           <>
-            <Button variant="secondary" onClick={() => navigate('/events')}>
-              <CalendarDays size={15} /> Conducteur
+            <Button variant="ghost" onClick={() => navigate('/events')}>
+              Voir le conducteur
             </Button>
-            <Button onClick={() => navigate('/stage')}>
-              Plateau 3D <ArrowRight size={15} />
-            </Button>
+            <Button onClick={() => navigate('/stage')}>Ouvrir le plateau 3D</Button>
           </>
         }
       />
 
       <DemoNotice />
 
-      <section className="work-register" aria-label="État de la production">
-        <div className="work-register-header">
-          <div>
-            <p className="work-register-title">État de préparation</p>
-            <p className="mt-0.5 text-[11px] text-content-subtle">
-              Données issues du parc, des incidents et de la checklist de production
-            </p>
+      <section className="grid gap-8 pb-5 pt-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)] lg:gap-12">
+        <div>
+          <p className="page-kicker">Prochaine échéance</p>
+          <div className="mt-7 flex flex-wrap items-end gap-x-7 gap-y-3">
+            <strong className="call-time font-data">20:00</strong>
+            <div className="max-w-sm pb-1">
+              <p className="font-editorial text-2xl leading-6 text-content-primary">
+                Début de la représentation
+              </p>
+              <p className="mt-2 text-xs text-content-muted">
+                Grande Salle · appel équipe confirmé
+              </p>
+            </div>
           </div>
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-blue-300">
-            <Wrench size={13} /> Installation
-          </span>
         </div>
+
+        <div className="self-end border-l-2 border-[var(--brand-violet)] pl-5">
+          <p className="text-xs leading-5 text-content-muted">
+            La production est en phase d’installation. Les contrôles matériel et les incidents
+            ouverts restent prioritaires avant l’entrée du public.
+          </p>
+          <p className="mt-3 text-xs font-semibold text-[var(--brand-violet-hover)]">
+            Installation en cours
+          </p>
+        </div>
+      </section>
+
+      <section aria-label="Point de situation" className="border-y border-theme-border">
         <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-          <StatusCell
-            icon={CheckCircle2}
+          <SituationItem
             label="Matériel opérationnel"
             value={`${availableEquipment} / ${mockEquipment.length}`}
-            detail="Équipements au statut opérationnel"
           />
-          <StatusCell
-            icon={Clock3}
+          <SituationItem
             label="Contrôles requis"
             value={controls.length.toString()}
-            detail="À vérifier ou hors service"
             tone="warning"
           />
-          <StatusCell
-            icon={AlertTriangle}
+          <SituationItem
             label="Incidents actifs"
             value={openIncidents.length.toString()}
-            detail="Ouverts ou en cours"
             tone="danger"
           />
-          <StatusCell
-            icon={Users}
+          <SituationItem
             label="Équipe affectée"
-            value={activeEvent.teamMembers.length.toString()}
-            detail={`${mockTeamMembers.length} membres référencés`}
+            value={`${activeEvent.teamMembers.length} / ${mockTeamMembers.length}`}
           />
         </div>
       </section>
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]">
-        <div className="space-y-4">
-          <section className="work-register">
-            <div className="work-register-header">
+      <div className="grid items-start gap-10 pt-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-14">
+        <div className="space-y-10">
+          <section className="editorial-section">
+            <div className="editorial-section-heading">
               <div>
-                <p className="work-register-title">Incidents à traiter</p>
-                <p className="mt-0.5 text-[11px] text-content-subtle">
-                  Classés par niveau d’urgence
-                </p>
+                <h2 className="text-sm font-bold text-content-primary">Incidents à traiter</h2>
+                <p className="mt-1 text-[11px] text-content-subtle">Classés par niveau d’urgence</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/incidents')}>
-                Registre complet <ArrowRight size={13} />
-              </Button>
+              <button
+                onClick={() => navigate('/incidents')}
+                className="text-xs font-semibold text-content-muted hover:text-content-primary"
+              >
+                Registre complet <span aria-hidden="true">→</span>
+              </button>
             </div>
-            <div>
-              {openIncidents.map((incident) => {
-                const color = getSeverityColor(incident.severity)
-                return (
-                  <button
-                    key={incident.id}
-                    onClick={() => navigate(`/incidents?incident=${incident.id}`)}
-                    className="work-row grid w-full grid-cols-[1.5rem_minmax(0,1fr)_auto_1rem] items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-theme-elevated"
-                  >
-                    <AlertTriangle size={15} style={{ color }} aria-hidden="true" />
-                    <span className="min-w-0">
-                      <span className="block truncate text-[13px] font-medium text-content-primary">
-                        {incident.title}
-                      </span>
-                      <span className="mt-0.5 block text-[11px] text-content-subtle">
-                        Signalé par {incident.reportedBy}
-                      </span>
+
+            {openIncidents.map((incident, index) => {
+              const color = getSeverityColor(incident.severity)
+              return (
+                <button
+                  key={incident.id}
+                  onClick={() => navigate(`/incidents?incident=${incident.id}`)}
+                  className="editorial-row grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 py-3 text-left transition-colors hover:bg-theme-elevated sm:grid-cols-[2rem_7rem_minmax(0,1fr)_auto]"
+                >
+                  <span className="font-data text-[10px] text-content-faint">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="hidden text-[11px] font-semibold sm:block" style={{ color }}>
+                    {getSeverityLabel(incident.severity)}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[13px] font-semibold text-content-primary">
+                      {incident.title}
                     </span>
-                    <span className="text-[11px] font-semibold" style={{ color }}>
-                      {getSeverityLabel(incident.severity)}
+                    <span className="mt-0.5 block text-[11px] text-content-subtle">
+                      Signalé par {incident.reportedBy}
                     </span>
-                    <ArrowRight size={13} className="text-content-faint" />
-                  </button>
-                )
-              })}
-            </div>
+                  </span>
+                  <span className="pr-1 text-content-faint" aria-hidden="true">
+                    →
+                  </span>
+                </button>
+              )
+            })}
           </section>
 
-          <section className="work-register">
-            <div className="work-register-header">
+          <section className="editorial-section">
+            <div className="editorial-section-heading">
               <div>
-                <p className="work-register-title">Contrôles matériel</p>
-                <p className="mt-0.5 text-[11px] text-content-subtle">
+                <h2 className="text-sm font-bold text-content-primary">Contrôles matériel</h2>
+                <p className="mt-1 text-[11px] text-content-subtle">
                   Éléments qui demandent une intervention
                 </p>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/equipment')}>
-                Ouvrir le parc <ArrowRight size={13} />
-              </Button>
+              <button
+                onClick={() => navigate('/equipment')}
+                className="text-xs font-semibold text-content-muted hover:text-content-primary"
+              >
+                Ouvrir le parc <span aria-hidden="true">→</span>
+              </button>
             </div>
-            <div>
-              {controls.map((equipment) => (
-                <button
-                  key={equipment.id}
-                  onClick={() => navigate(`/equipment?equipment=${equipment.id}`)}
-                  className="work-row grid w-full grid-cols-[1.5rem_minmax(0,1fr)_auto_1rem] items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-theme-elevated"
-                >
-                  <Box size={15} className="text-content-subtle" aria-hidden="true" />
-                  <span className="min-w-0">
-                    <span className="block truncate text-[13px] font-medium text-content-primary">
-                      {equipment.name}
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-content-subtle">
-                      {equipment.location}
-                      {equipment.responsiblePerson ? ` · ${equipment.responsiblePerson}` : ''}
-                    </span>
+
+            {controls.map((equipment, index) => (
+              <button
+                key={equipment.id}
+                onClick={() => navigate(`/equipment?equipment=${equipment.id}`)}
+                className="editorial-row grid w-full grid-cols-[2rem_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors hover:bg-theme-elevated"
+              >
+                <span className="font-data text-[10px] text-content-faint">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-semibold text-content-primary">
+                    {equipment.name}
                   </span>
-                  <Badge status={equipment.status} size="sm" />
-                  <ArrowRight size={13} className="text-content-faint" />
-                </button>
-              ))}
-            </div>
+                  <span className="mt-0.5 block text-[11px] text-content-subtle">
+                    {equipment.location}
+                    {equipment.responsiblePerson ? ` · ${equipment.responsiblePerson}` : ''}
+                  </span>
+                </span>
+                <Badge status={equipment.status} size="sm" />
+                <span className="pr-1 text-content-faint" aria-hidden="true">
+                  →
+                </span>
+              </button>
+            ))}
           </section>
         </div>
 
-        <aside className="work-register xl:sticky xl:top-4" aria-label="Feuille du jour">
-          <div className="work-register-header">
-            <p className="work-register-title">Feuille du jour</p>
-            <span className="text-[11px] text-content-subtle">11 fév. 2026</span>
-          </div>
-          <div className="border-b border-theme-border p-4">
-            <p className="text-[11px] font-semibold text-[var(--brand-violet-hover)]">
-              Prochaine échéance
-            </p>
-            <div className="mt-3 flex items-baseline gap-3">
-              <strong className="text-2xl font-semibold text-content-primary">20:00</strong>
-              <span className="text-sm text-content-primary">Début de la représentation</span>
-            </div>
-            <p className="mt-1 text-xs text-content-subtle">Grande Salle</p>
+        <aside className="editorial-section xl:sticky xl:top-5" aria-label="Feuille du jour">
+          <div className="editorial-section-heading">
+            <h2 className="text-sm font-bold text-content-primary">Feuille du jour</h2>
+            <span className="font-data text-[11px] text-content-subtle">11.02.2026</span>
           </div>
 
-          <div className="divide-y divide-theme-border">
-            <InfoLine
-              icon={Clock3}
+          <div className="space-y-0">
+            <DayLine
               label="Horaire"
               value={`${formatTime(activeEvent.startDate)} – ${formatTime(activeEvent.endDate)}`}
             />
-            <InfoLine
-              icon={MapPin}
-              label="Implantation"
-              value={`${activeEvent.venue} · ${activeEvent.stage}`}
-            />
-            <InfoLine
-              icon={Users}
+            <DayLine label="Implantation" value={`${activeEvent.venue} · ${activeEvent.stage}`} />
+            <DayLine
               label="Équipe"
               value={`${activeEvent.teamMembers.length} personnes affectées`}
             />
           </div>
 
-          <div className="border-t border-theme-border p-4">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-content-primary">Checklist</span>
-              <strong className="text-content-primary">{activeEvent.checklistProgress}%</strong>
+          <div className="mt-7 border-l border-theme-border pl-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-xs font-semibold text-content-primary">Checklist</span>
+              <strong className="font-data text-sm text-content-primary">
+                {activeEvent.checklistProgress}%
+              </strong>
             </div>
-            <div className="mt-2 h-1 bg-theme-elevated" aria-hidden="true">
+            <div className="mt-3 h-px bg-theme-elevated" aria-hidden="true">
               <div
-                className="h-full bg-[var(--brand-violet)]"
+                className="h-px bg-[var(--brand-violet)]"
                 style={{ width: `${activeEvent.checklistProgress}%` }}
               />
             </div>
-            <p className="mt-2 text-[11px] leading-4 text-content-subtle">
+            <p className="mt-3 text-[11px] leading-4 text-content-subtle">
               Progression calculée depuis la checklist associée à cet événement.
             </p>
           </div>
@@ -226,35 +217,24 @@ export function Dashboard() {
   )
 }
 
-function InfoLine({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof CalendarDays
-  label: string
-  value: string
-}) {
+function DayLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-start gap-2 px-4 py-3">
-      <Icon size={13} className="mt-0.5 text-content-subtle" aria-hidden="true" />
+    <div className="dashboard-state-line">
       <span className="text-[11px] text-content-subtle">{label}</span>
-      <span className="text-right text-xs font-medium text-content-primary">{value}</span>
+      <span className="max-w-[12rem] text-right text-xs font-semibold text-content-primary">
+        {value}
+      </span>
     </div>
   )
 }
 
-function StatusCell({
-  icon: Icon,
+function SituationItem({
   label,
   value,
-  detail,
   tone = 'brand',
 }: {
-  icon: typeof CalendarDays
   label: string
   value: string
-  detail: string
   tone?: 'brand' | 'warning' | 'danger'
 }) {
   const toneClass =
@@ -265,13 +245,9 @@ function StatusCell({
         : 'text-[var(--brand-violet-hover)]'
 
   return (
-    <div className="grid min-h-[5.5rem] grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-theme-border p-3 last:border-b-0 sm:odd:border-r xl:border-b-0 xl:border-r xl:last:border-r-0">
-      <Icon size={16} className={toneClass} aria-hidden="true" />
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-content-primary">{label}</p>
-        <p className="mt-0.5 truncate text-[10px] text-content-subtle">{detail}</p>
-      </div>
-      <strong className="text-lg font-semibold text-content-primary">{value}</strong>
+    <div className="flex min-h-14 items-baseline justify-between gap-4 py-3 sm:pr-6 sm:odd:border-r sm:odd:border-theme-border sm:even:pl-6 xl:border-r xl:border-theme-border xl:px-6 xl:first:pl-0 xl:last:border-r-0 xl:last:pr-0">
+      <span className="text-[11px] leading-4 text-content-muted">{label}</span>
+      <strong className={`font-data text-base font-semibold ${toneClass}`}>{value}</strong>
     </div>
   )
 }
