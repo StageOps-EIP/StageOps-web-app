@@ -501,6 +501,10 @@
   .demo-notice {
     display: none;
   }
+
+  .demo-notice[data-dirty='true'] {
+    display: flex;
+  }
 }
 
 /* Legacy screens inherit the same editorial geometry and label casing. */

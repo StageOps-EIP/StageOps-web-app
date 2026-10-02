@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { RotateCcw } from 'lucide-react'
+import { useDemoData } from '@/hooks/useDemoData'
 
 export function PageHeader({
   title,
@@ -30,10 +32,31 @@ export function DemoNotice({
 }: {
   children?: ReactNode
 }) {
+  const { isDemoDirty, resetDemoData } = useDemoData()
+
   return (
-    <div className="demo-notice" role="note">
-      <span className="h-1.5 w-1.5 rotate-45 bg-[var(--brand-violet)]" aria-hidden="true" />
+    <div className="demo-notice flex-wrap" role="note" data-dirty={isDemoDirty}>
+      <span
+        className="h-1.5 w-1.5 shrink-0 rotate-45 bg-[var(--brand-violet)]"
+        aria-hidden="true"
+      />
       <span>{children}</span>
+      {isDemoDirty && (
+        <>
+          <span className="text-content-faint" aria-hidden="true">
+            ·
+          </span>
+          <span className="text-[var(--brand-violet-hover)]">Modifications enregistrées</span>
+          <button
+            type="button"
+            onClick={resetDemoData}
+            className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-content-muted transition-colors hover:text-content-primary"
+          >
+            <RotateCcw size={12} aria-hidden="true" />
+            Réinitialiser la démo
+          </button>
+        </>
+      )}
     </div>
   )
 }

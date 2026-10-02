@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import { Button } from '@/components/design-system/Button'
-import { mockEquipment } from '@/lib/mockData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '@/lib/utils'
-import type { Incident } from '@/lib/types'
+import type { Equipment, Incident } from '@/lib/types'
 import type { IncidentStatus } from '@/lib/types'
 import { STATUS_COLORS } from '@/lib/design-tokens'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
@@ -17,17 +16,18 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export function IncidentDetailModal({
   incident,
+  equipment,
   onClose,
   onStatusChange,
 }: {
   incident: Incident
+  equipment?: Equipment
   onClose: () => void
   onStatusChange?: (status: IncidentStatus) => void
 }) {
   const trapRef = useFocusTrap(true)
   const sevColor = getSeverityColor(incident.severity)
   const statusCol = statusLabels[incident.status]
-  const eq = incident.equipmentId ? mockEquipment.find((e) => e.id === incident.equipmentId) : null
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -141,7 +141,7 @@ export function IncidentDetailModal({
           </div>
 
           {/* Linked equipment */}
-          {eq && (
+          {equipment && (
             <div>
               <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
                 Équipement concerné
@@ -151,10 +151,10 @@ export function IncidentDetailModal({
                   <Wrench size={18} className="text-content-muted" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-content-primary">{eq.name}</p>
+                  <p className="text-sm text-content-primary">{equipment.name}</p>
                   <p className="text-xs text-content-subtle mt-0.5">
-                    {eq.location}
-                    {eq.zone ? ` · ${eq.zone}` : ''}
+                    {equipment.location}
+                    {equipment.zone ? ` · ${equipment.zone}` : ''}
                   </p>
                 </div>
               </div>

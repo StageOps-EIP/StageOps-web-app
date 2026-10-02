@@ -1,10 +1,16 @@
-import { mockEquipment } from '../../lib/mockData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../../lib/utils'
-import type { Incident } from '../../lib/types'
+import type { Equipment, Incident } from '../../lib/types'
 
-export function IncidentCard({ incident, onClick }: { incident: Incident; onClick: () => void }) {
+export function IncidentCard({
+  incident,
+  equipment,
+  onClick,
+}: {
+  incident: Incident
+  equipment?: Equipment
+  onClick: () => void
+}) {
   const sevColor = getSeverityColor(incident.severity)
-  const eq = incident.equipmentId ? mockEquipment.find((e) => e.id === incident.equipmentId) : null
 
   return (
     <button
@@ -21,7 +27,7 @@ export function IncidentCard({ incident, onClick }: { incident: Incident; onClic
       </div>
       <p className="mb-3 line-clamp-2 text-xs text-content-subtle">{incident.description}</p>
       <div className="space-y-1.5 border-t border-theme-border pt-2.5">
-        {eq && <p className="text-[11px] text-content-muted">Matériel · {eq.name}</p>}
+        {equipment && <p className="text-[11px] text-content-muted">Matériel · {equipment.name}</p>}
         <div className="flex items-center justify-between gap-2 text-[11px] text-content-subtle">
           <span>{incident.reportedBy}</span>
           <span>{formatRelativeTime(incident.timestamp)}</span>

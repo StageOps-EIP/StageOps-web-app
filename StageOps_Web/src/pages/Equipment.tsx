@@ -6,7 +6,7 @@ import { SearchInput } from '@/components/design-system/Input'
 import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Badge'
 import { EmptyState } from '@/components/design-system/EmptyState'
 import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
-import { mockEquipment as initialEquipment } from '@/lib/mockData'
+import { useDemoData } from '@/hooks/useDemoData'
 import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, PackageSearch } from 'lucide-react'
 import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
@@ -16,7 +16,7 @@ import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal'
 export function Equipment() {
   usePageTitle('Parc matériel')
   const [searchParams, setSearchParams] = useSearchParams()
-  const [equipmentList, setEquipmentList] = useState<EquipmentType[]>(initialEquipment)
+  const { equipment: equipmentList, addEquipment, updateEquipment } = useDemoData()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all')
@@ -241,9 +241,7 @@ export function Equipment() {
           equipment={activeEquipment}
           onClose={closeDetail}
           onSave={(updated) => {
-            setEquipmentList((prev) =>
-              prev.map((item) => (item.id === updated.id ? updated : item)),
-            )
+            updateEquipment(updated)
             closeDetail()
           }}
         />
@@ -252,7 +250,7 @@ export function Equipment() {
         <AddEquipmentModal
           onClose={() => setShowAddModal(false)}
           onAdd={(newEquipment) => {
-            setEquipmentList((prev) => [newEquipment, ...prev])
+            addEquipment(newEquipment)
             setShowAddModal(false)
           }}
         />

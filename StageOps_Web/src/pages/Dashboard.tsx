@@ -2,22 +2,24 @@ import { useNavigate } from 'react-router'
 import { Badge } from '@/components/design-system/Badge'
 import { Button } from '@/components/design-system/Button'
 import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { useDemoData } from '@/hooks/useDemoData'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { mockEquipment, mockEvents, mockIncidents, mockTeamMembers } from '@/lib/mockData'
+import { mockEvents, mockTeamMembers } from '@/lib/mockData'
 import { formatTime, getSeverityColor, getSeverityLabel } from '@/lib/utils'
 import { SEVERITY_ORDER } from '@/lib/constants'
 
 export function Dashboard() {
   usePageTitle('Vue générale')
   const navigate = useNavigate()
+  const { equipment, incidents } = useDemoData()
   const activeEvent = mockEvents[0]
-  const controls = mockEquipment.filter(
+  const controls = equipment.filter(
     (equipment) => equipment.status === 'to-check' || equipment.status === 'hs',
   )
-  const openIncidents = mockIncidents
+  const openIncidents = incidents
     .filter((incident) => incident.status === 'open' || incident.status === 'in-progress')
     .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity])
-  const availableEquipment = mockEquipment.filter((equipment) => equipment.status === 'ok').length
+  const availableEquipment = equipment.filter((item) => item.status === 'ok').length
 
   return (
     <div className="page-shell space-y-5">
@@ -68,7 +70,7 @@ export function Dashboard() {
         <div className="grid sm:grid-cols-2 xl:grid-cols-4">
           <SituationItem
             label="Matériel opérationnel"
-            value={`${availableEquipment} / ${mockEquipment.length}`}
+            value={`${availableEquipment} / ${equipment.length}`}
           />
           <SituationItem
             label="Contrôles requis"

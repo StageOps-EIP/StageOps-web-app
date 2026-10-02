@@ -4,7 +4,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { Card } from '../components/design-system/Card'
 import { Button } from '../components/design-system/Button'
 import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
-import { mockIncidents, mockEquipment } from '../lib/mockData'
+import { useDemoData } from '@/hooks/useDemoData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../lib/utils'
 import { IncidentDetailModal } from '../components/incidents/IncidentDetailModal'
 import type { Incident, IncidentStatus } from '../lib/types'
@@ -14,45 +14,10 @@ import { NewIncidentModal } from '../components/incidents/NewIncidentModal'
 
 const columns = INCIDENT_COLUMNS
 
-const allIncidents: Incident[] = [
-  ...mockIncidents,
-  {
-    id: 'inc-006',
-    title: 'Fuite hydraulique praticable mobile',
-    description: 'Fuite détectée au niveau du vérin gauche du praticable mobile. Zone sécurisée.',
-    severity: 'critical',
-    status: 'open',
-    equipmentId: 'eq-005',
-    reportedBy: 'Jean Moreau',
-    timestamp: new Date('2026-02-11T11:00:00'),
-  },
-  {
-    id: 'inc-007',
-    title: 'Câble DMX défaillant perche 3',
-    description: 'Signal DMX intermittent sur la perche 3 côté Cour. Câble à remplacer.',
-    severity: 'medium',
-    status: 'in-progress',
-    equipmentId: 'eq-008',
-    reportedBy: 'Thomas Dubois',
-    timestamp: new Date('2026-02-11T07:30:00'),
-  },
-  {
-    id: 'inc-008',
-    title: 'Batterie radio HF faible',
-    description: 'Batteries des micros HF tombent sous 30% après 2h. Remplacement préventif.',
-    severity: 'low',
-    status: 'resolved',
-    reportedBy: 'Marie Lambert',
-    timestamp: new Date('2026-02-09T20:00:00'),
-    resolvedAt: new Date('2026-02-10T08:00:00'),
-    resolutionNotes: 'Batteries remplacées. Lot de 12 neuves en stock.',
-  },
-]
-
 export function Incidents() {
   usePageTitle('Incidents')
   const [searchParams, setSearchParams] = useSearchParams()
-  const [incidents, setIncidents] = useState<Incident[]>(allIncidents)
+  const { equipment, incidents, addIncident, updateIncident } = useDemoData()
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
@@ -147,6 +112,7 @@ export function Incidents() {
                     <IncidentCard
                       key={inc.id}
                       incident={inc}
+                      equipment={equipment.find((item) => item.id === inc.equipmentId)}
                       onClick={() => setSelectedIncident(inc)}
                     />
                   ))}
@@ -172,7 +138,7 @@ export function Incidents() {
                 const sevColor = getSeverityColor(inc.severity)
                 const statusCol = columns.find((c) => c.key === inc.status)
                 const eq = inc.equipmentId
-                  ? mockEquipment.find((e) => e.id === inc.equipmentId)
+                  ? equipment.find((item) => item.id === inc.equipmentId)
                   : null
                 return (
                   <button
@@ -222,6 +188,7 @@ export function Incidents() {
       {activeIncident && (
         <IncidentDetailModal
           incident={activeIncident}
+          equipment={equipment.find((item) => item.id === activeIncident.equipmentId)}
           onClose={() => {
             setSelectedIncident(null)
             if (searchParams.has('incident')) {
@@ -231,27 +198,14 @@ export function Incidents() {
             }
           }}
           onStatusChange={(status) => {
-            setIncidents((current) =>
-              current.map((incident) =>
-                incident.id === activeIncident.id
-                  ? {
-                      ...incident,
-                      status,
-                      resolvedAt:
-                        status === 'resolved'
-                          ? new Date('2026-02-11T12:30:00')
-                          : incident.resolvedAt,
-                    }
-                  : incident,
-              ),
-            )
+            const resolvedAt = status === 'resolved' ? new Date() : activeIncident.resolvedAt
+            updateIncident(activeIncident.id, { status, resolvedAt })
             setSelectedIncident((current) =>
               current
                 ? {
                     ...current,
                     status,
-                    resolvedAt:
-                      status === 'resolved' ? new Date('2026-02-11T12:30:00') : current.resolvedAt,
+                    resolvedAt,
                   }
                 : current,
             )
@@ -260,9 +214,10 @@ export function Incidents() {
       )}
       {showNewForm && (
         <NewIncidentModal
+          equipment={equipment}
           onClose={() => setShowNewForm(false)}
           onCreate={(incident) => {
-            setIncidents((current) => [incident, ...current])
+            addIncident(incident)
             setShowNewForm(false)
           }}
         />

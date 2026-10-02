@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { AlertCircle, X } from 'lucide-react'
 import { Button } from '../design-system/Button'
-import { mockEquipment } from '../../lib/mockData'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
-import type { Incident, IncidentSeverity } from '@/lib/types'
+import type { Equipment, Incident, IncidentSeverity } from '@/lib/types'
 
 export function NewIncidentModal({
   onClose,
   onCreate,
+  equipment,
 }: {
   onClose: () => void
   onCreate: (incident: Incident) => void
+  equipment: Equipment[]
 }) {
   const trapRef = useFocusTrap<HTMLFormElement>(true)
   const [form, setForm] = useState({
@@ -42,7 +43,7 @@ export function NewIncidentModal({
       status: 'open',
       equipmentId: form.equipmentId || undefined,
       reportedBy: form.reportedBy.trim(),
-      timestamp: new Date('2026-02-11T12:00:00'),
+      timestamp: new Date(),
     })
   }
 
@@ -119,9 +120,9 @@ export function NewIncidentModal({
                 onChange={(event) => set('equipmentId', event.target.value)}
               >
                 <option value="">Aucun</option>
-                {mockEquipment.map((equipment) => (
-                  <option key={equipment.id} value={equipment.id}>
-                    {equipment.name}
+                {equipment.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
                   </option>
                 ))}
               </select>
