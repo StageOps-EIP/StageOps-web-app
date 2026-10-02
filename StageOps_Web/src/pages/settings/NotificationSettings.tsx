@@ -6,7 +6,7 @@ export function NotificationSettings() {
     <Card>
       <CardHeader
         title="Notifications"
-        subtitle="Les changements s’appliquent à la session de démonstration"
+        subtitle="Configurez les alertes opérationnelles de votre espace"
       />
       <div>
         <SettingRow

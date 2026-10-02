@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { Card } from '@/components/design-system/Card'
 import { Button } from '@/components/design-system/Button'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { PageHeader } from '@/components/design-system/PageHeader'
 import { mockEvents } from '@/lib/mockData'
 import { AlertTriangle } from 'lucide-react'
 import type { Event } from '@/lib/types'
@@ -143,8 +143,6 @@ export function Events() {
           </>
         }
       />
-      <DemoNotice />
-
       {/* Conflicts warning */}
       {conflicts.length > 0 && (
         <Card className="border-amber-500/30 bg-amber-500/[0.04]">

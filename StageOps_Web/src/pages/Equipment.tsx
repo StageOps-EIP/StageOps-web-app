@@ -5,8 +5,8 @@ import { Button } from '@/components/design-system/Button'
 import { SearchInput } from '@/components/design-system/Input'
 import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Badge'
 import { EmptyState } from '@/components/design-system/EmptyState'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
-import { useDemoData } from '@/hooks/useDemoData'
+import { PageHeader } from '@/components/design-system/PageHeader'
+import { useOperationalData } from '@/hooks/useOperationalData'
 import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, PackageSearch } from 'lucide-react'
 import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
@@ -16,7 +16,7 @@ import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal'
 export function Equipment() {
   usePageTitle('Parc matériel')
   const [searchParams, setSearchParams] = useSearchParams()
-  const { equipment: equipmentList, addEquipment, updateEquipment } = useDemoData()
+  const { equipment: equipmentList, addEquipment, updateEquipment } = useOperationalData()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all')
@@ -57,8 +57,6 @@ export function Equipment() {
         description={`${equipmentList.length} équipements référencés`}
         actions={<Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>}
       />
-      <DemoNotice />
-
       <div className="toolbar">
         <div className="min-w-[16rem] flex-1">
           <SearchInput

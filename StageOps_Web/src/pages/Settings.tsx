@@ -7,7 +7,7 @@ import {
   SecuritySettings,
   ExportSettings,
 } from './settings/index'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { PageHeader } from '@/components/design-system/PageHeader'
 
 type SettingsSection = 'general' | 'notifications' | 'appearance' | 'security' | 'export'
 
@@ -30,10 +30,6 @@ export function Settings() {
         title="Paramètres"
         description="Configuration du lieu et préférences de l’interface."
       />
-      <DemoNotice>
-        Les réglages sont conservés uniquement dans cet environnement de démonstration.
-      </DemoNotice>
-
       <div className="grid gap-8 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-12">
         {/* Sidebar */}
         <div className="flex overflow-x-auto border-y border-theme-border lg:block lg:overflow-visible lg:border-b-0">

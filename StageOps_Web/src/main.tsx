@@ -4,15 +4,15 @@ import './index.css'
 import { ThemeProvider } from './lib/theme.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
-import { DemoDataProvider } from './contexts/DemoDataProvider.tsx'
+import { OperationalDataProvider } from './contexts/OperationalDataProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <ThemeProvider>
       <AuthProvider>
-        <DemoDataProvider>
+        <OperationalDataProvider>
           <App />
-        </DemoDataProvider>
+        </OperationalDataProvider>
       </AuthProvider>
     </ThemeProvider>
   </ErrorBoundary>,

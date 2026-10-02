@@ -38,7 +38,7 @@ export function ExportSettings() {
             </div>
             <Button variant="secondary" size="sm" fullWidth disabled>
               <Download size={14} />
-              Indisponible en démonstration
+              Fonction en préparation
             </Button>
           </div>
 
@@ -68,7 +68,7 @@ export function ExportSettings() {
             </div>
             <Button variant="secondary" size="sm" fullWidth disabled>
               <Download size={14} />
-              Indisponible en démonstration
+              Fonction en préparation
             </Button>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function ExportSettings() {
             </div>
             <Button variant="primary" size="sm" disabled>
               <Database size={14} />
-              Indisponible en démonstration
+              Fonction en préparation
             </Button>
           </div>
         </div>

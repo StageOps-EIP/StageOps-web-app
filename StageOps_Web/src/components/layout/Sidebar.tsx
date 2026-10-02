@@ -91,7 +91,7 @@ export function Sidebar() {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-medium text-content-primary">
-              {user?.email ?? 'Mode démonstration'}
+              {user?.email ?? 'Espace local'}
             </span>
             <span className="block text-[10px] text-content-subtle group-hover:text-content-muted">
               Profil et accès

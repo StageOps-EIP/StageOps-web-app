@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { DemoDataContext, type DemoDataContextValue } from './demo-data.context'
+import {
+  OperationalDataContext,
+  type OperationalDataContextValue,
+} from './operational-data.context'
 import { mockEquipment, mockIncidents } from '@/lib/mockData'
 import type { Equipment, Incident } from '@/lib/types'
 
-const STORAGE_KEY = 'stageops.demo.workspace.v1'
+const STORAGE_KEY = 'stageops.workspace.v1'
+const LEGACY_STORAGE_KEY = 'stageops.demo.workspace.v1'
 
 const initialIncidents: Incident[] = [
   ...mockIncidents,
@@ -40,7 +44,7 @@ const initialIncidents: Incident[] = [
   },
 ]
 
-interface StoredDemoData {
+interface StoredOperationalData {
   equipment: Array<Omit<Equipment, 'lastCheck'> & { lastCheck?: string }>
   incidents: Array<
     Omit<Incident, 'timestamp' | 'resolvedAt'> & {
@@ -50,91 +54,99 @@ interface StoredDemoData {
   >
 }
 
-function loadStoredData(): { equipment: Equipment[]; incidents: Incident[]; isDirty: boolean } {
+function loadStoredData(): { equipment: Equipment[]; incidents: Incident[] } {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { equipment: mockEquipment, incidents: initialIncidents, isDirty: false }
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)
+    if (!raw) return { equipment: mockEquipment, incidents: initialIncidents }
 
-    const stored = JSON.parse(raw) as StoredDemoData
+    const stored = JSON.parse(raw) as StoredOperationalData
     return {
       equipment: stored.equipment.map((item) => ({
         ...item,
         lastCheck: item.lastCheck ? new Date(item.lastCheck) : undefined,
       })),
-      incidents: stored.incidents.map((incident) => ({
-        ...incident,
-        timestamp: new Date(incident.timestamp),
-        resolvedAt: incident.resolvedAt ? new Date(incident.resolvedAt) : undefined,
-      })),
-      isDirty: true,
+      incidents: stored.incidents
+        .filter((incident) => incident.title !== 'Test persistance démo')
+        .map((incident) => ({
+          ...incident,
+          timestamp: new Date(incident.timestamp),
+          resolvedAt: incident.resolvedAt ? new Date(incident.resolvedAt) : undefined,
+        })),
     }
   } catch {
-    return { equipment: mockEquipment, incidents: initialIncidents, isDirty: false }
+    return { equipment: mockEquipment, incidents: initialIncidents }
   }
 }
 
-export function DemoDataProvider({ children }: { children: ReactNode }) {
+export function OperationalDataProvider({ children }: { children: ReactNode }) {
   const stored = useMemo(() => loadStoredData(), [])
   const [equipment, setEquipment] = useState<Equipment[]>(stored.equipment)
   const [incidents, setIncidents] = useState<Incident[]>(stored.incidents)
-  const [isDemoDirty, setIsDemoDirty] = useState(stored.isDirty)
 
   useEffect(() => {
-    if (!isDemoDirty) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ equipment, incidents }))
-  }, [equipment, incidents, isDemoDirty])
+    localStorage.removeItem(LEGACY_STORAGE_KEY)
+  }, [equipment, incidents])
 
   const addEquipment = useCallback((item: Equipment) => {
     setEquipment((current) => [item, ...current])
-    setIsDemoDirty(true)
   }, [])
 
   const updateEquipment = useCallback((updated: Equipment) => {
     setEquipment((current) => current.map((item) => (item.id === updated.id ? updated : item)))
-    setIsDemoDirty(true)
   }, [])
 
   const addIncident = useCallback((incident: Incident) => {
     setIncidents((current) => [incident, ...current])
-    setIsDemoDirty(true)
+    if (incident.equipmentId && incident.status !== 'resolved') {
+      setEquipment((current) =>
+        current.map((item) =>
+          item.id === incident.equipmentId && item.status === 'ok'
+            ? { ...item, status: 'to-check' }
+            : item,
+        ),
+      )
+    }
   }, [])
 
   const updateIncident = useCallback((id: string, patch: Partial<Incident>) => {
-    setIncidents((current) =>
-      current.map((incident) => (incident.id === id ? { ...incident, ...patch } : incident)),
-    )
-    setIsDemoDirty(true)
+    setIncidents((current) => {
+      const updated = current.map((incident) =>
+        incident.id === id ? { ...incident, ...patch } : incident,
+      )
+      const target = updated.find((incident) => incident.id === id)
+
+      if (target?.equipmentId && patch.status) {
+        const hasAnotherActiveIncident = updated.some(
+          (incident) =>
+            incident.id !== id &&
+            incident.equipmentId === target.equipmentId &&
+            incident.status !== 'resolved',
+        )
+        setEquipment((items) =>
+          items.map((item) => {
+            if (item.id !== target.equipmentId) return item
+            if (patch.status !== 'resolved') return { ...item, status: 'to-check' }
+            return hasAnotherActiveIncident ? item : { ...item, status: 'ok' }
+          }),
+        )
+      }
+
+      return updated
+    })
   }, [])
 
-  const resetDemoData = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY)
-    setEquipment(mockEquipment)
-    setIncidents(initialIncidents)
-    setIsDemoDirty(false)
-  }, [])
-
-  const value = useMemo<DemoDataContextValue>(
+  const value = useMemo<OperationalDataContextValue>(
     () => ({
       equipment,
       incidents,
-      isDemoDirty,
       addEquipment,
       updateEquipment,
       addIncident,
       updateIncident,
-      resetDemoData,
     }),
-    [
-      equipment,
-      incidents,
-      isDemoDirty,
-      addEquipment,
-      updateEquipment,
-      addIncident,
-      updateIncident,
-      resetDemoData,
-    ],
+    [equipment, incidents, addEquipment, updateEquipment, addIncident, updateIncident],
   )
 
-  return <DemoDataContext.Provider value={value}>{children}</DemoDataContext.Provider>
+  return <OperationalDataContext.Provider value={value}>{children}</OperationalDataContext.Provider>
 }

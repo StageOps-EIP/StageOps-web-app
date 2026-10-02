@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { Card, CardHeader } from '@/components/design-system/Card'
 import { Button } from '@/components/design-system/Button'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { PageHeader } from '@/components/design-system/PageHeader'
 import { mockTeamMembers } from '@/lib/mockData'
 
 import type { TeamMember } from '@/lib/types'
@@ -36,8 +36,6 @@ export function Team() {
           </Button>
         }
       />
-      <DemoNotice />
-
       <div className="toolbar">
         <div className="relative min-w-[16rem] max-w-xl flex-1">
           <Search

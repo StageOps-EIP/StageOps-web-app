@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { Card } from '../components/design-system/Card'
 import { Button } from '../components/design-system/Button'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
-import { useDemoData } from '@/hooks/useDemoData'
+import { PageHeader } from '@/components/design-system/PageHeader'
+import { useOperationalData } from '@/hooks/useOperationalData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../lib/utils'
 import { IncidentDetailModal } from '../components/incidents/IncidentDetailModal'
 import type { Incident, IncidentStatus } from '../lib/types'
@@ -18,7 +18,7 @@ const columns = INCIDENT_COLUMNS
 export function Incidents() {
   usePageTitle('Incidents')
   const [searchParams, setSearchParams] = useSearchParams()
-  const { equipment, incidents, addIncident, updateIncident } = useDemoData()
+  const { equipment, incidents, addIncident, updateIncident } = useOperationalData()
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
@@ -68,8 +68,6 @@ export function Incidents() {
           </>
         }
       />
-      <DemoNotice />
-
       <div className="toolbar">
         <span className="text-sm font-medium text-content-muted">Priorité</span>
         <div className="segmented-control overflow-x-auto">
@@ -223,8 +221,9 @@ export function Incidents() {
           onCreate={(incident) => {
             addIncident(incident)
             setShowNewForm(false)
-            toast.success('Incident ajouté au scénario', {
-              description: 'Il est enregistré et visible immédiatement dans le tableau de bord.',
+            toast.success('Incident enregistré', {
+              description:
+                'Le registre, le matériel associé et le tableau de bord ont été actualisés.',
             })
           }}
         />

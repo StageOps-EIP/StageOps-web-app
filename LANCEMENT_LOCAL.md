@@ -61,9 +61,10 @@ Les services sont ensuite accessibles ici :
 - CouchDB : <http://localhost:5984>
 - Administration CouchDB : <http://localhost:5984/_utils>
 
-Le frontend ouvre directement le tableau de bord en mode démonstration, sans
-compte. Les écrans d'inscription et de connexion restent disponibles depuis
-<http://localhost:3001/register> et <http://localhost:3001/login>.
+Le frontend permet d’ouvrir un espace local sans compte afin d’utiliser les
+fonctions hors ligne sur l’appareil courant. Les écrans d'inscription et de
+connexion restent disponibles depuis <http://localhost:3001/register> et
+<http://localhost:3001/login>.
 
 ## 3. Démarrer l'application mobile
 

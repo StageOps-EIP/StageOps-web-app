@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router'
 import { Badge } from '@/components/design-system/Badge'
 import { Button } from '@/components/design-system/Button'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
-import { useDemoData } from '@/hooks/useDemoData'
+import { PageHeader } from '@/components/design-system/PageHeader'
+import { useOperationalData } from '@/hooks/useOperationalData'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { mockEvents, mockTeamMembers } from '@/lib/mockData'
 import { formatTime, getSeverityColor, getSeverityLabel } from '@/lib/utils'
@@ -11,7 +11,7 @@ import { SEVERITY_ORDER } from '@/lib/constants'
 export function Dashboard() {
   usePageTitle('Vue générale')
   const navigate = useNavigate()
-  const { equipment, incidents } = useDemoData()
+  const { equipment, incidents } = useOperationalData()
   const activeEvent = mockEvents[0]
   const controls = equipment.filter(
     (equipment) => equipment.status === 'to-check' || equipment.status === 'hs',
@@ -36,8 +36,6 @@ export function Dashboard() {
           </>
         }
       />
-
-      <DemoNotice />
 
       <section className="grid gap-8 pb-5 pt-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)] lg:gap-12">
         <div>

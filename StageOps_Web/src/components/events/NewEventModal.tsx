@@ -80,7 +80,7 @@ export function NewEventModal({
               Nouvel événement
             </h2>
             <p className="mt-1 text-sm text-content-subtle">
-              Ajouté au planning de démonstration local.
+              L’événement sera ajouté au planning opérationnel.
             </p>
           </div>
           <button

@@ -2,7 +2,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/design-system/Button'
 import { Card, CardHeader } from '@/components/design-system/Card'
-import { DemoNotice, PageHeader } from '@/components/design-system/PageHeader'
+import { PageHeader } from '@/components/design-system/PageHeader'
 import { useAuth } from '@/contexts/auth.context'
 import { Mail, Shield, LogOut, LogIn, Settings } from 'lucide-react'
 
@@ -17,8 +17,8 @@ export function Profile() {
   usePageTitle('Profil')
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : 'Accès invité'
-  const displayName = user?.email ?? 'Session de démonstration'
+  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : 'Accès local'
+  const displayName = user?.email ?? 'Espace local StageOps'
   const initials = user?.email.slice(0, 2).toUpperCase() ?? 'SO'
 
   function handleLogout() {
@@ -33,12 +33,6 @@ export function Profile() {
         title="Profil"
         description="Identité, rôle et accès à l’application."
       />
-      {!user && (
-        <DemoNotice>
-          Vous utilisez StageOps sans compte dans l’environnement de démonstration.
-        </DemoNotice>
-      )}
-
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <Card>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
@@ -69,7 +63,7 @@ export function Profile() {
         </Card>
 
         <Card>
-          <CardHeader title="Accès" subtitle={user ? 'Compte connecté' : 'Démonstration locale'} />
+          <CardHeader title="Accès" subtitle={user ? 'Compte connecté' : 'Espace local hors-ligne'} />
           <div className="space-y-2">
             <Button variant="secondary" fullWidth onClick={() => navigate('/settings')}>
               <Settings size={16} /> Ouvrir les paramètres

@@ -11,18 +11,18 @@ export function SecuritySettings() {
           label="Modifier le mot de passe"
           description="Dernière modification il y a 45 jours"
         >
-          <Button variant="secondary" size="sm" disabled title="Indisponible en mode démonstration">
+          <Button variant="secondary" size="sm" disabled title="Fonction en préparation">
             Indisponible
           </Button>
         </SettingRow>
         <SettingRow
           label="Authentification à deux facteurs"
-          description="Configuration indisponible en mode démonstration"
+          description="Configuration prévue avec l’authentification serveur"
         >
           <Toggle label="Authentification à deux facteurs indisponible" disabled />
         </SettingRow>
         <SettingRow label="Sessions actives" description="2 sessions actives (Desktop, Mobile)">
-          <Button variant="ghost" size="sm" disabled title="Indisponible en mode démonstration">
+          <Button variant="ghost" size="sm" disabled title="Fonction en préparation">
             Indisponible
           </Button>
         </SettingRow>
@@ -32,7 +32,7 @@ export function SecuritySettings() {
         >
           <select
             disabled
-            title="Indisponible en mode démonstration"
+            title="Fonction en préparation"
             className="form-control w-auto px-3 disabled:cursor-not-allowed disabled:opacity-45"
           >
             <option>30 minutes</option>

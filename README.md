@@ -55,9 +55,9 @@ http://localhost:3000
 
 Offrir un centre de contrôle technique centralisé pour la supervision scénique.
 
-## Démonstration
+## Parcours incident
 
-Le parcours reproductible **création d’un incident → mise à jour du dashboard → persistance → réinitialisation** est décrit dans [DEMO_FRONT.md](DEMO_FRONT.md).
+Le fonctionnement **création d’un incident → mise à jour du matériel → actualisation du dashboard → persistance locale** est décrit dans [PARCOURS_INCIDENT.md](PARCOURS_INCIDENT.md).
 
 La méthode d’équipe, les statuts du GitHub Project et les règles de documentation sont centralisés dans le dépôt principal [StageOps](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
 

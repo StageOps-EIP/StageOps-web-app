@@ -81,7 +81,7 @@ export function Login() {
               Ouvrir une session
             </h2>
             <p className="mt-2 text-xs text-content-muted">
-              Utilisez votre compte ou accédez directement au scénario de démonstration.
+              Connectez-vous ou utilisez l’espace local hors-ligne sur cet appareil.
             </p>
           </div>
 
@@ -139,7 +139,7 @@ export function Login() {
             to="/"
             className="flex w-full items-center justify-between border border-theme-border bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-border)] hover:bg-[var(--brand-soft)]"
           >
-            Ouvrir la démonstration sans compte <span aria-hidden="true">→</span>
+            Continuer dans l’espace local <span aria-hidden="true">→</span>
           </Link>
           <p className="mt-6 text-center text-sm text-content-subtle">
             Pas encore de compte ?{' '}
