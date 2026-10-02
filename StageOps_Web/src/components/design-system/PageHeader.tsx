@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { useDemoData } from '@/hooks/useDemoData'
+import { toast } from 'sonner'
 
 export function PageHeader({
   title,
@@ -49,7 +50,10 @@ export function DemoNotice({
           <span className="text-[var(--brand-violet-hover)]">Modifications enregistrées</span>
           <button
             type="button"
-            onClick={resetDemoData}
+            onClick={() => {
+              resetDemoData()
+              toast.success('Scénario de démonstration réinitialisé')
+            }}
             className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-content-muted transition-colors hover:text-content-primary"
           >
             <RotateCcw size={12} aria-hidden="true" />

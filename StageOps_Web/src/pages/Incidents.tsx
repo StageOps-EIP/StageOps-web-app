@@ -11,6 +11,7 @@ import type { Incident, IncidentStatus } from '../lib/types'
 import { INCIDENT_COLUMNS, SEVERITY_ORDER } from '../lib/constants'
 import { IncidentCard } from '../components/incidents/IncidentCard'
 import { NewIncidentModal } from '../components/incidents/NewIncidentModal'
+import { toast } from 'sonner'
 
 const columns = INCIDENT_COLUMNS
 
@@ -200,6 +201,9 @@ export function Incidents() {
           onStatusChange={(status) => {
             const resolvedAt = status === 'resolved' ? new Date() : activeIncident.resolvedAt
             updateIncident(activeIncident.id, { status, resolvedAt })
+            toast.success('Statut de l’incident mis à jour', {
+              description: 'Le registre et le tableau de bord utilisent maintenant la même donnée.',
+            })
             setSelectedIncident((current) =>
               current
                 ? {
@@ -219,6 +223,9 @@ export function Incidents() {
           onCreate={(incident) => {
             addIncident(incident)
             setShowNewForm(false)
+            toast.success('Incident ajouté au scénario', {
+              description: 'Il est enregistré et visible immédiatement dans le tableau de bord.',
+            })
           }}
         />
       )}

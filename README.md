@@ -15,6 +15,7 @@ Cette application fournit une vue globale du projet technique et permet la super
 
 ## Architecture
 
+```text
 src/
   components/
   modules/
@@ -26,6 +27,7 @@ src/
   services/
   store/
   router/
+```
 
 ## Stack technique
 
@@ -53,7 +55,12 @@ http://localhost:3000
 
 Offrir un centre de contrôle technique centralisé pour la supervision scénique.
 
+## Démonstration
+
+Le parcours reproductible **création d’un incident → mise à jour du dashboard → persistance → réinitialisation** est décrit dans [DEMO_FRONT.md](DEMO_FRONT.md).
+
+La méthode d’équipe, les statuts du GitHub Project et les règles de documentation sont centralisés dans le dépôt principal [StageOps](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
+
 ## Licence
 
 Projet académique.
-
