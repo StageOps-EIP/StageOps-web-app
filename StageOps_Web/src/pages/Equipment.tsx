@@ -8,10 +8,14 @@ import { EmptyState } from '@/components/design-system/EmptyState'
 import { PageHeader } from '@/components/design-system/PageHeader'
 import { useOperationalData } from '@/hooks/useOperationalData'
 import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
-import { ChevronDown, PackageSearch } from 'lucide-react'
+import { buildCsvFilename, buildEquipmentCsv, downloadCsv } from '@/lib/csv-export'
+import { ChevronDown, Download, PackageSearch } from 'lucide-react'
 import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
 import { EquipmentDetailModal } from '@/components/equipment/EquipmentDetailModal'
 import { AddEquipmentModal } from '@/components/equipment/AddEquipmentModal'
+import { toast } from 'sonner'
+
+const PROJECT_NAME = 'Théâtre National'
 
 export function Equipment() {
   usePageTitle('Parc matériel')
@@ -49,13 +53,29 @@ export function Equipment() {
     }
   }
 
+  function exportEquipment() {
+    const filename = buildCsvFilename(PROJECT_NAME, 'inventaire')
+    downloadCsv(buildEquipmentCsv(equipmentList), filename)
+    toast.success('Inventaire exporté', {
+      description: `${equipmentList.length} équipement${equipmentList.length > 1 ? 's' : ''} · ${filename}`,
+    })
+  }
+
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context="Théâtre National"
+        context={PROJECT_NAME}
         title="Parc matériel"
         description={`${equipmentList.length} équipements référencés`}
-        actions={<Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>}
+        actions={
+          <>
+            <Button variant="secondary" onClick={exportEquipment} disabled={!equipmentList.length}>
+              <Download size={15} aria-hidden="true" />
+              Exporter CSV
+            </Button>
+            <Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>
+          </>
+        }
       />
       <div className="toolbar">
         <div className="min-w-[16rem] flex-1">

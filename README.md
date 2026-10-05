@@ -59,6 +59,8 @@ Offrir un centre de contrôle technique centralisé pour la supervision scéniqu
 
 Le fonctionnement **création d’un incident → mise à jour du matériel → actualisation du dashboard → persistance locale** est décrit dans [PARCOURS_INCIDENT.md](PARCOURS_INCIDENT.md).
 
+L’export partageable de l’inventaire et des incidents est décrit dans [EXPORT_CSV.md](EXPORT_CSV.md), avec les colonnes, les règles de compatibilité tableur et un scénario de démonstration.
+
 La méthode d’équipe, les statuts du GitHub Project et les règles de documentation sont centralisés dans le dépôt principal [StageOps](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
 
 ## Licence

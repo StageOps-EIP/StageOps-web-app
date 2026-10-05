@@ -12,8 +12,11 @@ import { INCIDENT_COLUMNS, SEVERITY_ORDER } from '../lib/constants'
 import { IncidentCard } from '../components/incidents/IncidentCard'
 import { NewIncidentModal } from '../components/incidents/NewIncidentModal'
 import { toast } from 'sonner'
+import { buildCsvFilename, buildIncidentsCsv, downloadCsv } from '@/lib/csv-export'
+import { Download } from 'lucide-react'
 
 const columns = INCIDENT_COLUMNS
+const PROJECT_NAME = 'Théâtre National'
 
 export function Incidents() {
   usePageTitle('Incidents')
@@ -40,10 +43,18 @@ export function Incidents() {
     (i) => i.severity === 'critical' || i.severity === 'high',
   ).length
 
+  function exportIncidents() {
+    const filename = buildCsvFilename(PROJECT_NAME, 'incidents')
+    downloadCsv(buildIncidentsCsv(incidents, equipment), filename)
+    toast.success('Incidents exportés', {
+      description: `${incidents.length} incident${incidents.length > 1 ? 's' : ''} · ${filename}`,
+    })
+  }
+
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context="Théâtre National"
+        context={PROJECT_NAME}
         title="Incidents et maintenance"
         description={
           <>
@@ -61,6 +72,11 @@ export function Incidents() {
                 Liste
               </button>
             </div>
+
+            <Button variant="secondary" onClick={exportIncidents} disabled={!incidents.length}>
+              <Download size={15} aria-hidden="true" />
+              Exporter CSV
+            </Button>
 
             <Button variant="primary" onClick={() => setShowNewForm(true)}>
               Signaler un incident
