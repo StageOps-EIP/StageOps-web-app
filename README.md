@@ -1,68 +1,46 @@
-# StageOps Web App
+# StageOps Web
 
-Interface desktop destinée au Régisseur Général.
+Frontend Web de StageOps pour superviser le matériel, les incidents et les opérations scéniques.
 
-Cette application fournit une vue globale du projet technique et permet la supervision centralisée des opérations scéniques.
+## Démarrer
 
-## Fonctionnalités
+Prérequis : Node 24 avec npm. Depuis la racine du dépôt :
 
-- Dashboard global
-- Gestion des projets
-- Visualisation du parc matériel
-- Monitoring temps réel
-- Planification technique
-- Visualisation 3D simplifiée de la scène
-
-## Architecture
-
-```text
-src/
-  components/
-  modules/
-    dashboard/
-    projects/
-    equipment/
-    monitoring/
-    scene-visualization/
-  services/
-  store/
-  router/
+```sh
+cd StageOps_Web
+npm ci
+npm run dev
 ```
 
-## Stack technique
+Vite démarre sur http://localhost:3000. Les requêtes /api sont relayées vers http://localhost:8080 ; VITE_API_URL permet de changer la cible du proxy. Les registres matériel/incidents utilisent actuellement un workspace local persistant. L’authentification utilise l’API existante ; la synchronisation distante du workspace n’est pas encore intégrée.
 
-- React ou Vue.js
-- API StageOps Backend
-- Architecture SPA
-- Visualisation 3D WebGL
+## Valider
 
-## Installation
+```sh
+cd StageOps_Web
+npm run validate
+```
 
-git clone <repo>
-cd stageops-web-app
-npm install
+Cette commande contrôle l’architecture, exécute les tests, le lint, les types application/tests et le build de production. La CI applique le même contrôle sur GitHub. Pour un aperçu du build : npm run preview.
 
-Configurer l’URL API.
+## Architecture et contribution
 
-### Lancement
+- [ARCHITECTURE.md](ARCHITECTURE.md) : couches, responsabilités, données, navigation, limites et mesures.
+- [ADR-001](docs/adr/001-web-architecture.md) : décision et compromis du refactoring.
+- [AGENTS.md](AGENTS.md) : règles pour les interventions dans ce dépôt.
+- [Méthodologie de l’équipe](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
+- [GitHub Project](https://github.com/orgs/StageOps-EIP/projects/2).
 
-npm run dev
+Stack réelle : React 18, TypeScript, React Router 7, Vite 7, Tailwind CSS et Three.js/React Three Fiber. Les pages sont chargées à la demande.
 
-Application disponible sur :
-http://localhost:3000
+## Parcours documentés
 
-## Objectif produit
+- [Incidents et cohérence matériel/dashboard](PARCOURS_INCIDENT.md).
+- [Exports CSV](EXPORT_CSV.md).
+- [Wiki Architecture Web](https://github.com/StageOps-EIP/StageOps/wiki/Architecture-Web).
 
-Offrir un centre de contrôle technique centralisé pour la supervision scénique.
+## État du produit
 
-## Parcours incident
+Le workspace matériel/incidents est validé, partagé entre les écrans et sauvegardé localement. Le conducteur, l’équipe, les préférences et l’éditeur conservent des sources/adaptateurs historiques : leurs limites et la suite #25 sont recensées dans ARCHITECTURE.md. Le frontend local n’est pas une preuve de synchronisation multi-utilisateur.
 
-Le fonctionnement **création d’un incident → mise à jour du matériel → actualisation du dashboard → persistance locale** est décrit dans [PARCOURS_INCIDENT.md](PARCOURS_INCIDENT.md).
-
-L’export partageable de l’inventaire et des incidents est décrit dans [EXPORT_CSV.md](EXPORT_CSV.md), avec les colonnes, les règles de compatibilité tableur et un scénario de démonstration.
-
-La méthode d’équipe, les statuts du GitHub Project et les règles de documentation sont centralisés dans le dépôt principal [StageOps](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
-
-## Licence
-
-Projet académique.
+Projet académique EIP.

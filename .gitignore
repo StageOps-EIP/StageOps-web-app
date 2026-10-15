@@ -2,4 +2,7 @@
 .env.*
 .copilot/*
 .github/agents/*.agent.md
-.github/
+.github/*
+!.github/workflows/
+.github/workflows/*
+!.github/workflows/web-quality.yml

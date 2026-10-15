@@ -1,11 +1,11 @@
-FROM node:20-alpine
+FROM node:24-alpine
 ARG STAGEOPS_NET_BRIDGE
 WORKDIR /app
 
 COPY package*.json ./
 RUN HTTP_PROXY="$STAGEOPS_NET_BRIDGE" HTTPS_PROXY="$STAGEOPS_NET_BRIDGE" \
     http_proxy="$STAGEOPS_NET_BRIDGE" https_proxy="$STAGEOPS_NET_BRIDGE" \
-    npm install --no-audit --no-fund \
+    npm ci --no-audit --no-fund \
     --fetch-retries=5 \
     --fetch-retry-mintimeout=2000 \
     --fetch-retry-maxtimeout=10000 \
