@@ -8,6 +8,8 @@ Lire ARCHITECTURE.md et les ADR concernés, puis consulter le GitHub Project Sta
 
 ## Frontières
 
+Avant de remplacer une technologie de la stack ou d’ajouter une dépendance structurante pour les performances, présenter à Illan les mesures, les options, les gains attendus et les coûts de migration. Les optimisations courantes dans la stack existante peuvent avancer dans le périmètre demandé.
+
 - domain : modèles, règles pures et ports ; aucune dépendance React/navigateur.
 - application : commandes et orchestration, uniquement application/domain.
 - infrastructure : adaptateurs externes, aucune dépendance aux écrans.

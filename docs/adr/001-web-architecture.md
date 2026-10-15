@@ -1,6 +1,6 @@
 # ADR-001 — Séparer le workspace métier du navigateur
 
-Date : 15 octobre 2026. Statut : proposé dans la PR d’architecture Web ; à accepter lors de la revue.
+Date : 15 octobre 2026. Statut : adopté après fusion de la PR #2, autorisée par Illan. Aucune revue humaine indépendante n’est revendiquée.
 
 ## Contexte
 
