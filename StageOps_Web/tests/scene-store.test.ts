@@ -6,7 +6,7 @@ import type { SceneRepository } from '../src/domain/scene-repository.ts'
 
 function ids() {
   let next = 0
-  return (kind: 'obj' | 'light') => `${kind}-${++next}`
+  return (kind: 'obj' | 'light' | 'cue') => `${kind}-${++next}`
 }
 function repository(status: 'ready' | 'invalid' = 'ready', ok = true) {
   const saved: Scene[] = []
@@ -74,4 +74,56 @@ test('an invalid stored scene is never overwritten', () => {
   store.commands.addObject('box')
   assert.equal(saved.length, 0)
   assert.match(store.getSnapshot().persistenceIssue ?? '', /conservée/)
+})
+
+test('in Conduite mode an edit pauses playback and is recorded at the playhead', () => {
+  const { port, saved } = repository()
+  const store = createSceneStore(port, ids())
+  store.commands.addObject('person')
+  store.commands.setMode('conduite')
+  store.commands.play()
+  store.commands.advance(12.3)
+  assert.equal(store.getPlayback().playing, true)
+  store.commands.updateObject('obj-1', { position: [3, 0, 0] })
+  assert.equal(store.getPlayback().playing, false)
+  const { timeline, objects } = store.getSnapshot().scene
+  assert.equal(timeline.cues[0].time, 12.3)
+  assert.deepEqual(objects[0].position, [0, 0, 0])
+  assert.equal(saved.at(-1)?.timeline.keyframes.length, 1)
+})
+
+test('playback stops at the end and cue navigation jumps between cues', () => {
+  const { port } = repository()
+  const store = createSceneStore(port, ids())
+  store.commands.seek(20)
+  const first = store.commands.addCueHere()
+  store.commands.seek(45)
+  store.commands.addCueHere()
+  assert.equal(store.commands.addCueHere(), store.commands.currentCueId())
+  store.commands.seek(0)
+  store.commands.nextCue()
+  assert.equal(store.getPlayback().time, 20)
+  assert.equal(store.commands.currentCueId(), first)
+  store.commands.nextCue()
+  assert.equal(store.getPlayback().time, 45)
+  store.commands.previousCue()
+  assert.equal(store.getPlayback().time, 20)
+  store.commands.play()
+  assert.equal(store.getSnapshot().mode, 'conduite')
+  store.commands.advance(1000)
+  assert.equal(store.getPlayback().playing, false)
+  assert.equal(store.getPlayback().time, store.getPlayback().duration)
+})
+
+test('playback ticks do not publish a new scene snapshot', () => {
+  const { port } = repository()
+  const store = createSceneStore(port, ids())
+  let sceneCalls = 0
+  let playbackCalls = 0
+  store.subscribe(() => sceneCalls++)
+  store.subscribePlayback(() => playbackCalls++)
+  store.commands.seek(5)
+  store.commands.seek(6)
+  assert.equal(sceneCalls, 0)
+  assert.equal(playbackCalls, 2)
 })

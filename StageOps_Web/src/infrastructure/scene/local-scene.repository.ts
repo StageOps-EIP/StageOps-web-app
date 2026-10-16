@@ -1,10 +1,16 @@
 import type {
+  Cue,
+  Keyframe,
+  LightKeyValues,
+  ObjectKeyValues,
   RenderingSettings,
   Scene,
   SceneLight,
   SceneMaterial,
   SceneObject,
   SurfaceMaterials,
+  Timeline,
+  Transition,
   Vector3,
 } from '../../domain/scene-models.ts'
 import {
@@ -125,6 +131,96 @@ function rendering(value: unknown): RenderingSettings {
     highQuality: bool(item.highQuality),
   }
 }
+function cue(value: unknown): Cue {
+  const item = record(value)
+  const time = number(item.time)
+  if (time < 0) throw new Error('Invalid cue time')
+  return {
+    id: text(item.id),
+    number: number(item.number),
+    time,
+    label: text(item.label),
+    note: text(item.note),
+  }
+}
+function transition(value: unknown): Transition {
+  const item = record(value)
+  if (item.kind === 'cut') return { kind: 'cut' }
+  if (item.kind !== 'smooth') throw new Error('Invalid transition')
+  if (item.duration === null) return { kind: 'smooth', duration: null }
+  const duration = number(item.duration)
+  if (duration < 0) throw new Error('Invalid duration')
+  return { kind: 'smooth', duration }
+}
+/** Copies only the keys present, validated with the same rules as the base element. */
+function keyValues<T>(value: unknown, readers: Record<string, (raw: unknown) => unknown>): T {
+  const item = record(value)
+  const result: Record<string, unknown> = {}
+  for (const [key, raw] of Object.entries(item)) {
+    if (!Object.hasOwn(readers, key)) throw new Error('Unknown animated value')
+    result[key] = readers[key](raw)
+  }
+  return result as T
+}
+const OBJECT_KEY_READERS = {
+  position: vector,
+  rotation: vector,
+  visible: bool,
+  posture: (raw: unknown) => enumeration(raw, POSTURES),
+}
+const LIGHT_KEY_READERS = {
+  position: vector,
+  targetPosition: vector,
+  intensity: number,
+  temperature: number,
+  color,
+  angle: number,
+  visible: bool,
+}
+function keyframe(value: unknown): Keyframe {
+  const item = record(value)
+  const common = {
+    cueId: text(item.cueId),
+    targetId: text(item.targetId),
+    transition: transition(item.transition),
+  }
+  if (item.targetKind === 'object')
+    return {
+      ...common,
+      targetKind: 'object',
+      values: keyValues<ObjectKeyValues>(item.values, OBJECT_KEY_READERS),
+    }
+  if (item.targetKind === 'light')
+    return {
+      ...common,
+      targetKind: 'light',
+      values: keyValues<LightKeyValues>(item.values, LIGHT_KEY_READERS),
+    }
+  throw new Error('Invalid keyframe target')
+}
+/** Older saves have no cue sheet. Keyframes must point to existing cues and elements. */
+function timeline(value: unknown, objects: SceneObject[], lights: SceneLight[]): Timeline {
+  if (value === undefined) return { cues: [], keyframes: [] }
+  const item = record(value)
+  if (!Array.isArray(item.cues) || !Array.isArray(item.keyframes))
+    throw new Error('Invalid timeline')
+  const result = { cues: item.cues.map(cue), keyframes: item.keyframes.map(keyframe) }
+  uniqueIds(result.cues)
+  const cueIds = new Set(result.cues.map((entry) => entry.id))
+  const targets = new Set([
+    ...objects.map((entry) => `object:${entry.id}`),
+    ...lights.map((entry) => `light:${entry.id}`),
+  ])
+  const seen = new Set<string>()
+  for (const frame of result.keyframes) {
+    const target = `${frame.targetKind}:${frame.targetId}`
+    const key = `${frame.cueId}|${target}`
+    if (!cueIds.has(frame.cueId) || !targets.has(target) || seen.has(key))
+      throw new Error('Invalid keyframe reference')
+    seen.add(key)
+  }
+  return result
+}
 function uniqueIds(items: { id: string }[]): void {
   if (
     items.some((item) => !item.id) ||
@@ -143,15 +239,17 @@ export function deserializeScene(raw: string): Scene {
   if (stored.version !== undefined && stored.version !== 1) throw new Error('Unknown version')
   if (!Array.isArray(stored.objects) || !Array.isArray(stored.lights))
     throw new Error('Invalid scene')
-  const result: Scene = {
-    objects: stored.objects.map(sceneObject),
-    lights: stored.lights.map(sceneLight),
+  const objects = stored.objects.map(sceneObject)
+  const lights = stored.lights.map(sceneLight)
+  uniqueIds(objects)
+  uniqueIds(lights)
+  return {
+    objects,
+    lights,
     surfaces: surfaces(stored.surfaces),
+    timeline: timeline(stored.timeline, objects, lights),
     rendering: rendering(stored.version === 1 ? stored.rendering : stored.postProcessing),
   }
-  uniqueIds(result.objects)
-  uniqueIds(result.lights)
-  return result
 }
 export function serializeScene(scene: Scene): string {
   return JSON.stringify({
@@ -159,6 +257,7 @@ export function serializeScene(scene: Scene): string {
     objects: scene.objects,
     lights: scene.lights,
     surfaces: scene.surfaces,
+    timeline: scene.timeline,
     rendering: scene.rendering,
   })
 }

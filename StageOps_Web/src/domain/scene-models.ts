@@ -90,11 +90,65 @@ export interface RenderingSettings {
   highQuality: boolean
 }
 
-/** Editable content: what undo/redo restores. */
+/** A line of the stage manager's cue sheet: when (minute of the show) and which cue number. */
+export interface Cue {
+  id: string
+  number: number
+  /** Seconds since the start of the show. */
+  time: number
+  label: string
+  note: string
+}
+
+/**
+ * How an element reaches the state set by a cue:
+ * - cut: it keeps its previous state, then jumps at the cue time;
+ * - smooth: it moves/fades during `duration` seconds ending at the cue time,
+ *   or since its previous cue when `duration` is null.
+ */
+export type Transition = { kind: 'cut' } | { kind: 'smooth'; duration: number | null }
+
+export const OBJECT_ANIMATED_KEYS = ['position', 'rotation', 'visible', 'posture'] as const
+export const LIGHT_ANIMATED_KEYS = [
+  'position',
+  'targetPosition',
+  'intensity',
+  'temperature',
+  'color',
+  'angle',
+  'visible',
+] as const
+export type ObjectKeyValues = Partial<Pick<SceneObject, (typeof OBJECT_ANIMATED_KEYS)[number]>>
+export type LightKeyValues = Partial<Pick<SceneLight, (typeof LIGHT_ANIMATED_KEYS)[number]>>
+
+/** State of one element at one cue. */
+export type Keyframe =
+  | {
+      cueId: string
+      targetKind: 'object'
+      targetId: string
+      transition: Transition
+      values: ObjectKeyValues
+    }
+  | {
+      cueId: string
+      targetKind: 'light'
+      targetId: string
+      transition: Transition
+      values: LightKeyValues
+    }
+
+export interface Timeline {
+  cues: Cue[]
+  keyframes: Keyframe[]
+}
+
+/** Editable content: what undo/redo restores. The objects and lights are the base set-up. */
 export interface SceneContent {
   objects: SceneObject[]
   lights: SceneLight[]
   surfaces: SurfaceMaterials
+  timeline: Timeline
 }
 
 /** Persisted scene: content plus display preferences. */
@@ -358,6 +412,7 @@ export function createDefaultScene(): Scene {
       rightWall: applyPreset('rideau'),
       ceiling: applyPreset('beton'),
     },
+    timeline: { cues: [], keyframes: [] },
     rendering: { ...DEFAULT_RENDERING },
   }
 }
