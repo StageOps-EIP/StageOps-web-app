@@ -12,6 +12,7 @@ interface EditableObjectProps {
   transformMode: TransformMode
   onDrag: (dragging: boolean) => void
   readOnly?: boolean
+  castShadow: boolean
 }
 
 export function EditableObject({
@@ -20,6 +21,7 @@ export function EditableObject({
   transformMode,
   onDrag,
   readOnly = false,
+  castShadow,
 }: EditableObjectProps) {
   const { select, clearSelection, updateObject, beginGesture, endGesture } = useSceneEditor()
   const groupRef = useRef<THREE.Group>(null!)
@@ -63,7 +65,7 @@ export function EditableObject({
         onPointerOver={readOnly ? undefined : () => setHovered(true)}
         onPointerOut={readOnly ? undefined : () => setHovered(false)}
       >
-        <ObjectShape object={object} />
+        <ObjectShape object={object} castShadow={castShadow} />
         {isSelected && !readOnly && <ObjectOutline object={object} color="#7964ff" opacity={0.6} />}
         {hovered && !isSelected && !readOnly && (
           <ObjectOutline object={object} color="#71717a" opacity={0.4} />
