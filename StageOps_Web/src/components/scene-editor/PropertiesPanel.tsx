@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { useDisplayedScene, usePlayback } from '@/hooks/usePlayback'
+import { cueAt, formatShowTime, keyframeFor, type TimelineTarget } from '@/domain/timeline'
 import {
+  ASSEMBLED_OBJECT_TYPES,
   MATERIAL_PRESETS,
   MATERIAL_PRESET_KEYS,
   kelvinToHex,
   type MaterialPreset,
+  type Posture,
   type SceneLight,
   type SceneMaterial,
   type SceneObject,
@@ -232,12 +236,109 @@ function MaterialEditor({
 }
 
 // ─── Object panel ─────────────────────────────────────────────────────────────
+/** Conduite mode: what this element does at the cue under the playhead. */
+function CueSection({ target }: { target: TimelineTarget }) {
+  const { scene, mode, setTransition, removeFromCue, beginGesture, endGesture } = useSceneEditor()
+  const { time } = usePlayback()
+  if (mode !== 'conduite') return null
+  const cue = cueAt(scene.timeline, time)
+  const frame = cue ? keyframeFor(scene.timeline, cue.id, target) : undefined
+  const transition = frame?.transition
+  return (
+    <div className="mx-4 mb-4 rounded-lg border border-[var(--brand-violet)]/40 bg-[var(--brand-soft)] p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--brand-violet-hover)]">
+        Conduite · {formatShowTime(time)}
+        {cue ? ` · Q${cue.number}` : ''}
+      </p>
+      {!frame || !cue || !transition ? (
+        <p className="mt-1 text-[11px] leading-relaxed text-content-muted">
+          Déplacez, tournez ou réglez cet élément : le changement sera enregistré
+          {cue ? ` dans Q${cue.number}` : ` dans un nouveau cue à ${formatShowTime(time)}`}.
+        </p>
+      ) : (
+        <div className="mt-2 space-y-2">
+          <div role="group" aria-label="Transition" className="flex gap-1">
+            {(
+              [
+                ['cut', 'Coupe'],
+                ['smooth', 'Progressif'],
+              ] as const
+            ).map(([kind, label]) => (
+              <button
+                key={kind}
+                type="button"
+                aria-pressed={transition.kind === kind}
+                onClick={() =>
+                  setTransition(
+                    cue.id,
+                    target,
+                    kind === 'cut' ? { kind: 'cut' } : { kind: 'smooth', duration: null },
+                  )
+                }
+                className={`flex-1 rounded-md border px-2 py-1 text-[11px] ${
+                  transition.kind === kind
+                    ? 'border-cyan-400 bg-cyan-400/10 text-[#f5f5f7]'
+                    : 'border-[#27272e] text-[#a1a1aa] hover:text-[#f5f5f7]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {transition.kind === 'smooth' && (
+            <label className="flex items-center gap-2 text-[11px] text-content-muted">
+              Durée
+              <input
+                type="number"
+                min={0}
+                step={0.5}
+                placeholder="auto"
+                aria-label="Durée de la transition en secondes"
+                value={transition.duration ?? ''}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === '' ? null : Math.max(0, parseFloat(e.target.value))
+                  setTransition(cue.id, target, {
+                    kind: 'smooth',
+                    duration: value === null || Number.isNaN(value) ? null : value,
+                  })
+                }}
+                onFocus={beginGesture}
+                onBlur={endGesture}
+                className="w-16 rounded border border-[#27272e] bg-[#1c1c21] px-1.5 py-0.5 text-xs text-[#f5f5f7]"
+              />
+              <span>
+                s {transition.duration === null ? '(depuis le cue précédent)' : 'avant le cue'}
+              </span>
+            </label>
+          )}
+          <button
+            type="button"
+            onClick={() => removeFromCue(cue.id, target)}
+            className="text-[11px] text-red-400 hover:underline"
+          >
+            Retirer cet élément de Q{cue.number}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const POSTURE_LABELS: Record<Posture, string> = {
+  standing: 'Debout',
+  sitting: 'Assis',
+  lying: 'Allongé',
+}
+
 function ObjectPanel() {
-  const { scene, selection, updateObject } = useSceneEditor()
+  const { selection, updateObject } = useSceneEditor()
+  const gesture = useGestureHandlers()
   const [tab, setTab] = useState<'transform' | 'material'>('transform')
 
+  const displayed = useDisplayedScene()
   const obj =
-    selection?.kind === 'object' ? scene.objects.find((o) => o.id === selection.id) : undefined
+    selection?.kind === 'object' ? displayed.objects.find((o) => o.id === selection.id) : undefined
   if (!obj) return null
 
   function updateObj(updates: Partial<Omit<SceneObject, 'id'>>) {
@@ -247,9 +348,37 @@ function ObjectPanel() {
   return (
     <div>
       <div className="px-4 pb-3">
-        <p className="text-xs text-[#a1a1aa] font-medium truncate">{obj.name}</p>
-        <p className="text-[10px] text-[#52525b]">{obj.type}</p>
+        <input
+          type="text"
+          aria-label="Nom"
+          value={obj.name}
+          onChange={(e) => updateObj({ name: e.target.value })}
+          {...gesture}
+          className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+        />
+        <p className="mt-1 text-[10px] text-[#52525b]">{obj.type}</p>
+        {obj.type === 'person' && (
+          <div className="mt-3 flex gap-1" role="group" aria-label="Posture">
+            {(Object.keys(POSTURE_LABELS) as Posture[]).map((posture) => (
+              <button
+                key={posture}
+                type="button"
+                aria-pressed={(obj.posture ?? 'standing') === posture}
+                onClick={() => updateObj({ posture })}
+                className={`flex-1 rounded-md border px-2 py-1 text-[11px] ${
+                  (obj.posture ?? 'standing') === posture
+                    ? 'border-cyan-400 bg-cyan-400/10 text-[#f5f5f7]'
+                    : 'border-[#27272e] text-[#a1a1aa] hover:text-[#f5f5f7]'
+                }`}
+              >
+                {POSTURE_LABELS[posture]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
+      <CueSection target={{ kind: 'object', id: obj.id }} />
 
       {/* Tabs */}
       <div className="flex border-b border-[#27272e] mb-4 px-2">
@@ -336,7 +465,11 @@ function ObjectPanel() {
 
             <button
               onClick={() =>
-                updateObj({ position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [1, 1, 1] })
+                updateObj({
+                  position: [0, ASSEMBLED_OBJECT_TYPES.includes(obj.type) ? 0 : 0.5, 0],
+                  rotation: [0, 0, 0],
+                  scale: [1, 1, 1],
+                })
               }
               className="w-full px-3 py-1.5 rounded-lg text-xs text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
             >
@@ -379,10 +512,11 @@ function ObjectPanel() {
 
 // ─── Light panel ──────────────────────────────────────────────────────────────
 function LightPanel() {
-  const { scene, selection, updateLight, deleteLight } = useSceneEditor()
+  const { selection, updateLight, deleteLight } = useSceneEditor()
   const gesture = useGestureHandlers()
+  const displayed = useDisplayedScene()
   const light =
-    selection?.kind === 'light' ? scene.lights.find((l) => l.id === selection.id) : undefined
+    selection?.kind === 'light' ? displayed.lights.find((l) => l.id === selection.id) : undefined
   if (!light) return null
 
   function update(updates: Partial<Omit<SceneLight, 'id'>>) {
@@ -397,183 +531,186 @@ function LightPanel() {
   }
 
   return (
-    <div className="px-4 space-y-4">
-      {/* En-tête : badge type + nom modifiable */}
-      <div>
-        <span className="inline-block px-2 py-0.5 rounded-full bg-[#27272e] text-[10px] text-[#a1a1aa] font-medium">
-          {typeLabels[light.type] ?? light.type}
-        </span>
-        <input
-          type="text"
-          value={light.name}
-          onChange={(e) => update({ name: e.target.value })}
-          {...gesture}
-          className="mt-1 w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
-        />
-      </div>
-
-      {/* Position XYZ */}
-      <div>
-        <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
-          Position
-        </p>
-        <div className="grid grid-cols-3 gap-1.5">
-          {(['x', 'y', 'z'] as const).map((axis, i) => (
-            <NumInput
-              key={axis}
-              label={axis.toUpperCase()}
-              value={light.position[i]}
-              onChange={(v) => {
-                const pos = [...light.position] as [number, number, number]
-                pos[i] = v
-                update({ position: pos })
-              }}
-            />
-          ))}
+    <div>
+      <CueSection target={{ kind: 'light', id: light.id }} />
+      <div className="px-4 space-y-4">
+        {/* En-tête : badge type + nom modifiable */}
+        <div>
+          <span className="inline-block px-2 py-0.5 rounded-full bg-[#27272e] text-[10px] text-[#a1a1aa] font-medium">
+            {typeLabels[light.type] ?? light.type}
+          </span>
+          <input
+            type="text"
+            value={light.name}
+            onChange={(e) => update({ name: e.target.value })}
+            {...gesture}
+            className="mt-1 w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+          />
         </div>
-      </div>
 
-      {/* Target XYZ — spot uniquement */}
-      {light.type === 'spot' && (
+        {/* Position XYZ */}
         <div>
           <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
-            Cible (Target)
+            Position
           </p>
           <div className="grid grid-cols-3 gap-1.5">
             {(['x', 'y', 'z'] as const).map((axis, i) => (
               <NumInput
                 key={axis}
                 label={axis.toUpperCase()}
-                value={(light.targetPosition ?? [0, 0, 0])[i]}
+                value={light.position[i]}
                 onChange={(v) => {
-                  const tgt = [...(light.targetPosition ?? [0, 0, 0])] as [number, number, number]
-                  tgt[i] = v
-                  update({ targetPosition: tgt })
+                  const pos = [...light.position] as [number, number, number]
+                  pos[i] = v
+                  update({ position: pos })
                 }}
               />
             ))}
           </div>
         </div>
-      )}
 
-      <Slider
-        label="Intensité"
-        value={light.intensity}
-        min={0}
-        max={10}
-        step={0.05}
-        onChange={(v) => update({ intensity: v })}
-      />
+        {/* Target XYZ — spot uniquement */}
+        {light.type === 'spot' && (
+          <div>
+            <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              Cible (Target)
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(['x', 'y', 'z'] as const).map((axis, i) => (
+                <NumInput
+                  key={axis}
+                  label={axis.toUpperCase()}
+                  value={(light.targetPosition ?? [0, 0, 0])[i]}
+                  onChange={(v) => {
+                    const tgt = [...(light.targetPosition ?? [0, 0, 0])] as [number, number, number]
+                    tgt[i] = v
+                    update({ targetPosition: tgt })
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
-      {/* Température avec barre gradient */}
-      <div>
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-[11px] text-[#71717a]">Température (K)</span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-[#52525b] font-mono">{light.temperature}K</span>
-            <span
-              className="w-5 h-5 rounded border border-white/10"
-              style={{ backgroundColor: kelvinToHex(light.temperature) }}
-            />
+        <Slider
+          label="Intensité"
+          value={light.intensity}
+          min={0}
+          max={10}
+          step={0.05}
+          onChange={(v) => update({ intensity: v })}
+        />
+
+        {/* Température avec barre gradient */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[11px] text-[#71717a]">Température (K)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-[#52525b] font-mono">{light.temperature}K</span>
+              <span
+                className="w-5 h-5 rounded border border-white/10"
+                style={{ backgroundColor: kelvinToHex(light.temperature) }}
+              />
+            </div>
+          </div>
+          <input
+            type="range"
+            min={2700}
+            max={10000}
+            step={100}
+            value={light.temperature}
+            onChange={(e) => {
+              const temp = parseInt(e.target.value)
+              update({ temperature: temp, color: kelvinToHex(temp) })
+            }}
+            {...gesture}
+            className="w-full h-1.5 rounded-full accent-cyan-400"
+            style={{ background: 'transparent' }}
+          />
+          {/* Barre de visualisation couleur température */}
+          <div
+            className="w-full h-2 rounded-full mt-1"
+            style={{ background: 'linear-gradient(to right, #ff7700, #ffffff, #aaccff)' }}
+          />
+          <div className="flex justify-between text-[9px] text-[#52525b] mt-0.5">
+            <span>2700K</span>
+            <span>10000K</span>
           </div>
         </div>
-        <input
-          type="range"
-          min={2700}
-          max={10000}
-          step={100}
-          value={light.temperature}
-          onChange={(e) => {
-            const temp = parseInt(e.target.value)
-            update({ temperature: temp, color: kelvinToHex(temp) })
-          }}
-          {...gesture}
-          className="w-full h-1.5 rounded-full accent-cyan-400"
-          style={{ background: 'transparent' }}
-        />
-        {/* Barre de visualisation couleur température */}
-        <div
-          className="w-full h-2 rounded-full mt-1"
-          style={{ background: 'linear-gradient(to right, #ff7700, #ffffff, #aaccff)' }}
-        />
-        <div className="flex justify-between text-[9px] text-[#52525b] mt-0.5">
-          <span>2700K</span>
-          <span>10000K</span>
+
+        <div>
+          <label className="block text-[11px] text-[#71717a] mb-1">Couleur override</label>
+          <input
+            type="color"
+            value={light.color}
+            onChange={(e) => update({ color: e.target.value })}
+            {...gesture}
+            className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
+          />
         </div>
-      </div>
 
-      <div>
-        <label className="block text-[11px] text-[#71717a] mb-1">Couleur override</label>
-        <input
-          type="color"
-          value={light.color}
-          onChange={(e) => update({ color: e.target.value })}
-          {...gesture}
-          className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
-        />
-      </div>
+        {(light.type === 'spot' || light.type === 'directional') && (
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={light.castShadow}
+              onChange={(e) => update({ castShadow: e.target.checked })}
+              className="accent-cyan-400"
+            />
+            <span className="text-xs text-[#a1a1aa]">Projeter ombres</span>
+          </label>
+        )}
 
-      {(light.type === 'spot' || light.type === 'directional') && (
+        {light.type === 'spot' && (
+          <>
+            <Slider
+              label="Angle (°)"
+              value={radToDeg(light.angle)}
+              min={1}
+              max={90}
+              step={1}
+              onChange={(v) => update({ angle: degToRad(v) })}
+            />
+            <Slider
+              label="Pénombre"
+              value={light.penumbra}
+              min={0}
+              max={1}
+              step={0.01}
+              onChange={(v) => update({ penumbra: v })}
+            />
+          </>
+        )}
+
+        {(light.type === 'spot' || light.type === 'point') && (
+          <Slider
+            label="Distance"
+            value={light.distance}
+            min={0}
+            max={50}
+            step={0.5}
+            onChange={(v) => update({ distance: v })}
+          />
+        )}
+
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            checked={light.castShadow}
-            onChange={(e) => update({ castShadow: e.target.checked })}
+            checked={light.visible}
+            onChange={(e) => update({ visible: e.target.checked })}
             className="accent-cyan-400"
           />
-          <span className="text-xs text-[#a1a1aa]">Projeter ombres</span>
+          <span className="text-xs text-[#a1a1aa]">Visible</span>
         </label>
-      )}
 
-      {light.type === 'spot' && (
-        <>
-          <Slider
-            label="Angle (°)"
-            value={radToDeg(light.angle)}
-            min={1}
-            max={90}
-            step={1}
-            onChange={(v) => update({ angle: degToRad(v) })}
-          />
-          <Slider
-            label="Pénombre"
-            value={light.penumbra}
-            min={0}
-            max={1}
-            step={0.01}
-            onChange={(v) => update({ penumbra: v })}
-          />
-        </>
-      )}
-
-      {(light.type === 'spot' || light.type === 'point') && (
-        <Slider
-          label="Distance"
-          value={light.distance}
-          min={0}
-          max={50}
-          step={0.5}
-          onChange={(v) => update({ distance: v })}
-        />
-      )}
-
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={light.visible}
-          onChange={(e) => update({ visible: e.target.checked })}
-          className="accent-cyan-400"
-        />
-        <span className="text-xs text-[#a1a1aa]">Visible</span>
-      </label>
-
-      <button
-        onClick={() => deleteLight(light.id)}
-        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
-      >
-        <Trash2 size={13} />
-        Supprimer la lumière
-      </button>
+        <button
+          onClick={() => deleteLight(light.id)}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+        >
+          <Trash2 size={13} />
+          Supprimer la lumière
+        </button>
+      </div>
     </div>
   )
 }

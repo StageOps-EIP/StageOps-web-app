@@ -1,9 +1,10 @@
 import { useRef, useState, useCallback } from 'react'
 import type * as THREE from 'three'
 import { type ThreeEvent } from '@react-three/fiber'
-import { TransformControls } from '@react-three/drei'
+import { Html, TransformControls } from '@react-three/drei'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
 import type { SceneObject, TransformMode } from '@/domain/scene-models'
+import { ObjectOutline, ObjectShape } from './ObjectShape'
 
 interface EditableObjectProps {
   object: SceneObject
@@ -21,16 +22,16 @@ export function EditableObject({
   readOnly = false,
 }: EditableObjectProps) {
   const { select, clearSelection, updateObject, beginGesture, endGesture } = useSceneEditor()
-  const meshRef = useRef<THREE.Mesh>(null!)
+  const groupRef = useRef<THREE.Group>(null!)
   const [hovered, setHovered] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  const callbackMeshRef = useCallback((node: THREE.Mesh | null) => {
-    meshRef.current = node!
+  const callbackGroupRef = useCallback((node: THREE.Group | null) => {
+    groupRef.current = node!
     setMounted(node !== null)
   }, [])
 
-  const { material, geometry, position, rotation, scale, visible, locked, type } = object
+  const { position, rotation, scale, visible, locked, type } = object
 
   function handleClick(e: ThreeEvent<MouseEvent>) {
     if (readOnly) return
@@ -40,88 +41,46 @@ export function EditableObject({
   }
 
   function handleObjectChange() {
-    if (!meshRef.current) return
-    const mesh = meshRef.current
+    const group = groupRef.current
+    if (!group) return
     updateObject(object.id, {
-      position: mesh.position.toArray() as [number, number, number],
-      rotation: [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z],
-      scale: mesh.scale.toArray() as [number, number, number],
+      position: group.position.toArray() as [number, number, number],
+      rotation: [group.rotation.x, group.rotation.y, group.rotation.z],
+      scale: group.scale.toArray() as [number, number, number],
     })
   }
 
   if (!visible) return null
 
-  // Outline mesh: slightly bigger, wireframe cyan
-  const outlineScale: [number, number, number] = [scale[0] * 1.02, scale[1] * 1.02, scale[2] * 1.02]
-
   return (
     <group>
-      <mesh
-        ref={callbackMeshRef}
+      <group
+        ref={callbackGroupRef}
         position={position}
         rotation={rotation}
         scale={scale}
-        castShadow
-        receiveShadow
         onClick={handleClick}
         onPointerOver={readOnly ? undefined : () => setHovered(true)}
         onPointerOut={readOnly ? undefined : () => setHovered(false)}
       >
-        {type === 'box' || type === 'equipment' ? (
-          <boxGeometry args={[geometry.width, geometry.height, geometry.depth]} />
-        ) : type === 'plane' ? (
-          <planeGeometry args={[geometry.width, geometry.height]} />
-        ) : (
-          <cylinderGeometry args={[geometry.width / 2, geometry.width / 2, geometry.height, 32]} />
+        <ObjectShape object={object} />
+        {isSelected && !readOnly && <ObjectOutline object={object} color="#7964ff" opacity={0.6} />}
+        {hovered && !isSelected && !readOnly && (
+          <ObjectOutline object={object} color="#71717a" opacity={0.4} />
         )}
-        <meshStandardMaterial
-          color={material.color}
-          roughness={material.roughness}
-          metalness={material.metalness}
-          emissive={material.emissive}
-          emissiveIntensity={material.emissiveIntensity}
-          transparent={material.opacity < 1}
-          opacity={material.opacity}
-          wireframe={material.wireframe}
-        />
-      </mesh>
-
-      {/* Selection outline — hidden in readOnly */}
-      {isSelected && !readOnly && (
-        <mesh position={position} rotation={rotation} scale={outlineScale}>
-          {type === 'box' || type === 'equipment' ? (
-            <boxGeometry args={[geometry.width, geometry.height, geometry.depth]} />
-          ) : type === 'plane' ? (
-            <planeGeometry args={[geometry.width, geometry.height]} />
-          ) : (
-            <cylinderGeometry
-              args={[geometry.width / 2, geometry.width / 2, geometry.height, 32]}
-            />
-          )}
-          <meshBasicMaterial color="#7964ff" wireframe transparent opacity={0.6} />
-        </mesh>
-      )}
-
-      {/* Hover outline — hidden in readOnly */}
-      {hovered && !isSelected && !readOnly && (
-        <mesh position={position} rotation={rotation} scale={outlineScale}>
-          {type === 'box' || type === 'equipment' ? (
-            <boxGeometry args={[geometry.width, geometry.height, geometry.depth]} />
-          ) : type === 'plane' ? (
-            <planeGeometry args={[geometry.width, geometry.height]} />
-          ) : (
-            <cylinderGeometry
-              args={[geometry.width / 2, geometry.width / 2, geometry.height, 32]}
-            />
-          )}
-          <meshBasicMaterial color="#71717a" wireframe transparent opacity={0.4} />
-        </mesh>
-      )}
+        {type === 'person' && (
+          <Html center position={[0, object.geometry.height + 0.3, 0]} zIndexRange={[10, 0]}>
+            <span className="pointer-events-none select-none whitespace-nowrap border border-theme-border bg-theme-base px-1.5 py-0.5 text-[10px] font-medium text-content-primary">
+              {object.name}
+            </span>
+          </Html>
+        )}
+      </group>
 
       {/* Transform gizmo — hidden in readOnly */}
       {isSelected && !locked && mounted && !readOnly && (
         <TransformControls
-          object={meshRef}
+          object={groupRef}
           mode={transformMode}
           onObjectChange={handleObjectChange}
           onMouseDown={() => {

@@ -98,3 +98,52 @@ test('unavailable storage and quota errors are recoverable', () => {
   assert.equal(full.save(scene()).ok, false)
   assert.ok(store.data.has(LEGACY_SCENE_STORAGE_KEY))
 })
+
+test('people keep their posture and an unknown posture is rejected', () => {
+  const withPerson = {
+    ...scene(),
+    objects: [{ ...createSceneObject('person', 'kevin'), posture: 'lying' as const }],
+  }
+  assert.deepEqual(deserializeScene(serializeScene(withPerson)), withPerson)
+  const raw = JSON.parse(serializeScene(withPerson))
+  raw.objects[0].posture = 'flying'
+  assert.throws(() => deserializeScene(JSON.stringify(raw)))
+})
+
+test('the cue sheet round-trips and broken references are rejected', () => {
+  const withShow = {
+    ...scene(),
+    timeline: {
+      cues: [{ id: 'q1', number: 1, time: 150, label: 'Kevin entre', note: 'jardin' }],
+      keyframes: [
+        {
+          cueId: 'q1',
+          targetKind: 'object' as const,
+          targetId: 'obj-1',
+          transition: { kind: 'smooth' as const, duration: null },
+          values: { position: [1, 0, 2] as [number, number, number], visible: true },
+        },
+        {
+          cueId: 'q1',
+          targetKind: 'light' as const,
+          targetId: 'light-jardin-1',
+          transition: { kind: 'smooth' as const, duration: 3 },
+          values: { intensity: 4, color: '#ffaa00' },
+        },
+      ],
+    },
+  }
+  assert.deepEqual(deserializeScene(serializeScene(withShow)), withShow)
+  const broken = (mutate: (raw: ReturnType<typeof JSON.parse>) => void) => {
+    const raw = JSON.parse(serializeScene(withShow))
+    mutate(raw)
+    return () => deserializeScene(JSON.stringify(raw))
+  }
+  assert.throws(broken((raw) => (raw.timeline.keyframes[0].cueId = 'missing')))
+  assert.throws(broken((raw) => (raw.timeline.keyframes[0].targetId = 'ghost')))
+  assert.throws(broken((raw) => (raw.timeline.keyframes[0].values.name = 'Kevin')))
+  assert.throws(broken((raw) => (raw.timeline.keyframes[0].values.constructor = 1)))
+  assert.throws(broken((raw) => (raw.timeline.keyframes[1].transition.duration = -1)))
+  assert.throws(broken((raw) => (raw.timeline.cues[0].time = -5)))
+  assert.throws(broken((raw) => raw.timeline.keyframes.push(raw.timeline.keyframes[0])))
+})
