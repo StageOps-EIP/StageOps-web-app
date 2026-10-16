@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { useMemo } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { useDisplayedScene } from '@/hooks/usePlayback'
 import {
   GRID_HEIGHT,
   STAGE_DEPTH,
@@ -59,7 +60,7 @@ function LightPool({
 }
 
 function DynamicLightPools() {
-  const { lights } = useSceneEditor().scene
+  const { lights } = useDisplayedScene()
   return (
     <>
       {lights

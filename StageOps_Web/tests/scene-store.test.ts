@@ -127,3 +127,9 @@ test('playback ticks do not publish a new scene snapshot', () => {
   assert.equal(sceneCalls, 0)
   assert.equal(playbackCalls, 2)
 })
+
+test('commands work when extracted from the store, as React components use them', () => {
+  const { port } = repository()
+  const { togglePlay } = createSceneStore(port, ids()).commands
+  assert.doesNotThrow(() => togglePlay())
+})

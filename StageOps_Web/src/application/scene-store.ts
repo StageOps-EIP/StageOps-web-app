@@ -112,6 +112,10 @@ export function createSceneStore(repository: SceneRepository, createId: SceneIdF
     setPlayback({ playing: false })
     return { time: playback.time, newCueId: createId('cue') }
   }
+  function play() {
+    if (state.mode !== 'conduite') dispatch({ type: 'mode/changed', mode: 'conduite' })
+    setPlayback({ playing: true, time: playback.time >= playback.duration ? 0 : playback.time })
+  }
   function seekToCue(direction: 1 | -1) {
     const cues = sortCues(state.scene.timeline.cues)
     const target =
@@ -194,14 +198,9 @@ export function createSceneStore(repository: SceneRepository, createId: SceneIdF
         dispatch({ type: 'keyframe/deleted', cueId, target }),
 
       // ─── Playback ────────────────────────────────────────────────────────
-      play: () => {
-        if (state.mode !== 'conduite') dispatch({ type: 'mode/changed', mode: 'conduite' })
-        setPlayback({
-          playing: true,
-          time: playback.time >= playback.duration ? 0 : playback.time,
-        })
-      },
+      play,
       pause: () => setPlayback({ playing: false }),
+      togglePlay: () => (playback.playing ? setPlayback({ playing: false }) : play()),
       seek: (time: number) => setPlayback({ time }),
       /** Moves the playhead by `seconds` while playing; stops at the end of the cue sheet. */
       advance: (seconds: number) => {

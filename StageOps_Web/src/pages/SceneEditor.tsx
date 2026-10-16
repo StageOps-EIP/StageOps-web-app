@@ -1,17 +1,39 @@
 import { useRef, useEffect } from 'react'
 import { Mouse, Settings2 } from 'lucide-react'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { useDisplayedScene } from '@/hooks/usePlayback'
+import { ConduitePanel } from '@/components/scene-editor/ConduitePanel'
 import { EditorToolbar } from '@/components/scene-editor/EditorToolbar'
 import { EditorCanvas } from '@/components/scene-editor/EditorCanvas'
 import { SceneTreePanel } from '@/components/scene-editor/SceneTreePanel'
 import { PropertiesPanel } from '@/components/scene-editor/PropertiesPanel'
 
 // Inner component that has access to the store context
+/** Own component: in Conduite mode it re-renders on every frame, the editor around it does not. */
+function SelectionStatus() {
+  const { selection } = useSceneEditor()
+  const { objects, lights } = useDisplayedScene()
+  const selected =
+    selection?.kind === 'object'
+      ? objects.find((o) => o.id === selection.id)
+      : selection?.kind === 'light'
+        ? lights.find((l) => l.id === selection.id)
+        : undefined
+  if (!selected) return <span>Aucune sélection</span>
+  const [x, y, z] = selected.position
+  return (
+    <span>
+      {selected.name} x:{x.toFixed(2)} y:{y.toFixed(2)} z:{z.toFixed(2)}
+    </span>
+  )
+}
+
 function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) {
   const {
-    scene,
     selection,
     transformMode,
+    mode,
+    togglePlay,
     persistenceIssue,
     setTransformMode,
     deleteObject,
@@ -21,7 +43,6 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
     undo,
     redo,
   } = useSceneEditor()
-  const { objects, lights } = scene
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -48,6 +69,11 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selection?.kind === 'object') deleteObject(selection.id)
         if (selection?.kind === 'light') deleteLight(selection.id)
+        return
+      }
+      if (e.key === ' ' && mode === 'conduite') {
+        e.preventDefault()
+        togglePlay()
         return
       }
       if (e.key === 'Escape') {
@@ -78,6 +104,8 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [
     selection,
+    mode,
+    togglePlay,
     setTransformMode,
     deleteObject,
     deleteLight,
@@ -86,17 +114,6 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
     undo,
     redo,
   ])
-
-  const selectedObj =
-    selection?.kind === 'object' ? objects.find((o) => o.id === selection.id) : null
-  const selectedLight =
-    selection?.kind === 'light' ? lights.find((l) => l.id === selection.id) : null
-
-  const statusText = selectedObj
-    ? `${selectedObj.name}  x:${selectedObj.position[0].toFixed(2)}  y:${selectedObj.position[1].toFixed(2)}  z:${selectedObj.position[2].toFixed(2)}`
-    : selectedLight
-      ? `${selectedLight.name}  x:${selectedLight.position[0].toFixed(2)}  y:${selectedLight.position[1].toFixed(2)}  z:${selectedLight.position[2].toFixed(2)}`
-      : null
 
   return (
     <>
@@ -132,7 +149,7 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
           </div>
           {/* Status bar */}
           <div className="flex h-7 flex-shrink-0 items-center gap-6 border-t border-theme-border bg-theme-deeper px-4 font-mono text-[10px] text-content-subtle">
-            {statusText ? <span>{statusText}</span> : <span>Aucune sélection</span>}
+            <SelectionStatus />
             <span className="ml-auto text-[var(--brand-violet-hover)]">
               Mode :{' '}
               {transformMode === 'translate'
@@ -145,6 +162,7 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
         </div>
         <PropertiesPanel />
       </div>
+      {mode === 'conduite' && <ConduitePanel />}
     </>
   )
 }
