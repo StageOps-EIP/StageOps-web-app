@@ -1,6 +1,6 @@
 # Architecture du frontend Web StageOps
 
-État au 16 octobre 2026. Cette architecture concerne uniquement le dépôt Web.
+État au 16 octobre 2026 (scène 3D, conduite et rendu). Cette architecture concerne uniquement le dépôt Web.
 
 ## But
 
@@ -71,7 +71,8 @@ La persistance ne se produit pas pendant le rendu React ni dans un updater imbri
 Le plateau (`/stage`) et l’éditeur (`/editor`) suivent le même découpage que le workspace :
 
 - `domain/scene-models.ts` : objets, lumières, surfaces, préférences d’affichage, dimensions du plateau, matériaux et fabriques d’éléments ;
-- `domain/scene.ts` : `sceneReducer` pur, sélection et historique annuler/rétablir ;
+- `domain/scene.ts` : `sceneReducer` pur, sélection, mode Décor/Conduite et historique annuler/rétablir ;
+- `domain/timeline.ts` : conduite (cues, transitions) et calcul de l’état de la scène à un instant ;
 - `application/scene-store.ts` : commandes, snapshot stable, sauvegarde via `SceneRepository` ;
 - `infrastructure/scene/` : validation, migration de l’ancien format et génération d’identifiants ;
 - `app/scene-workspace.tsx` : route lazy qui crée un seul store pour le plateau et l’éditeur ;
@@ -85,7 +86,43 @@ Règles de l’historique :
 - une modification sans effet ou visant un identifiant inconnu ne crée pas d’étape ;
 - la sélection est retirée si l’élément n’existe plus après suppression, annulation ou rétablissement.
 
-Persistance : seule la scène est sauvegardée (`stageops.scene.v1`, format `{ version: 1, objects, lights, surfaces, rendering }`). L’ancienne clé `stageops-scene`, qui contenait tout l’état React, est lue puis supprimée après la première sauvegarde réussie. Les mêmes garanties que pour le workspace s’appliquent : payload invalide conservé et jamais écrasé, stockage indisponible signalé, échec de quota visible. Le store reste en mémoire pendant la session : l’historique est conservé en passant du plateau à l’éditeur.
+Persistance : seule la scène est sauvegardée (`stageops.scene.v1`, format `{ version: 1, objects, lights, surfaces, timeline, rendering }` ; `timeline` absent = conduite vide). L’ancienne clé `stageops-scene`, qui contenait tout l’état React, est lue puis supprimée après la première sauvegarde réussie. Les mêmes garanties que pour le workspace s’appliquent : payload invalide conservé et jamais écrasé, stockage indisponible signalé, échec de quota visible. Le store reste en mémoire pendant la session : l’historique est conservé en passant du plateau à l’éditeur.
+
+## Conduite (#27)
+
+Le régisseur saisit sa conduite comme sur papier : un **cue** = minute de la pièce + numéro (12, 12.5…) + libellé + note. Un cue fixe l’état **atteint** à cette minute par certains éléments (personnes et objets : position, orientation, posture, visibilité ; projecteurs : position, cible, intensité, température, couleur, angle, visibilité).
+
+- Transition par élément et par cue : **coupe** (état précédent conservé puis changement à la minute du cue) ou **progressive** (sur N secondes avant le cue, ou depuis le cue précédent de l’élément si la durée est vide).
+- Avant le premier cue, la scène est dans son état de base (**Décor**).
+- `evaluateScene(scene, t)` est une fonction pure : interpolation linéaire des nombres, vecteurs et couleurs ; une entrée en scène est visible dès le début de son mouvement ; posture et disparition au cue.
+- En mode **Conduite**, toute modification d’un réglage animable est enregistrée dans le cue à l’instant courant (créé et numéroté automatiquement s’il n’existe pas) et met la lecture en pause ; les autres réglages (nom, matériau, dimensions) modifient le Décor.
+- La position de lecture est publiée sur un canal séparé du store : pendant la lecture, seuls le canvas, la ligne de temps et le panneau Propriétés se mettent à jour à chaque image.
+
+## Rendu 3D (#34)
+
+Three.js et React Three Fiber sont conservés (benchmark M1) ; seule la couche de rendu de `components/scene-editor/` a été réécrite.
+
+| Choix | Pourquoi |
+| --- | --- |
+| Rendu à la demande (`frameloop="demand"`) | aucune image calculée quand rien ne bouge |
+| Budget de lumières temps réel (Éco 4, Standard 8, HD 16 ; la lumière sélectionnée d’abord) | le coût de chaque pixel augmente avec le nombre de lumières ; les autres projecteurs sont simulés par leur faisceau et une tache au sol |
+| Budget d’ombres parmi les lumières réelles (0 / 2 / 4) | chaque ombre redessine la scène |
+| Géométries fusionnées et partagées ; fauteuils et porteuses instanciés | moins d’appels de dessin |
+| Lambert en Éco ; post-traitement et reflets HD chargés à la demande | coût par pixel et poids du bundle |
+| Qualité **Auto** | part de Standard, suit le nombre d’images par seconde réel, puis rendu à 75 % en dernier recours |
+
+Le plateau est une scène à l’italienne construite autour du volume éditable (24 × 18 m, gril à 10 m) : nez de scène à 1 m, cadre de scène, trois paires de pendrillons et frises (désactivables), porteuses, salle en gradins. Les cinq surfaces modifiables ne sont visibles que de l’intérieur (vue de dessus en coupe). Les intensités 0–10 de l’éditeur sont converties en unités physiques. Vues caméra : Ensemble, Salle, Régie, Dessus.
+
+Mesures sur une scène lourde (20 personnes, 50 chaises, 6 tables, 30 projecteurs), build de production, Chromium avec rendu logiciel SwiftShader (bien plus lent qu’une puce graphique réelle : seules les comparaisons comptent) :
+
+| Mesure | Avant | Éco | Standard | HD |
+| --- | --- | --- | --- | --- |
+| Images calculées par seconde à l’arrêt | 2,3 (continu) | 0 | 0 | 0 |
+| Appels de dessin par image | 2 744 | 201 | 223 | 228 |
+| Textures GPU créées | 111 | 6 | 27 | 34 |
+| Images/s pendant une rotation de caméra | 2,3 | 2,9 | 1,9 | 0,8 |
+
+Effet du nombre de projecteurs réellement calculés (Éco, sans faisceaux) : 30 → 1 image/s, 6 → 3,3, 0 → 11,5, d’où le budget de lumières.
 
 ## Persistance et migration
 
@@ -107,7 +144,8 @@ Mesure du build de production local :
 | --- | --- | --- |
 | Entrée JavaScript minifiée | 1 434,86 Ko | environ 292,45 Ko |
 | Entrée compressée gzip | 390,19 Ko | environ 94,27 Ko |
-| Moteur/Canvas 3D | dans le chargement global | chunk séparé, environ 979,76 Ko |
+| Moteur/Canvas 3D | dans le chargement global | chunk séparé, environ 939,44 Ko (990,54 Ko avant #34) |
+| Post-traitement / reflets HD | dans le chunk 3D | chunks à la demande, environ 68,11 Ko / 53,80 Ko |
 | Store et adaptateur de la scène | — | chunk `scene-workspace` séparé, environ 8,62 Ko |
 
 Cela réduit l’entrée d’environ 80 %. La refonte de la scène (#26) laisse l’entrée à environ 292,95 Ko : le code de scène n’est chargé qu’avec la première route 3D. Ce n’est pas une mesure du temps de chargement réseau et les pages ajoutent leurs propres chunks. Le chunk 3D reste lourd ; l’avertissement Vite est conservé.
@@ -141,7 +179,7 @@ La validation exécute architecture, tests Node, ESLint, types de l’applicatio
 - Authentification, thème et préférences conservent leurs adaptateurs historiques. Leur extraction devra suivre le même contrat de responsabilité, avec migration de leurs données.
 - Pas de synchronisation multi-utilisateur ni arbitrage des écritures entre onglets.
 - Des tests de parcours navigateur automatisés restent à ajouter ; les tests unitaires ne les remplacent pas.
-- Scène 3D : pas encore de lien entre les objets de scène et l’inventaire (`equipmentId` existe mais n’est jamais renseigné) ; une seule scène locale, non rattachée à un projet ni synchronisée ; le chunk Three.js reste lourd.
+- Scène 3D : pas encore de lien entre les objets de scène et l’inventaire (`equipmentId` existe mais n’est jamais renseigné, #33) ; une seule scène locale, non rattachée à un projet ni synchronisée ; le chunk Three.js reste lourd (~940 Ko) ; pas d’export de la conduite (#32) ; mesures à compléter sur de vrais PC (portable sans carte graphique, PC fixe).
 
 ## Traçabilité
 
@@ -149,6 +187,9 @@ La validation exécute architecture, tests Node, ESLint, types de l’applicatio
 - [#23 — Routes et 3D](https://github.com/StageOps-EIP/StageOps/issues/23)
 - [#24 — Contrôles et documentation](https://github.com/StageOps-EIP/StageOps/issues/24)
 - [#26 — Scène 3D](https://github.com/StageOps-EIP/StageOps/issues/26)
+- [#27 — Prévisualiser la conduite](https://github.com/StageOps-EIP/StageOps/issues/27) (#28 à #33)
+- [#34 — Refonte du rendu 3D](https://github.com/StageOps-EIP/StageOps/issues/34)
 - [Décision ADR-001](docs/adr/001-web-architecture.md)
 - [Décision ADR-002](docs/adr/002-scene-3d-architecture.md)
+- [Décision ADR-003](docs/adr/003-rendu-3d.md)
 - [Wiki Architecture Web](https://github.com/StageOps-EIP/StageOps/wiki/Architecture-Web)
