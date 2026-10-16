@@ -1,21 +1,22 @@
 # Architecture du frontend Web StageOps
 
-État au 15 octobre 2026. Cette architecture concerne uniquement le dépôt Web.
+État au 16 octobre 2026. Cette architecture concerne uniquement le dépôt Web.
 
 ## But
 
-Pouvoir ajouter une fonctionnalité, changer le stockage ou charger une page lourde sans mélanger ces responsabilités. Le workspace matériel/incidents est le premier périmètre migré ; les autres domaines restent visibles dans la liste de dette ci-dessous.
+Pouvoir ajouter une fonctionnalité, changer le stockage ou charger une page lourde sans mélanger ces responsabilités. Le workspace matériel/incidents et la scène 3D sont migrés ; les autres domaines restent visibles dans la liste de dette ci-dessous.
 
 ## Organisation réelle
 
 ```text
 StageOps_Web/
   src/
-    app/                   composition des providers, routes, erreurs de navigation
-    application/           store workspace, commandes, persistance via un port
-    domain/                modèles, règles pures, interface WorkspaceRepository
+    app/                   composition des providers, routes, erreurs de navigation, route scène lazy
+    application/           stores workspace et scène, commandes, persistance via un port
+    domain/                modèles, règles pures, interfaces WorkspaceRepository et SceneRepository
     infrastructure/
       workspace/           adaptateur localStorage, validation, données initiales
+      scene/               adaptateur localStorage de la scène, migration, identifiants
     contexts/              adaptation des stores à React et contexte auth existant
     hooks/                 accès aux contextes, filtres et comportements de présentation
     pages/                 écrans et assemblage des parcours
@@ -24,7 +25,7 @@ StageOps_Web/
       equipment/           UI matériel
       incidents/           UI incidents
       events/              UI conducteur
-      scene-editor/        éditeur 3D existant
+      scene-editor/        rendu Three.js du plateau et panneaux de l’éditeur
     lib/                   utilitaires, styles et points de compatibilité historiques
     services/              anciens stubs, pas une API persistante
   scripts/                 contrôle des dépendances
@@ -65,6 +66,27 @@ La persistance ne se produit pas pendant le rendu React ni dans un updater imbri
 - Réaffecter un incident réconcilie l’ancien et le nouvel équipement.
 - Le modèle ne stocke pas encore la provenance d’un état `to-check` ; distinguer plusieurs causes simultanées demandera une évolution métier explicite.
 
+## Scène 3D
+
+Le plateau (`/stage`) et l’éditeur (`/editor`) suivent le même découpage que le workspace :
+
+- `domain/scene-models.ts` : objets, lumières, surfaces, préférences d’affichage, dimensions du plateau, matériaux et fabriques d’éléments ;
+- `domain/scene.ts` : `sceneReducer` pur, sélection et historique annuler/rétablir ;
+- `application/scene-store.ts` : commandes, snapshot stable, sauvegarde via `SceneRepository` ;
+- `infrastructure/scene/` : validation, migration de l’ancien format et génération d’identifiants ;
+- `app/scene-workspace.tsx` : route lazy qui crée un seul store pour le plateau et l’éditeur ;
+- `components/scene-editor/` : rendu et interactions, uniquement via `useSceneEditor()`.
+
+Règles de l’historique :
+
+- une modification hors geste crée une étape ; un geste (glisser le gizmo, curseur, saisie d’un champ, sélecteur de couleur) crée une seule étape, quelle que soit la quantité de mises à jour ;
+- rétablir revient à l’état annulé ; une nouvelle modification vide la pile « rétablir » ; 50 étapes maximum ;
+- sélection, mode de transformation et préférences d’affichage ne sont pas annulables ;
+- une modification sans effet ou visant un identifiant inconnu ne crée pas d’étape ;
+- la sélection est retirée si l’élément n’existe plus après suppression, annulation ou rétablissement.
+
+Persistance : seule la scène est sauvegardée (`stageops.scene.v1`, format `{ version: 1, objects, lights, surfaces, rendering }`). L’ancienne clé `stageops-scene`, qui contenait tout l’état React, est lue puis supprimée après la première sauvegarde réussie. Les mêmes garanties que pour le workspace s’appliquent : payload invalide conservé et jamais écrasé, stockage indisponible signalé, échec de quota visible. Le store reste en mémoire pendant la session : l’historique est conservé en passant du plateau à l’éditeur.
+
 ## Persistance et migration
 
 La clé `stageops.workspace.v1` reste compatible. L’adaptateur accepte l’ancienne clé `stageops.demo.workspace.v1` sans filtrer des incidents à partir de leur titre.
@@ -85,9 +107,10 @@ Mesure du build de production local :
 | --- | --- | --- |
 | Entrée JavaScript minifiée | 1 434,86 Ko | environ 292,45 Ko |
 | Entrée compressée gzip | 390,19 Ko | environ 94,27 Ko |
-| Moteur/Canvas 3D | dans le chargement global | chunk séparé, environ 985,70 Ko |
+| Moteur/Canvas 3D | dans le chargement global | chunk séparé, environ 979,76 Ko |
+| Store et adaptateur de la scène | — | chunk `scene-workspace` séparé, environ 8,62 Ko |
 
-Cela réduit l’entrée d’environ 80 %. Ce n’est pas une mesure du temps de chargement réseau et les pages ajoutent leurs propres chunks. Le chunk 3D reste lourd ; l’avertissement Vite est conservé.
+Cela réduit l’entrée d’environ 80 %. La refonte de la scène (#26) laisse l’entrée à environ 292,95 Ko : le code de scène n’est chargé qu’avec la première route 3D. Ce n’est pas une mesure du temps de chargement réseau et les pages ajoutent leurs propres chunks. Le chunk 3D reste lourd ; l’avertissement Vite est conservé.
 
 ## Validation et CI
 
@@ -115,14 +138,17 @@ La validation exécute architecture, tests Node, ESLint, types de l’applicatio
 ## Dette connue et prochaine étape
 
 - [#25 — Unifier conducteur et équipe](https://github.com/StageOps-EIP/StageOps/issues/25) : pages et composants lisent encore des fixtures séparées ; les anciens services ne sont pas persistants.
-- Authentification, thème, préférences et éditeur 3D conservent leurs adaptateurs historiques. Leur extraction devra suivre le même contrat de responsabilité, avec migration de leurs données.
+- Authentification, thème et préférences conservent leurs adaptateurs historiques. Leur extraction devra suivre le même contrat de responsabilité, avec migration de leurs données.
 - Pas de synchronisation multi-utilisateur ni arbitrage des écritures entre onglets.
 - Des tests de parcours navigateur automatisés restent à ajouter ; les tests unitaires ne les remplacent pas.
+- Scène 3D : pas encore de lien entre les objets de scène et l’inventaire (`equipmentId` existe mais n’est jamais renseigné) ; une seule scène locale, non rattachée à un projet ni synchronisée ; le chunk Three.js reste lourd.
 
 ## Traçabilité
 
 - [#22 — Workspace](https://github.com/StageOps-EIP/StageOps/issues/22)
 - [#23 — Routes et 3D](https://github.com/StageOps-EIP/StageOps/issues/23)
 - [#24 — Contrôles et documentation](https://github.com/StageOps-EIP/StageOps/issues/24)
+- [#26 — Scène 3D](https://github.com/StageOps-EIP/StageOps/issues/26)
 - [Décision ADR-001](docs/adr/001-web-architecture.md)
+- [Décision ADR-002](docs/adr/002-scene-3d-architecture.md)
 - [Wiki Architecture Web](https://github.com/StageOps-EIP/StageOps/wiki/Architecture-Web)
