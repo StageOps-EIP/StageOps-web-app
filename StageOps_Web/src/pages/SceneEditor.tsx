@@ -4,7 +4,7 @@ import { useSceneEditor } from '@/hooks/useSceneEditor'
 import { useDisplayedScene } from '@/hooks/usePlayback'
 import { ConduitePanel } from '@/components/scene-editor/ConduitePanel'
 import { EditorToolbar } from '@/components/scene-editor/EditorToolbar'
-import { EditorCanvas } from '@/components/scene-editor/EditorCanvas'
+import { EditorCanvas, type CaptureRef } from '@/components/scene-editor/EditorCanvas'
 import { SceneTreePanel } from '@/components/scene-editor/SceneTreePanel'
 import { PropertiesPanel } from '@/components/scene-editor/PropertiesPanel'
 
@@ -28,7 +28,7 @@ function SelectionStatus() {
   )
 }
 
-function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) {
+function EditorInner({ captureRef }: { captureRef: CaptureRef }) {
   const {
     selection,
     transformMode,
@@ -117,12 +117,12 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
 
   return (
     <>
-      <EditorToolbar canvasRef={canvasRef} />
-      <div className="flex flex-1 overflow-hidden">
+      <EditorToolbar captureRef={captureRef} />
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <SceneTreePanel />
-        <div className="flex-1 relative flex flex-col">
-          <div className="flex-1 relative">
-            <EditorCanvas canvasRef={canvasRef} />
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+          <div className="relative min-h-0 flex-1">
+            <EditorCanvas captureRef={captureRef} />
             {/* Hint overlay when nothing selected */}
             {persistenceIssue && (
               <p
@@ -168,11 +168,11 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
 }
 
 export function SceneEditor() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const captureRef: CaptureRef = useRef<(() => string) | null>(null)
 
   return (
     <div className="flex h-dvh w-screen flex-col overflow-hidden bg-theme-void">
-      <EditorInner canvasRef={canvasRef} />
+      <EditorInner captureRef={captureRef} />
     </div>
   )
 }
