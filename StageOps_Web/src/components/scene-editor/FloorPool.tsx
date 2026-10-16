@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import type { SceneLight } from '@/domain/scene-models'
+import { floorPoolPlacement } from './floor-pool-placement'
 
 /*
  * Pool of light on the floor for a simulated spot (outside the real-time light budget).
@@ -26,18 +27,7 @@ function sharedPoolTexture(): THREE.CanvasTexture {
 }
 
 export function FloorPool({ light, color }: { light: SceneLight; color: string }) {
-  const placement = useMemo(() => {
-    const from = new THREE.Vector3(...light.position)
-    const direction = new THREE.Vector3(...light.targetPosition).sub(from).normalize()
-    if (direction.y > -0.05 || from.y <= 0) return null
-    const distance = from.y / -direction.y
-    const hit = from.add(direction.multiplyScalar(distance))
-    const angle = light.type === 'rect-area' ? Math.PI / 3 : light.angle
-    return {
-      position: [hit.x, 0.012, hit.z] as [number, number, number],
-      radius: Math.min(Math.tan(Math.min(angle, 1.3)) * distance * (1 + light.penumbra * 0.3), 8),
-    }
-  }, [light.position, light.targetPosition, light.angle, light.penumbra, light.type])
+  const placement = useMemo(() => floorPoolPlacement(light), [light])
   if (!placement || light.intensity <= 0) return null
   return (
     <mesh position={placement.position} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>

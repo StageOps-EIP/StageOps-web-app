@@ -100,6 +100,8 @@ Le régisseur saisit sa conduite comme sur papier : un **cue** = minute de la pi
 
 ## Rendu 3D (#34)
 
+Les corrections de review (Auto, capture PNG et portée des spots simulés) sont décrites dans [REVIEW_RENDER_3D.md](docs/REVIEW_RENDER_3D.md), avec les tests de non-régression et les scénarios de validation d’Hugo.
+
 Three.js et React Three Fiber sont conservés (benchmark M1) ; seule la couche de rendu de `components/scene-editor/` a été réécrite.
 
 | Choix | Pourquoi |

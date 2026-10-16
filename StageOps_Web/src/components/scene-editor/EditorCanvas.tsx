@@ -1,11 +1,14 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, PerformanceMonitor } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
+import type { EffectComposer as EffectComposerImpl } from 'postprocessing'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
-import { useDisplayedScene } from '@/hooks/usePlayback'
+import { useDisplayedScene, usePlayback } from '@/hooks/usePlayback'
+import { AutoQualityMonitor } from './AutoQualityMonitor'
+import { captureScenePng } from './capture-scene'
 import { EditableObject } from './EditableObject'
 import { EditableLight } from './EditableLight'
 import { RenderTierContext } from './render-context'
@@ -36,17 +39,22 @@ const DEFAULT_TARGET = new THREE.Vector3(...CAMERA_VIEWS.ensemble.target)
 export type CaptureRef = MutableRefObject<(() => string) | null>
 
 /** Renders one frame on request and reads it: no need to keep the drawing buffer every frame. */
-function CaptureBridge({ captureRef }: { captureRef: CaptureRef }) {
+function CaptureBridge({
+  captureRef,
+  composerRef,
+}: {
+  captureRef: CaptureRef
+  composerRef: MutableRefObject<EffectComposerImpl | null>
+}) {
   const { gl, scene, camera } = useThree()
   useEffect(() => {
     captureRef.current = () => {
-      gl.render(scene, camera)
-      return gl.domElement.toDataURL('image/png')
+      return captureScenePng(gl, scene, camera, composerRef.current)
     }
     return () => {
       captureRef.current = null
     }
-  }, [captureRef, gl, scene, camera])
+  }, [captureRef, composerRef, gl, scene, camera])
   return null
 }
 
@@ -65,7 +73,6 @@ function CameraRig({ view }: { view: { name: CameraView; request: number } }) {
   return null
 }
 
-const TIERS: QualityTier[] = ['eco', 'standard', 'hd']
 const TIER_LABELS: Record<QualityTier, string> = { eco: 'Éco', standard: 'Standard', hd: 'HD' }
 
 interface EditorCanvasProps {
@@ -77,6 +84,9 @@ export function EditorCanvas({ captureRef, readOnly = false }: EditorCanvasProps
   const { scene, selection, transformMode, clearSelection } = useSceneEditor()
   const { objects, lights } = useDisplayedScene()
   const { rendering } = scene
+  const { playing } = usePlayback()
+  const composerRef = useRef<EffectComposerImpl | null>(null)
+  const [isOrbiting, setIsOrbiting] = useState(false)
 
   // In Auto, start at Standard and follow the machine's actual frame rate.
   const [autoTier, setAutoTier] = useState<QualityTier>('standard')
@@ -84,11 +94,6 @@ export function EditorCanvas({ captureRef, readOnly = false }: EditorCanvasProps
   const [lowResolution, setLowResolution] = useState(false)
   const tier: QualityTier = rendering.quality === 'auto' ? autoTier : rendering.quality
   const preset = QUALITY_PRESETS[tier]
-  const step = (direction: 1 | -1) =>
-    setAutoTier(
-      (current) =>
-        TIERS[Math.min(TIERS.length - 1, Math.max(0, TIERS.indexOf(current) + direction))],
-    )
 
   const selectedLightId = selection?.kind === 'light' ? selection.id : null
   const realLights = useMemo(
@@ -123,18 +128,13 @@ export function EditorCanvas({ captureRef, readOnly = false }: EditorCanvasProps
         <RenderTierContext.Provider value={tier}>
           <color attach="background" args={['#07070a']} />
           <fog attach="fog" args={['#07070a', 45, 110]} />
-          {rendering.quality === 'auto' && (
-            <PerformanceMonitor
-              onDecline={() => step(-1)}
-              onIncline={() => step(1)}
-              flipflops={3}
-              onFallback={() => {
-                setAutoTier('eco')
-                setLowResolution(true)
-              }}
-            />
-          )}
-
+          <AutoQualityMonitor
+            active={rendering.quality === 'auto' && (playing || isDragging || isOrbiting)}
+            onChange={({ tier, lowResolution }) => {
+              setAutoTier(tier)
+              setLowResolution(lowResolution)
+            }}
+          />
           {/* Dim work light: the stage is lit by the scene's own projectors. */}
           <hemisphereLight args={['#c9d2ff', '#1a1612', 0.35]} />
           <ambientLight intensity={0.06} />
@@ -177,17 +177,23 @@ export function EditorCanvas({ captureRef, readOnly = false }: EditorCanvasProps
             enableDamping
             dampingFactor={0.1}
             enabled={!isDragging}
+            onStart={() => setIsOrbiting(true)}
+            onEnd={() => setIsOrbiting(false)}
             target={DEFAULT_TARGET}
             maxPolarAngle={Math.PI / 2 - 0.02}
             minDistance={2}
             maxDistance={60}
           />
           <CameraRig view={view} />
-          {captureRef && <CaptureBridge captureRef={captureRef} />}
+          {captureRef && <CaptureBridge captureRef={captureRef} composerRef={composerRef} />}
 
           {postProcessing && (
             <Suspense fallback={null}>
-              <PostProcessingEffects pp={rendering} multisampling={preset.multisampling} />
+              <PostProcessingEffects
+                pp={rendering}
+                multisampling={preset.multisampling}
+                composerRef={composerRef}
+              />
             </Suspense>
           )}
         </RenderTierContext.Provider>
