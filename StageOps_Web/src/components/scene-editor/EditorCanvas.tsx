@@ -1,25 +1,24 @@
-import { Suspense, useState } from 'react';
-import type { RefObject } from 'react';
-import type * as THREE from 'three';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import { useSceneEditor } from './scene-editor.store';
-import { EditableObject } from './EditableObject';
-import { EditableLight } from './EditableLight';
-import { SurfaceObjects } from './SurfaceObjects';
-import { PostProcessingEffects } from './PostProcessingEffects';
+import { Suspense, useState } from 'react'
+import type { RefObject } from 'react'
+import type * as THREE from 'three'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { EditableObject } from './EditableObject'
+import { EditableLight } from './EditableLight'
+import { SurfaceObjects } from './SurfaceObjects'
+import { PostProcessingEffects } from './PostProcessingEffects'
 
 interface EditorCanvasProps {
-  canvasRef?: RefObject<HTMLCanvasElement>;
-  readOnly?: boolean;
+  canvasRef?: RefObject<HTMLCanvasElement>
+  readOnly?: boolean
 }
 
 export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps) {
-  const { state, dispatch } = useSceneEditor();
-  const { objects, lights, selectedId, selectedType, transformMode, postProcessing } = state;
-  const pp = postProcessing;
+  const { scene, selection, transformMode, clearSelection } = useSceneEditor()
+  const { objects, lights, rendering: pp } = scene
 
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false)
 
   return (
     <Canvas
@@ -30,19 +29,19 @@ export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps)
       gl={{ antialias: true, preserveDrawingBuffer: true, alpha: false }}
       camera={{ position: [0, 7, 20], fov: 55 }}
       style={{ width: '100%', height: '100%', background: '#0a0a0b' }}
-      onPointerMissed={readOnly ? undefined : () => dispatch({ type: 'DESELECT' })}
+      onPointerMissed={readOnly ? undefined : clearSelection}
     >
       <fog attach="fog" args={['#0a0a0b', 40, 90]} />
       <hemisphereLight args={['#fff4e0', '#0a0a18', 0.18] as [string, string, number]} />
       <ambientLight intensity={0.12} />
 
-      <SurfaceObjects />
+      <SurfaceObjects readOnly={readOnly} />
 
       {lights.map((l) => (
         <EditableLight
           key={l.id}
           light={l}
-          isSelected={selectedId === l.id && selectedType === 'light'}
+          isSelected={selection?.kind === 'light' && selection.id === l.id}
           onDrag={setIsDragging}
           readOnly={readOnly}
         />
@@ -52,7 +51,7 @@ export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps)
         <EditableObject
           key={o.id}
           object={o}
-          isSelected={selectedId === o.id && selectedType === 'object'}
+          isSelected={selection?.kind === 'object' && selection.id === o.id}
           transformMode={transformMode}
           onDrag={setIsDragging}
           readOnly={readOnly}
@@ -71,5 +70,5 @@ export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps)
         <PostProcessingEffects pp={pp} />
       </Suspense>
     </Canvas>
-  );
+  )
 }

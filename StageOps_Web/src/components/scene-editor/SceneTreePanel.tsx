@@ -15,18 +15,9 @@ import {
   Unlock,
   Trash2,
 } from 'lucide-react'
-import { useSceneEditor } from './scene-editor.store'
-import type { SceneObject, SceneLight, SurfaceKey } from './scene-editor.types'
-import { DEFAULT_MATERIAL } from './scene-editor.materials'
-import { kelvinToHex } from './scene-editor.materials'
-
-const SURFACE_LABELS: Record<SurfaceKey, string> = {
-  floor: 'Sol',
-  backWall: 'Fond de scène',
-  leftWall: 'Jardin (gauche)',
-  rightWall: 'Cour (droite)',
-  ceiling: 'Plafond',
-}
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { SURFACE_KEYS, kelvinToHex, type SceneLight, type SceneObject } from '@/domain/scene-models'
+import { SURFACE_LABELS } from './scene-editor.labels'
 
 function ObjectIcon({ type }: { type: SceneObject['type'] }) {
   if (type === 'plane') return <Layers size={13} />
@@ -41,41 +32,6 @@ function LightIcon({ type }: { type: SceneLight['type'] }) {
   return <Circle size={13} />
 }
 
-function newDefaultObject(): SceneObject {
-  return {
-    id: `obj-${Date.now()}`,
-    name: 'Praticable',
-    type: 'box',
-    position: [0, 0.5, 0],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-    material: { ...DEFAULT_MATERIAL },
-    geometry: { width: 2, height: 1, depth: 2 },
-    visible: true,
-    locked: false,
-  }
-}
-
-function newDefaultLight(): SceneLight {
-  return {
-    id: `light-${Date.now()}`,
-    name: 'Spot',
-    type: 'spot',
-    position: [0, 8, 0],
-    targetPosition: [0, 0, 0],
-    color: kelvinToHex(5500),
-    intensity: 2,
-    temperature: 5500,
-    castShadow: false,
-    distance: 20,
-    angle: Math.PI / 6,
-    penumbra: 0.4,
-    width: 2,
-    height: 2,
-    visible: true,
-  }
-}
-
 function ScrollItem({ active, children }: { active: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLLIElement>(null)
   useEffect(() => {
@@ -87,8 +43,18 @@ function ScrollItem({ active, children }: { active: boolean; children: React.Rea
 }
 
 export function SceneTreePanel() {
-  const { state, dispatch } = useSceneEditor()
-  const { objects, lights, selectedId, selectedType, selectedSurface, surfaces } = state
+  const {
+    scene,
+    selection,
+    select,
+    addObject,
+    updateObject,
+    deleteObject,
+    addLight,
+    updateLight,
+    deleteLight,
+  } = useSceneEditor()
+  const { objects, lights, surfaces } = scene
 
   const [objectsOpen, setObjectsOpen] = useState(true)
   const [lightsOpen, setLightsOpen] = useState(true)
@@ -116,7 +82,7 @@ export function SceneTreePanel() {
               Objets
             </button>
             <button
-              onClick={() => dispatch({ type: 'ADD_OBJECT', object: newDefaultObject() })}
+              onClick={() => addObject('box')}
               aria-label="Ajouter un objet"
               className="flex h-7 w-7 items-center justify-center rounded-md text-content-subtle transition-colors hover:bg-[var(--brand-soft)] hover:text-[var(--brand-violet-hover)]"
             >
@@ -132,7 +98,7 @@ export function SceneTreePanel() {
                 </li>
               )}
               {objects.map((obj) => {
-                const active = selectedId === obj.id && selectedType === 'object'
+                const active = selection?.kind === 'object' && selection.id === obj.id
                 return (
                   <ScrollItem key={obj.id} active={active}>
                     <div
@@ -143,7 +109,7 @@ export function SceneTreePanel() {
                       }`}
                     >
                       <button
-                        onClick={() => dispatch({ type: 'SELECT_OBJECT', id: obj.id })}
+                        onClick={() => select({ kind: 'object', id: obj.id })}
                         className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
                       >
                         <span className="text-content-subtle">
@@ -157,11 +123,7 @@ export function SceneTreePanel() {
                           aria-label={obj.visible ? `Masquer ${obj.name}` : `Afficher ${obj.name}`}
                           onClick={(e) => {
                             e.stopPropagation()
-                            dispatch({
-                              type: 'UPDATE_OBJECT',
-                              id: obj.id,
-                              updates: { visible: !obj.visible },
-                            })
+                            updateObject(obj.id, { visible: !obj.visible })
                           }}
                           className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
                         >
@@ -174,11 +136,7 @@ export function SceneTreePanel() {
                           }
                           onClick={(e) => {
                             e.stopPropagation()
-                            dispatch({
-                              type: 'UPDATE_OBJECT',
-                              id: obj.id,
-                              updates: { locked: !obj.locked },
-                            })
+                            updateObject(obj.id, { locked: !obj.locked })
                           }}
                           className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
                         >
@@ -189,7 +147,7 @@ export function SceneTreePanel() {
                           aria-label={`Supprimer ${obj.name}`}
                           onClick={(e) => {
                             e.stopPropagation()
-                            dispatch({ type: 'DELETE_OBJECT', id: obj.id })
+                            deleteObject(obj.id)
                           }}
                           className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
                         >
@@ -216,7 +174,7 @@ export function SceneTreePanel() {
               Lumières
             </button>
             <button
-              onClick={() => dispatch({ type: 'ADD_LIGHT', light: newDefaultLight() })}
+              onClick={() => addLight('spot')}
               aria-label="Ajouter une lumière"
               className="flex h-7 w-7 items-center justify-center rounded-md text-content-subtle transition-colors hover:bg-[var(--brand-soft)] hover:text-[var(--brand-violet-hover)]"
             >
@@ -227,7 +185,7 @@ export function SceneTreePanel() {
           {lightsOpen && (
             <ul className="pb-1">
               {lights.map((light) => {
-                const active = selectedId === light.id && selectedType === 'light'
+                const active = selection?.kind === 'light' && selection.id === light.id
                 const dotColor = kelvinToHex(light.temperature)
                 return (
                   <ScrollItem key={light.id} active={active}>
@@ -239,7 +197,7 @@ export function SceneTreePanel() {
                       }`}
                     >
                       <button
-                        onClick={() => dispatch({ type: 'SELECT_LIGHT', id: light.id })}
+                        onClick={() => select({ kind: 'light', id: light.id })}
                         className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
                       >
                         <span
@@ -259,11 +217,7 @@ export function SceneTreePanel() {
                           }
                           onClick={(e) => {
                             e.stopPropagation()
-                            dispatch({
-                              type: 'UPDATE_LIGHT',
-                              id: light.id,
-                              updates: { visible: !light.visible },
-                            })
+                            updateLight(light.id, { visible: !light.visible })
                           }}
                           className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
                         >
@@ -274,7 +228,7 @@ export function SceneTreePanel() {
                           aria-label={`Supprimer ${light.name}`}
                           onClick={(e) => {
                             e.stopPropagation()
-                            dispatch({ type: 'DELETE_LIGHT', id: light.id })
+                            deleteLight(light.id)
                           }}
                           className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
                         >
@@ -293,13 +247,13 @@ export function SceneTreePanel() {
         <div>
           <div className="px-4 py-2.5 text-xs font-semibold text-content-muted">Surfaces</div>
           <ul className="pb-2">
-            {(Object.keys(SURFACE_LABELS) as SurfaceKey[]).map((key) => {
-              const isActive = selectedType === 'surface' && selectedSurface === key
+            {SURFACE_KEYS.map((key) => {
+              const isActive = selection?.kind === 'surface' && selection.id === key
               const mat = surfaces[key]
               return (
                 <li key={key}>
                   <button
-                    onClick={() => dispatch({ type: 'SELECT_SURFACE', surface: key })}
+                    onClick={() => select({ kind: 'surface', id: key })}
                     className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs text-left transition-colors ${
                       isActive
                         ? 'bg-cyan-400/10 border-l-2 border-cyan-400 text-[#f5f5f7]'

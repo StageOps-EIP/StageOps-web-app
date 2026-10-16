@@ -27,7 +27,13 @@ export const router = createBrowserRouter([
       },
       {
         path: 'stage',
-        lazy: async () => ({ Component: (await import('../pages/StageView')).StageView }),
+        lazy: async () => ({ Component: (await import('./scene-workspace')).SceneWorkspace }),
+        children: [
+          {
+            index: true,
+            lazy: async () => ({ Component: (await import('../pages/StageView')).StageView }),
+          },
+        ],
       },
       {
         path: 'equipment',
@@ -54,8 +60,14 @@ export const router = createBrowserRouter([
   },
   {
     path: '/editor',
-    lazy: async () => ({ Component: (await import('../pages/SceneEditor')).SceneEditor }),
+    lazy: async () => ({ Component: (await import('./scene-workspace')).SceneWorkspace }),
     ErrorBoundary: RouteError,
     HydrateFallback: RouteLoading,
+    children: [
+      {
+        index: true,
+        lazy: async () => ({ Component: (await import('../pages/SceneEditor')).SceneEditor }),
+      },
+    ],
   },
 ])
