@@ -12,6 +12,7 @@ import {
   LIGHT_TYPES,
   MATERIAL_PRESET_KEYS,
   OBJECT_TYPES,
+  POSTURES,
   SURFACE_KEYS,
 } from '../../domain/scene-models.ts'
 import type { SceneRepository } from '../../domain/scene-repository.ts'
@@ -76,6 +77,7 @@ function sceneObject(value: unknown): SceneObject {
     scale: vector(item.scale),
     material: material(item.material),
     ...(item.equipmentId === undefined ? {} : { equipmentId: text(item.equipmentId) }),
+    ...(item.posture === undefined ? {} : { posture: enumeration(item.posture, POSTURES) }),
     geometry: {
       width: number(geometry.width),
       height: number(geometry.height),

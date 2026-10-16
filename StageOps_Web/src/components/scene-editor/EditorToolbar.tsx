@@ -23,6 +23,9 @@ interface EditorToolbarProps {
 }
 
 const OBJECT_MENU: [ObjectType, string][] = [
+  ['person', 'Personne (mannequin)'],
+  ['chair', 'Chaise'],
+  ['table', 'Table'],
   ['box', 'Praticable (cube)'],
   ['plane', 'Décor plan'],
   ['cylinder', 'Colonne / cylindre'],

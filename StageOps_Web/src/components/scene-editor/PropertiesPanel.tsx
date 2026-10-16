@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
 import {
+  ASSEMBLED_OBJECT_TYPES,
   MATERIAL_PRESETS,
   MATERIAL_PRESET_KEYS,
   kelvinToHex,
   type MaterialPreset,
+  type Posture,
   type SceneLight,
   type SceneMaterial,
   type SceneObject,
@@ -232,8 +234,15 @@ function MaterialEditor({
 }
 
 // ─── Object panel ─────────────────────────────────────────────────────────────
+const POSTURE_LABELS: Record<Posture, string> = {
+  standing: 'Debout',
+  sitting: 'Assis',
+  lying: 'Allongé',
+}
+
 function ObjectPanel() {
   const { scene, selection, updateObject } = useSceneEditor()
+  const gesture = useGestureHandlers()
   const [tab, setTab] = useState<'transform' | 'material'>('transform')
 
   const obj =
@@ -247,8 +256,34 @@ function ObjectPanel() {
   return (
     <div>
       <div className="px-4 pb-3">
-        <p className="text-xs text-[#a1a1aa] font-medium truncate">{obj.name}</p>
-        <p className="text-[10px] text-[#52525b]">{obj.type}</p>
+        <input
+          type="text"
+          aria-label="Nom"
+          value={obj.name}
+          onChange={(e) => updateObj({ name: e.target.value })}
+          {...gesture}
+          className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+        />
+        <p className="mt-1 text-[10px] text-[#52525b]">{obj.type}</p>
+        {obj.type === 'person' && (
+          <div className="mt-3 flex gap-1" role="group" aria-label="Posture">
+            {(Object.keys(POSTURE_LABELS) as Posture[]).map((posture) => (
+              <button
+                key={posture}
+                type="button"
+                aria-pressed={(obj.posture ?? 'standing') === posture}
+                onClick={() => updateObj({ posture })}
+                className={`flex-1 rounded-md border px-2 py-1 text-[11px] ${
+                  (obj.posture ?? 'standing') === posture
+                    ? 'border-cyan-400 bg-cyan-400/10 text-[#f5f5f7]'
+                    : 'border-[#27272e] text-[#a1a1aa] hover:text-[#f5f5f7]'
+                }`}
+              >
+                {POSTURE_LABELS[posture]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -336,7 +371,11 @@ function ObjectPanel() {
 
             <button
               onClick={() =>
-                updateObj({ position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [1, 1, 1] })
+                updateObj({
+                  position: [0, ASSEMBLED_OBJECT_TYPES.includes(obj.type) ? 0 : 0.5, 0],
+                  rotation: [0, 0, 0],
+                  scale: [1, 1, 1],
+                })
               }
               className="w-full px-3 py-1.5 rounded-lg text-xs text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
             >

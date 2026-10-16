@@ -98,3 +98,14 @@ test('unavailable storage and quota errors are recoverable', () => {
   assert.equal(full.save(scene()).ok, false)
   assert.ok(store.data.has(LEGACY_SCENE_STORAGE_KEY))
 })
+
+test('people keep their posture and an unknown posture is rejected', () => {
+  const withPerson = {
+    ...scene(),
+    objects: [{ ...createSceneObject('person', 'kevin'), posture: 'lying' as const }],
+  }
+  assert.deepEqual(deserializeScene(serializeScene(withPerson)), withPerson)
+  const raw = JSON.parse(serializeScene(withPerson))
+  raw.objects[0].posture = 'flying'
+  assert.throws(() => deserializeScene(JSON.stringify(raw)))
+})
