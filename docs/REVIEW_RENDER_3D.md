@@ -24,7 +24,7 @@ Le trajet oblique entre le projecteur et le sol est comparé à sa portée. Aucu
 
 ## Validation et revue Hugo
 
-Huit tests ciblés couvrent : 60 FPS soutenus, inactivité et reprise, baisse/récupération, courte baisse, capture avec/sans compositeur, portée verticale et oblique. Ils s’ajoutent aux 65 tests de la branche.
+Neuf tests ciblés couvrent : 60 FPS soutenus, inactivité et reprise, interruption sans image intermédiaire, baisse/récupération, courte baisse, capture avec/sans compositeur, portée verticale et oblique. Ils s’ajoutent aux 65 tests de la branche.
 
 Scénarios navigateur :
 

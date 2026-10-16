@@ -38,6 +38,16 @@ test('short FPS dips do not lower quality', () => {
   for (let frame = 0; frame < 180; frame++) state = sampleAutoQuality(state, 1 / 60, true)
   assert.equal(state.tier, 'standard')
 })
+
+test('ending an interaction clears a pending slow window before the next demand frame', () => {
+  let state = createAutoQualityState()
+  for (let frame = 0; frame < 13; frame++) state = sampleAutoQuality(state, 0.1, true)
+  assert.equal(state.slowWindows, 1)
+  state = sampleAutoQuality(state, 0, false)
+  state = sampleAutoQuality(state, 300, true)
+  assert.equal(state.slowWindows, 0)
+  assert.equal(state.tier, 'standard')
+})
 test('PNG capture reads the composed image without overwriting it with raw rendering', () => {
   let pixels = ''
   const renderer = {
