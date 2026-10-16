@@ -1,23 +1,29 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
-import { useSceneEditor } from './scene-editor.store'
-import { MATERIAL_PRESETS, PRESET_LABELS, kelvinToHex } from './scene-editor.materials'
-import type {
-  SceneLight,
-  SceneMaterial,
-  SceneObject,
-  MaterialPreset,
-  SurfaceKey,
-} from './scene-editor.types'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import {
+  MATERIAL_PRESETS,
+  MATERIAL_PRESET_KEYS,
+  kelvinToHex,
+  type MaterialPreset,
+  type SceneLight,
+  type SceneMaterial,
+  type SceneObject,
+} from '@/domain/scene-models'
+import { PRESET_LABELS, SURFACE_LABELS } from './scene-editor.labels'
 
-const PRESET_KEYS = Object.keys(MATERIAL_PRESETS) as MaterialPreset[]
-
-const SURFACE_LABELS: Record<SurfaceKey, string> = {
-  floor: 'Sol',
-  backWall: 'Fond de scène',
-  leftWall: 'Jardin',
-  rightWall: 'Cour',
-  ceiling: 'Plafond',
+/**
+ * Continuous inputs (sliders, typed numbers, colour pickers) group their changes into a
+ * single undo step: the gesture starts on focus/press and ends on blur/release.
+ */
+function useGestureHandlers() {
+  const { beginGesture, endGesture } = useSceneEditor()
+  return {
+    onFocus: beginGesture,
+    onPointerDown: beginGesture,
+    onPointerUp: endGesture,
+    onBlur: endGesture,
+  }
 }
 
 function radToDeg(r: number) {
@@ -43,6 +49,7 @@ function Slider({
   step: number
   onChange: (v: number) => void
 }) {
+  const gesture = useGestureHandlers()
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
@@ -56,6 +63,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
+        {...gesture}
         className="w-full h-1.5 rounded-full accent-cyan-400 bg-[#27272e]"
       />
     </div>
@@ -76,6 +84,7 @@ function NumInput({
   min?: number
   onChange: (v: number) => void
 }) {
+  const gesture = useGestureHandlers()
   return (
     <div>
       <label className="block text-[10px] text-[#52525b] mb-0.5">{label}</label>
@@ -85,6 +94,7 @@ function NumInput({
         min={min}
         value={Math.round(value * 100) / 100}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        {...gesture}
         className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
       />
     </div>
@@ -101,7 +111,7 @@ function MaterialPresetGrid({
 }) {
   return (
     <div className="grid grid-cols-4 gap-1.5 mb-4">
-      {PRESET_KEYS.map((p) => (
+      {MATERIAL_PRESET_KEYS.map((p) => (
         <button
           key={p}
           onClick={() => onSelect(p)}
@@ -133,6 +143,7 @@ function MaterialEditor({
   material: SceneMaterial
   onChange: (updates: Partial<SceneMaterial>) => void
 }) {
+  const gesture = useGestureHandlers()
   return (
     <div className="space-y-3">
       <MaterialPresetGrid
@@ -155,6 +166,7 @@ function MaterialEditor({
             type="color"
             value={material.color}
             onChange={(e) => onChange({ color: e.target.value, preset: 'custom' })}
+            {...gesture}
             className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
           />
           <span className="text-xs text-[#52525b] font-mono">{material.color}</span>
@@ -184,6 +196,7 @@ function MaterialEditor({
           type="color"
           value={material.emissive}
           onChange={(e) => onChange({ emissive: e.target.value })}
+          {...gesture}
           className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
         />
       </div>
@@ -220,14 +233,15 @@ function MaterialEditor({
 
 // ─── Object panel ─────────────────────────────────────────────────────────────
 function ObjectPanel() {
-  const { state, dispatch } = useSceneEditor()
+  const { scene, selection, updateObject } = useSceneEditor()
   const [tab, setTab] = useState<'transform' | 'material'>('transform')
 
-  const obj = state.objects.find((o) => o.id === state.selectedId)
+  const obj =
+    selection?.kind === 'object' ? scene.objects.find((o) => o.id === selection.id) : undefined
   if (!obj) return null
 
-  function updateObj(updates: Partial<SceneObject>) {
-    dispatch({ type: 'UPDATE_OBJECT', id: obj!.id, updates })
+  function updateObj(updates: Partial<Omit<SceneObject, 'id'>>) {
+    updateObject(obj!.id, updates)
   }
 
   return (
@@ -365,12 +379,14 @@ function ObjectPanel() {
 
 // ─── Light panel ──────────────────────────────────────────────────────────────
 function LightPanel() {
-  const { state, dispatch } = useSceneEditor()
-  const light = state.lights.find((l) => l.id === state.selectedId)
+  const { scene, selection, updateLight, deleteLight } = useSceneEditor()
+  const gesture = useGestureHandlers()
+  const light =
+    selection?.kind === 'light' ? scene.lights.find((l) => l.id === selection.id) : undefined
   if (!light) return null
 
-  function update(updates: Partial<SceneLight>) {
-    dispatch({ type: 'UPDATE_LIGHT', id: light!.id, updates })
+  function update(updates: Partial<Omit<SceneLight, 'id'>>) {
+    updateLight(light!.id, updates)
   }
 
   const typeLabels: Record<string, string> = {
@@ -391,6 +407,7 @@ function LightPanel() {
           type="text"
           value={light.name}
           onChange={(e) => update({ name: e.target.value })}
+          {...gesture}
           className="mt-1 w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
         />
       </div>
@@ -470,6 +487,7 @@ function LightPanel() {
             const temp = parseInt(e.target.value)
             update({ temperature: temp, color: kelvinToHex(temp) })
           }}
+          {...gesture}
           className="w-full h-1.5 rounded-full accent-cyan-400"
           style={{ background: 'transparent' }}
         />
@@ -490,6 +508,7 @@ function LightPanel() {
           type="color"
           value={light.color}
           onChange={(e) => update({ color: e.target.value })}
+          {...gesture}
           className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
         />
       </div>
@@ -549,9 +568,7 @@ function LightPanel() {
       </label>
 
       <button
-        onClick={() => {
-          dispatch({ type: 'DELETE_LIGHT', id: light.id })
-        }}
+        onClick={() => deleteLight(light.id)}
         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
       >
         <Trash2 size={13} />
@@ -563,19 +580,13 @@ function LightPanel() {
 
 // ─── Surface panel ────────────────────────────────────────────────────────────
 function SurfacePanel() {
-  const { state, dispatch } = useSceneEditor()
-  const key = state.selectedSurface
-  if (!key) return null
+  const { scene, selection, updateSurface, applyMaterialToAllSurfaces } = useSceneEditor()
+  if (selection?.kind !== 'surface') return null
+  const key = selection.id
+  const mat = scene.surfaces[key]
 
-  const mat = state.surfaces[key]
-
-  function update(updates: Partial<typeof mat>) {
-    dispatch({ type: 'UPDATE_SURFACE', surface: key!, material: updates })
-  }
-
-  function applyToAll() {
-    const surfaces: SurfaceKey[] = ['floor', 'backWall', 'leftWall', 'rightWall', 'ceiling']
-    surfaces.forEach((s) => dispatch({ type: 'UPDATE_SURFACE', surface: s, material: mat }))
+  function update(updates: Partial<SceneMaterial>) {
+    updateSurface(key, updates)
   }
 
   return (
@@ -587,7 +598,7 @@ function SurfacePanel() {
       <MaterialEditor material={mat} onChange={update} />
 
       <button
-        onClick={applyToAll}
+        onClick={() => applyMaterialToAllSurfaces(mat)}
         className="w-full px-3 py-2 rounded-lg text-xs font-medium text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] border border-[#27272e] transition-colors"
       >
         Appliquer à toutes les surfaces
@@ -598,8 +609,7 @@ function SurfacePanel() {
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 export function PropertiesPanel() {
-  const { state } = useSceneEditor()
-  const { selectedType } = state
+  const selectedType = useSceneEditor().selection?.kind
 
   return (
     <div className="flex w-64 flex-shrink-0 flex-col overflow-hidden border-l border-theme-border bg-theme-base lg:w-72">

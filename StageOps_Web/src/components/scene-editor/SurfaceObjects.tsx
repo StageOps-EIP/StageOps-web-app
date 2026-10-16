@@ -1,10 +1,15 @@
 import * as THREE from 'three'
 import { useMemo } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
-import { useSceneEditor } from './scene-editor.store'
-import { STAGE_WIDTH, STAGE_DEPTH, GRID_HEIGHT } from '../stage3d/stage3d.constants'
-import { kelvinToHex } from './scene-editor.materials'
-import type { SurfaceKey, SceneMaterial } from './scene-editor.types'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import {
+  GRID_HEIGHT,
+  STAGE_DEPTH,
+  STAGE_WIDTH,
+  kelvinToHex,
+  type SceneMaterial,
+  type SurfaceKey,
+} from '@/domain/scene-models'
 
 const HW = STAGE_WIDTH / 2 // 12
 const HD = STAGE_DEPTH / 2 // 9
@@ -54,8 +59,7 @@ function LightPool({
 }
 
 function DynamicLightPools() {
-  const { state } = useSceneEditor()
-  const { lights } = state
+  const { lights } = useSceneEditor().scene
   return (
     <>
       {lights
@@ -93,6 +97,7 @@ function SurfaceMesh({
   rotation,
   geometry,
   side,
+  readOnly,
 }: {
   surfaceKey: SurfaceKey
   material: SceneMaterial
@@ -100,12 +105,14 @@ function SurfaceMesh({
   rotation: [number, number, number]
   geometry: [number, number]
   side?: THREE.Side
+  readOnly: boolean
 }) {
-  const { dispatch } = useSceneEditor()
+  const { select } = useSceneEditor()
 
   function handleClick(e: ThreeEvent<MouseEvent>) {
+    if (readOnly) return
     e.stopPropagation?.()
-    dispatch({ type: 'SELECT_SURFACE', surface: surfaceKey })
+    select({ kind: 'surface', id: surfaceKey })
   }
 
   return (
@@ -126,9 +133,8 @@ function SurfaceMesh({
   )
 }
 
-export function SurfaceObjects() {
-  const { state } = useSceneEditor()
-  const { surfaces } = state
+export function SurfaceObjects({ readOnly = false }: { readOnly?: boolean }) {
+  const { surfaces } = useSceneEditor().scene
 
   return (
     <group>
@@ -190,6 +196,7 @@ export function SurfaceObjects() {
 
       {/* Floor */}
       <SurfaceMesh
+        readOnly={readOnly}
         surfaceKey="floor"
         material={surfaces.floor}
         position={[0, 0, 0]}
@@ -202,6 +209,7 @@ export function SurfaceObjects() {
 
       {/* Back wall */}
       <SurfaceMesh
+        readOnly={readOnly}
         surfaceKey="backWall"
         material={surfaces.backWall}
         position={[0, GRID_HEIGHT / 2, -HD]}
@@ -212,6 +220,7 @@ export function SurfaceObjects() {
 
       {/* Left wall (jardin, -X) */}
       <SurfaceMesh
+        readOnly={readOnly}
         surfaceKey="leftWall"
         material={surfaces.leftWall}
         position={[-HW, GRID_HEIGHT / 2, 0]}
@@ -222,6 +231,7 @@ export function SurfaceObjects() {
 
       {/* Right wall (cour, +X) */}
       <SurfaceMesh
+        readOnly={readOnly}
         surfaceKey="rightWall"
         material={surfaces.rightWall}
         position={[HW, GRID_HEIGHT / 2, 0]}
@@ -232,6 +242,7 @@ export function SurfaceObjects() {
 
       {/* Ceiling */}
       <SurfaceMesh
+        readOnly={readOnly}
         surfaceKey="ceiling"
         material={surfaces.ceiling}
         position={[0, GRID_HEIGHT, 0]}

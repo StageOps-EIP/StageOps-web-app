@@ -2,9 +2,8 @@ import { useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { type ThreeEvent } from '@react-three/fiber'
 import { TransformControls } from '@react-three/drei'
-import { useSceneEditor } from './scene-editor.store'
-import { kelvinToHex } from './scene-editor.materials'
-import type { SceneLight } from './scene-editor.types'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { kelvinToHex, type SceneLight } from '@/domain/scene-models'
 
 interface EditableLightProps {
   light: SceneLight
@@ -14,7 +13,7 @@ interface EditableLightProps {
 }
 
 export function EditableLight({ light, isSelected, onDrag, readOnly = false }: EditableLightProps) {
-  const { dispatch } = useSceneEditor()
+  const { select, clearSelection, updateLight, beginGesture, endGesture } = useSceneEditor()
   const helperRef = useRef<THREE.Mesh>(null!)
   const [helperMounted, setHelperMounted] = useState(false)
   const [spotTarget, setSpotTarget] = useState<THREE.Object3D | null>(null)
@@ -30,13 +29,14 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
   function handleHelperClick(e: ThreeEvent<MouseEvent>) {
     if (readOnly) return
     e.stopPropagation?.()
-    dispatch({ type: 'SELECT_LIGHT', id: isSelected ? null : light.id })
+    if (isSelected) clearSelection()
+    else select({ kind: 'light', id: light.id })
   }
 
   function handleObjectChange() {
     if (!helperRef.current) return
     const pos = helperRef.current.position.toArray() as [number, number, number]
-    dispatch({ type: 'UPDATE_LIGHT', id: light.id, updates: { position: pos } })
+    updateLight(light.id, { position: pos })
   }
 
   if (!light.visible) return null
@@ -179,8 +179,14 @@ export function EditableLight({ light, isSelected, onDrag, readOnly = false }: E
               object={helperRef}
               mode="translate"
               onObjectChange={handleObjectChange}
-              onMouseDown={() => onDrag(true)}
-              onMouseUp={() => onDrag(false)}
+              onMouseDown={() => {
+                beginGesture()
+                onDrag(true)
+              }}
+              onMouseUp={() => {
+                endGesture()
+                onDrag(false)
+              }}
             />
           )}
         </>

@@ -41,6 +41,6 @@ Stack réelle : React 18, TypeScript, React Router 7, Vite 7, Tailwind CSS et Th
 
 ## État du produit
 
-Le workspace matériel/incidents est validé, partagé entre les écrans et sauvegardé localement. Le conducteur, l’équipe, les préférences et l’éditeur conservent des sources/adaptateurs historiques : leurs limites et la suite #25 sont recensées dans ARCHITECTURE.md. Le frontend local n’est pas une preuve de synchronisation multi-utilisateur.
+Le workspace matériel/incidents est validé, partagé entre les écrans et sauvegardé localement. La scène 3D (plateau et éditeur) suit le même découpage. Le conducteur, l’équipe et les préférences conservent des sources/adaptateurs historiques : leurs limites et la suite #25 sont recensées dans ARCHITECTURE.md. Le frontend local n’est pas une preuve de synchronisation multi-utilisateur.
 
 Projet académique EIP.

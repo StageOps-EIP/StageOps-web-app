@@ -15,49 +15,24 @@ import {
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { useSceneEditor } from './scene-editor.store'
-import type { SceneObject, SceneLight, TransformMode } from './scene-editor.types'
-import { DEFAULT_MATERIAL } from './scene-editor.materials'
-import { kelvinToHex } from './scene-editor.materials'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import type { LightType, ObjectType, TransformMode } from '@/domain/scene-models'
 
 interface EditorToolbarProps {
   canvasRef: RefObject<HTMLCanvasElement>
 }
 
-function newObject(type: SceneObject['type'], name: string): SceneObject {
-  return {
-    id: `obj-${Date.now()}`,
-    name,
-    type,
-    position: [0, type === 'plane' ? 0.01 : 0.5, 0],
-    rotation: type === 'plane' ? [-Math.PI / 2, 0, 0] : [0, 0, 0],
-    scale: [1, 1, 1],
-    material: { ...DEFAULT_MATERIAL },
-    geometry: { width: 2, height: type === 'plane' ? 2 : 1, depth: 2 },
-    visible: true,
-    locked: false,
-  }
-}
-
-function newLight(type: SceneLight['type'], name: string): SceneLight {
-  return {
-    id: `light-${Date.now()}`,
-    name,
-    type,
-    position: [0, 8, 0],
-    targetPosition: [0, 0, 0],
-    color: kelvinToHex(5500),
-    intensity: 2,
-    temperature: 5500,
-    castShadow: false,
-    distance: 20,
-    angle: Math.PI / 6,
-    penumbra: 0.4,
-    width: 2,
-    height: 2,
-    visible: true,
-  }
-}
+const OBJECT_MENU: [ObjectType, string][] = [
+  ['box', 'Praticable (cube)'],
+  ['plane', 'Décor plan'],
+  ['cylinder', 'Colonne / cylindre'],
+]
+const LIGHT_MENU: [LightType, string][] = [
+  ['directional', 'Lumière directionnelle'],
+  ['spot', 'Spot'],
+  ['point', 'Lumière ponctuelle'],
+  ['rect-area', 'Area light'],
+]
 
 const TRANSFORM_MODES: {
   mode: TransformMode
@@ -72,14 +47,21 @@ const TRANSFORM_MODES: {
 
 export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
   const navigate = useNavigate()
-  const { state, dispatch } = useSceneEditor()
-  const { transformMode, postProcessing, historyIndex, history } = state
-  const pp = postProcessing
+  const {
+    scene,
+    transformMode,
+    canUndo,
+    canRedo,
+    setTransformMode,
+    addObject,
+    addLight,
+    undo,
+    redo,
+    updateRendering,
+  } = useSceneEditor()
+  const pp = scene.rendering
 
   const [showAddMenu, setShowAddMenu] = useState(false)
-
-  const canUndo = historyIndex >= 0
-  const canRedo = historyIndex < history.length - 1
 
   function handleExport() {
     const canvas = canvasRef.current
@@ -118,7 +100,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
             <button
               key={mode}
               title={`${label} (${shortcut})`}
-              onClick={() => dispatch({ type: 'SET_TRANSFORM_MODE', mode })}
+              onClick={() => setTransformMode(mode)}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                 transformMode === mode
                   ? 'bg-[var(--brand-violet)] text-[#080a10]'
@@ -150,17 +132,11 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
               onMouseLeave={() => setShowAddMenu(false)}
             >
               <p className="px-3 py-1.5 text-xs font-semibold text-content-subtle">Objets</p>
-              {(
-                [
-                  ['box', 'Praticable (Cube)'],
-                  ['plane', 'Décor plan'],
-                  ['cylinder', 'Colonne / cylindre'],
-                ] as [SceneObject['type'], string][]
-              ).map(([type, label]) => (
+              {OBJECT_MENU.map(([type, label]) => (
                 <button
                   key={type}
                   onClick={() => {
-                    dispatch({ type: 'ADD_OBJECT', object: newObject(type, label) })
+                    addObject(type)
                     setShowAddMenu(false)
                   }}
                   className="w-full px-3 py-2 text-left text-sm text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary"
@@ -171,18 +147,11 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
 
               <div className="my-1 h-px bg-theme-border" />
               <p className="px-3 py-1.5 text-xs font-semibold text-content-subtle">Lumières</p>
-              {(
-                [
-                  ['directional', 'Lumière directionnelle'],
-                  ['spot', 'Spot'],
-                  ['point', 'Lumière ponctuelle'],
-                  ['rect-area', 'Area light'],
-                ] as [SceneLight['type'], string][]
-              ).map(([type, label]) => (
+              {LIGHT_MENU.map(([type, label]) => (
                 <button
                   key={type}
                   onClick={() => {
-                    dispatch({ type: 'ADD_LIGHT', light: newLight(type, label) })
+                    addLight(type)
                     setShowAddMenu(false)
                   }}
                   className="w-full px-3 py-2 text-left text-sm text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary"
@@ -200,7 +169,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
         <div className="flex items-center gap-1">
           <button
             disabled={!canUndo}
-            onClick={() => dispatch({ type: 'UNDO' })}
+            onClick={undo}
             title="Annuler (Ctrl+Z)"
             className="flex h-8 w-8 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-30"
           >
@@ -208,7 +177,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
           </button>
           <button
             disabled={!canRedo}
-            onClick={() => dispatch({ type: 'REDO' })}
+            onClick={redo}
             title="Rétablir (Ctrl+Y)"
             className="flex h-8 w-8 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-30"
           >
@@ -223,9 +192,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
         <button
           type="button"
           aria-pressed={pp.highQuality}
-          onClick={() =>
-            dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { highQuality: !pp.highQuality } })
-          }
+          onClick={() => updateRendering({ highQuality: !pp.highQuality })}
           className="flex items-center gap-2"
         >
           <span className="hidden text-xs text-content-subtle md:inline">Qualité HD</span>
@@ -242,7 +209,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
         <button
           type="button"
           aria-pressed={pp.bloom}
-          onClick={() => dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { bloom: !pp.bloom } })}
+          onClick={() => updateRendering({ bloom: !pp.bloom })}
           className="flex items-center gap-2"
         >
           <span className="hidden text-xs text-content-subtle md:inline">Bloom</span>
@@ -259,9 +226,7 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
         <button
           type="button"
           aria-pressed={pp.vignette}
-          onClick={() =>
-            dispatch({ type: 'UPDATE_POSTPROCESSING', updates: { vignette: !pp.vignette } })
-          }
+          onClick={() => updateRendering({ vignette: !pp.vignette })}
           className="flex items-center gap-2"
         >
           <span className="hidden text-xs text-content-subtle md:inline">Vignette</span>

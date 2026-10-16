@@ -1,8 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { Mouse, Settings2 } from 'lucide-react'
-import { useNavigate } from 'react-router'
-import { SceneEditorProvider } from '@/components/scene-editor/scene-editor.provider'
-import { useSceneEditor } from '@/components/scene-editor/scene-editor.store'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
 import { EditorToolbar } from '@/components/scene-editor/EditorToolbar'
 import { EditorCanvas } from '@/components/scene-editor/EditorCanvas'
 import { SceneTreePanel } from '@/components/scene-editor/SceneTreePanel'
@@ -10,57 +8,67 @@ import { PropertiesPanel } from '@/components/scene-editor/PropertiesPanel'
 
 // Inner component that has access to the store context
 function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) {
-  const { state, dispatch } = useSceneEditor()
-  const { selectedId, selectedType, transformMode, objects, lights } = state
-  const navigate = useNavigate()
+  const {
+    scene,
+    selection,
+    transformMode,
+    persistenceIssue,
+    setTransformMode,
+    deleteObject,
+    deleteLight,
+    duplicateObject,
+    clearSelection,
+    undo,
+    redo,
+  } = useSceneEditor()
+  const { objects, lights } = scene
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       // Ignore shortcuts when typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      )
+        return
 
       if (e.key === 'g' || e.key === 'G') {
-        dispatch({ type: 'SET_TRANSFORM_MODE', mode: 'translate' })
+        setTransformMode('translate')
         return
       }
       if (e.key === 'r' || e.key === 'R') {
-        dispatch({ type: 'SET_TRANSFORM_MODE', mode: 'rotate' })
+        setTransformMode('rotate')
         return
       }
       if (e.key === 's' || e.key === 'S') {
-        dispatch({ type: 'SET_TRANSFORM_MODE', mode: 'scale' })
+        setTransformMode('scale')
         return
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (!selectedId) return
-        if (selectedType === 'object') dispatch({ type: 'DELETE_OBJECT', id: selectedId })
-        if (selectedType === 'light') dispatch({ type: 'DELETE_LIGHT', id: selectedId })
+        if (selection?.kind === 'object') deleteObject(selection.id)
+        if (selection?.kind === 'light') deleteLight(selection.id)
         return
       }
       if (e.key === 'Escape') {
-        dispatch({ type: 'DESELECT' })
+        clearSelection()
         return
       }
       if (e.ctrlKey || e.metaKey) {
         if (e.key === 'd' || e.key === 'D') {
           e.preventDefault()
-          if (selectedId && selectedType === 'object') {
-            dispatch({ type: 'DUPLICATE_OBJECT', id: selectedId })
-          }
+          if (selection?.kind === 'object') duplicateObject(selection.id)
           return
         }
         if (e.key === 'z' || e.key === 'Z') {
           e.preventDefault()
-          if (e.shiftKey) {
-            dispatch({ type: 'REDO' })
-          } else {
-            dispatch({ type: 'UNDO' })
-          }
+          if (e.shiftKey) redo()
+          else undo()
           return
         }
         if (e.key === 'y' || e.key === 'Y') {
           e.preventDefault()
-          dispatch({ type: 'REDO' })
+          redo()
           return
         }
       }
@@ -68,10 +76,21 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [dispatch, selectedId, selectedType, navigate])
+  }, [
+    selection,
+    setTransformMode,
+    deleteObject,
+    deleteLight,
+    duplicateObject,
+    clearSelection,
+    undo,
+    redo,
+  ])
 
-  const selectedObj = selectedType === 'object' ? objects.find((o) => o.id === selectedId) : null
-  const selectedLight = selectedType === 'light' ? lights.find((l) => l.id === selectedId) : null
+  const selectedObj =
+    selection?.kind === 'object' ? objects.find((o) => o.id === selection.id) : null
+  const selectedLight =
+    selection?.kind === 'light' ? lights.find((l) => l.id === selection.id) : null
 
   const statusText = selectedObj
     ? `${selectedObj.name}  x:${selectedObj.position[0].toFixed(2)}  y:${selectedObj.position[1].toFixed(2)}  z:${selectedObj.position[2].toFixed(2)}`
@@ -88,7 +107,15 @@ function EditorInner({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasEleme
           <div className="flex-1 relative">
             <EditorCanvas canvasRef={canvasRef} />
             {/* Hint overlay when nothing selected */}
-            {!selectedId && (
+            {persistenceIssue && (
+              <p
+                role="alert"
+                className="absolute left-1/2 top-3 z-10 w-[min(90%,32rem)] -translate-x-1/2 border border-theme-border bg-theme-base px-4 py-2 text-center text-xs text-content-primary"
+              >
+                {persistenceIssue}
+              </p>
+            )}
+            {!selection && (
               <div className="absolute inset-0 flex items-end justify-center pb-8 pointer-events-none z-10">
                 <div className="flex items-center gap-4 border border-theme-border bg-theme-base px-4 py-2 text-xs text-content-subtle">
                   <span>
@@ -127,9 +154,7 @@ export function SceneEditor() {
 
   return (
     <div className="flex h-dvh w-screen flex-col overflow-hidden bg-theme-void">
-      <SceneEditorProvider>
-        <EditorInner canvasRef={canvasRef} />
-      </SceneEditorProvider>
+      <EditorInner canvasRef={canvasRef} />
     </div>
   )
 }

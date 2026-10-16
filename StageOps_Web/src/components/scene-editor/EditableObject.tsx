@@ -2,8 +2,8 @@ import { useRef, useState, useCallback } from 'react'
 import type * as THREE from 'three'
 import { type ThreeEvent } from '@react-three/fiber'
 import { TransformControls } from '@react-three/drei'
-import { useSceneEditor } from './scene-editor.store'
-import type { SceneObject, TransformMode } from './scene-editor.types'
+import { useSceneEditor } from '@/hooks/useSceneEditor'
+import type { SceneObject, TransformMode } from '@/domain/scene-models'
 
 interface EditableObjectProps {
   object: SceneObject
@@ -20,7 +20,7 @@ export function EditableObject({
   onDrag,
   readOnly = false,
 }: EditableObjectProps) {
-  const { dispatch } = useSceneEditor()
+  const { select, clearSelection, updateObject, beginGesture, endGesture } = useSceneEditor()
   const meshRef = useRef<THREE.Mesh>(null!)
   const [hovered, setHovered] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -35,24 +35,17 @@ export function EditableObject({
   function handleClick(e: ThreeEvent<MouseEvent>) {
     if (readOnly) return
     e.stopPropagation?.()
-    if (isSelected) {
-      dispatch({ type: 'DESELECT' })
-    } else {
-      dispatch({ type: 'SELECT_OBJECT', id: object.id })
-    }
+    if (isSelected) clearSelection()
+    else select({ kind: 'object', id: object.id })
   }
 
   function handleObjectChange() {
     if (!meshRef.current) return
     const mesh = meshRef.current
-    dispatch({
-      type: 'UPDATE_OBJECT',
-      id: object.id,
-      updates: {
-        position: mesh.position.toArray() as [number, number, number],
-        rotation: [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z],
-        scale: mesh.scale.toArray() as [number, number, number],
-      },
+    updateObject(object.id, {
+      position: mesh.position.toArray() as [number, number, number],
+      rotation: [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z],
+      scale: mesh.scale.toArray() as [number, number, number],
     })
   }
 
@@ -131,8 +124,15 @@ export function EditableObject({
           object={meshRef}
           mode={transformMode}
           onObjectChange={handleObjectChange}
-          onMouseDown={() => onDrag(true)}
-          onMouseUp={() => onDrag(false)}
+          onMouseDown={() => {
+            // One drag of the gizmo is one undo step, whatever the number of frames.
+            beginGesture()
+            onDrag(true)
+          }}
+          onMouseUp={() => {
+            endGesture()
+            onDrag(false)
+          }}
         />
       )}
     </group>
