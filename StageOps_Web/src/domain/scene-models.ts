@@ -82,12 +82,22 @@ export interface SceneLight {
 
 export type SurfaceMaterials = Record<SurfaceKey, SceneMaterial>
 
+/**
+ * Rendering quality. `auto` starts at standard and adapts to the machine; `eco` is meant for
+ * office laptops without a graphics card.
+ */
+export type RenderQuality = 'auto' | 'eco' | 'standard' | 'hd'
+export const RENDER_QUALITIES: readonly RenderQuality[] = ['auto', 'eco', 'standard', 'hd']
+
 export interface RenderingSettings {
+  quality: RenderQuality
   bloom: boolean
   bloomIntensity: number
-  ssao: boolean
   vignette: boolean
-  highQuality: boolean
+  /** Visible light beams (haze effect). */
+  beams: boolean
+  /** Proscenium, legs and borders around the stage. */
+  stageDressing: boolean
 }
 
 /** A line of the stage manager's cue sheet: when (minute of the show) and which cue number. */
@@ -358,11 +368,12 @@ export function createSceneLight(type: LightType, id: string): SceneLight {
 }
 
 export const DEFAULT_RENDERING: RenderingSettings = {
+  quality: 'auto',
   bloom: true,
   bloomIntensity: 0.4,
-  ssao: false,
   vignette: true,
-  highQuality: false,
+  beams: true,
+  stageDressing: true,
 }
 
 /** Empty stage: default surfaces and a three-light rig, no set pieces. */

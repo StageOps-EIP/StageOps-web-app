@@ -19,6 +19,7 @@ import {
   MATERIAL_PRESET_KEYS,
   OBJECT_TYPES,
   POSTURES,
+  RENDER_QUALITIES,
   SURFACE_KEYS,
 } from '../../domain/scene-models.ts'
 import type { SceneRepository } from '../../domain/scene-repository.ts'
@@ -123,12 +124,21 @@ function rendering(value: unknown): RenderingSettings {
   // Older saves may predate these preferences; they are not scene content.
   if (value === undefined) return { ...DEFAULT_RENDERING }
   const item = record(value)
+  const optionalBool = (raw: unknown, fallback: boolean) =>
+    raw === undefined ? fallback : bool(raw)
   return {
+    // Before the render rework, quality was a single "HD" switch.
+    quality:
+      item.quality === undefined
+        ? item.highQuality === true
+          ? 'hd'
+          : 'auto'
+        : enumeration(item.quality, RENDER_QUALITIES),
     bloom: bool(item.bloom),
     bloomIntensity: number(item.bloomIntensity),
-    ssao: bool(item.ssao),
     vignette: bool(item.vignette),
-    highQuality: bool(item.highQuality),
+    beams: optionalBool(item.beams, DEFAULT_RENDERING.beams),
+    stageDressing: optionalBool(item.stageDressing, DEFAULT_RENDERING.stageDressing),
   }
 }
 function cue(value: unknown): Cue {

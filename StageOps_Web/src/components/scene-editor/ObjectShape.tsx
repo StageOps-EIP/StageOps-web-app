@@ -1,9 +1,30 @@
-import type { Posture, SceneObject } from '@/domain/scene-models'
+import * as THREE from 'three'
+import type { SceneObject } from '@/domain/scene-models'
+import { useRenderTier } from './render-context'
+import { furnitureGeometry, personGeometry } from './scene-geometries'
 
-type Geometry = SceneObject['geometry']
+// Shared by every mannequin; never disposed (dispose={null} on its mesh).
+const NOSE_MATERIAL = new THREE.MeshLambertMaterial({ color: '#1f2430' })
 
+/**
+ * One material per object; React Three Fiber updates it in place and disposes it.
+ * In Éco, Lambert shading replaces physically based shading: much cheaper per pixel and per
+ * light, at the cost of glossy reflections.
+ */
 function Material({ object }: { object: SceneObject }) {
   const { material } = object
+  const tier = useRenderTier()
+  if (tier === 'eco')
+    return (
+      <meshLambertMaterial
+        color={material.color}
+        emissive={material.emissive}
+        emissiveIntensity={material.emissiveIntensity}
+        transparent={material.opacity < 1}
+        opacity={material.opacity}
+        wireframe={material.wireframe}
+      />
+    )
   return (
     <meshStandardMaterial
       color={material.color}
@@ -18,133 +39,35 @@ function Material({ object }: { object: SceneObject }) {
   )
 }
 
-/** Simple mannequin built from capsules; it faces +Z (towards the audience by default). */
-function Person({ object, posture }: { object: SceneObject; posture: Posture }) {
-  const s = object.geometry.height / 1.75
-  const part = (
-    key: string,
-    position: [number, number, number],
-    radius: number,
-    length: number,
-    rotation: [number, number, number] = [0, 0, 0],
-  ) => (
-    <mesh key={key} position={position} rotation={rotation} castShadow receiveShadow>
-      <capsuleGeometry args={[radius * s, length * s, 4, 12]} />
-      <Material object={object} />
-    </mesh>
-  )
-  const head = (y: number, z = 0) => (
-    <group position={[0, y * s, z * s]}>
-      <mesh castShadow>
-        <sphereGeometry args={[0.11 * s, 16, 16]} />
-        <Material object={object} />
-      </mesh>
-      {/* Nose: shows where the person is looking */}
-      <mesh position={[0, 0, 0.11 * s]}>
-        <boxGeometry args={[0.04 * s, 0.04 * s, 0.06 * s]} />
-        <meshStandardMaterial color="#1f2430" />
-      </mesh>
-    </group>
-  )
-
-  if (posture === 'sitting') {
+export function ObjectShape({ object, castShadow }: { object: SceneObject; castShadow: boolean }) {
+  const { type, geometry } = object
+  if (type === 'person') {
+    const posture = object.posture ?? 'standing'
+    const { body, nose } = personGeometry(posture)
+    const scale = geometry.height / 1.75
     return (
-      <group>
-        {part('thigh-l', [-0.1, 0.47, 0.2], 0.07, 0.3, [Math.PI / 2, 0, 0])}
-        {part('thigh-r', [0.1, 0.47, 0.2], 0.07, 0.3, [Math.PI / 2, 0, 0])}
-        {part('shin-l', [-0.1, 0.24, 0.4], 0.06, 0.3)}
-        {part('shin-r', [0.1, 0.24, 0.4], 0.06, 0.3)}
-        {part('torso', [0, 0.82, 0], 0.16, 0.35)}
-        {part('arm-l', [-0.25, 0.78, 0.08], 0.05, 0.4, [0.4, 0, 0])}
-        {part('arm-r', [0.25, 0.78, 0.08], 0.05, 0.4, [0.4, 0, 0])}
-        {head(1.22)}
-      </group>
-    )
-  }
-  const standing = (
-    <group>
-      {part('leg-l', [-0.1, 0.45, 0], 0.07, 0.7)}
-      {part('leg-r', [0.1, 0.45, 0], 0.07, 0.7)}
-      {part('torso', [0, 1.15, 0], 0.16, 0.4)}
-      {part('arm-l', [-0.26, 1.08, 0], 0.05, 0.5)}
-      {part('arm-r', [0.26, 1.08, 0], 0.05, 0.5)}
-      {head(1.62)}
-    </group>
-  )
-  if (posture === 'lying') {
-    // Lying on the back, head towards the back of the stage.
-    return (
-      <group position={[0, 0.16 * s, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        {standing}
-      </group>
-    )
-  }
-  return standing
-}
-
-function Legs({
-  object,
-  geometry,
-  height,
-}: {
-  object: SceneObject
-  geometry: Geometry
-  height: number
-}) {
-  const x = geometry.width / 2 - 0.03
-  const z = geometry.depth / 2 - 0.03
-  return (
-    <>
-      {[
-        [-x, -z],
-        [x, -z],
-        [-x, z],
-        [x, z],
-      ].map(([lx, lz]) => (
-        <mesh key={`${lx}:${lz}`} position={[lx, height / 2, lz]} castShadow receiveShadow>
-          <boxGeometry args={[0.04, height, 0.04]} />
+      <group
+        scale={scale}
+        position={posture === 'lying' ? [0, 0.16 * scale, 0] : [0, 0, 0]}
+        rotation={posture === 'lying' ? [-Math.PI / 2, 0, 0] : [0, 0, 0]}
+      >
+        {/* Shared geometries are passed as props: they are not disposed with the mesh. */}
+        <mesh geometry={body} castShadow={castShadow} receiveShadow>
           <Material object={object} />
         </mesh>
-      ))}
-    </>
-  )
-}
-
-function Chair({ object }: { object: SceneObject }) {
-  const g = object.geometry
-  const seat = g.height * 0.5
-  return (
-    <group>
-      <Legs object={object} geometry={g} height={seat} />
-      <mesh position={[0, seat, 0]} castShadow receiveShadow>
-        <boxGeometry args={[g.width, 0.05, g.depth]} />
+        <mesh geometry={nose} material={NOSE_MATERIAL} dispose={null} />
+      </group>
+    )
+  }
+  if (type === 'chair' || type === 'table') {
+    return (
+      <mesh geometry={furnitureGeometry(type, geometry)} castShadow={castShadow} receiveShadow>
         <Material object={object} />
       </mesh>
-      <mesh position={[0, seat + (g.height - seat) / 2, -g.depth / 2 + 0.02]} castShadow>
-        <boxGeometry args={[g.width, g.height - seat, 0.04]} />
-        <Material object={object} />
-      </mesh>
-    </group>
-  )
-}
-
-function Table({ object }: { object: SceneObject }) {
-  const g = object.geometry
+    )
+  }
   return (
-    <group>
-      <Legs object={object} geometry={g} height={g.height - 0.04} />
-      <mesh position={[0, g.height - 0.02, 0]} castShadow receiveShadow>
-        <boxGeometry args={[g.width, 0.04, g.depth]} />
-        <Material object={object} />
-      </mesh>
-    </group>
-  )
-}
-
-function Primitive({ object }: { object: SceneObject }) {
-  const { type, geometry } = object
-  return (
-    <mesh castShadow receiveShadow>
+    <mesh castShadow={castShadow} receiveShadow>
       {type === 'plane' ? (
         <planeGeometry args={[geometry.width, geometry.height]} />
       ) : type === 'cylinder' ? (
@@ -157,14 +80,6 @@ function Primitive({ object }: { object: SceneObject }) {
   )
 }
 
-export function ObjectShape({ object }: { object: SceneObject }) {
-  if (object.type === 'person')
-    return <Person object={object} posture={object.posture ?? 'standing'} />
-  if (object.type === 'chair') return <Chair object={object} />
-  if (object.type === 'table') return <Table object={object} />
-  return <Primitive object={object} />
-}
-
 /** Wireframe used for hover and selection; matches the object's footprint. */
 export function ObjectOutline({
   object,
@@ -175,24 +90,19 @@ export function ObjectOutline({
   color: string
   opacity: number
 }) {
-  const { type, geometry } = object
+  const { type, geometry, posture } = object
   const assembled = type === 'person' || type === 'chair' || type === 'table'
-  const lying = type === 'person' && object.posture === 'lying'
-  const size: [number, number, number] = lying
-    ? [geometry.width, 0.35, geometry.height]
-    : [
-        geometry.width,
-        type === 'person' && object.posture === 'sitting'
-          ? 1.35 * (geometry.height / 1.75)
-          : geometry.height,
-        geometry.depth,
-      ]
+  const scale = geometry.height / 1.75
+  const size: [number, number, number] =
+    type === 'person' && posture === 'lying'
+      ? [geometry.width, 0.35 * scale, geometry.height]
+      : type === 'person' && posture === 'sitting'
+        ? [geometry.width, 1.35 * scale, 0.7 * scale]
+        : [geometry.width, geometry.height, type === 'plane' ? 0.02 : geometry.depth]
   return (
     <mesh position={assembled ? [0, size[1] / 2, 0] : [0, 0, 0]} scale={1.02}>
-      {type === 'plane' ? (
-        <planeGeometry args={[geometry.width, geometry.height]} />
-      ) : type === 'cylinder' ? (
-        <cylinderGeometry args={[geometry.width / 2, geometry.width / 2, geometry.height, 32]} />
+      {type === 'cylinder' ? (
+        <cylinderGeometry args={[geometry.width / 2, geometry.width / 2, geometry.height, 24]} />
       ) : (
         <boxGeometry args={size} />
       )}

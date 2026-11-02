@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { RefObject } from 'react'
 import { useNavigate } from 'react-router'
 import {
   Boxes,
@@ -13,15 +12,23 @@ import {
   Camera,
   ChevronDown,
   Clapperboard,
+  MonitorCog,
   ListOrdered,
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
-import type { LightType, ObjectType, TransformMode } from '@/domain/scene-models'
+import {
+  RENDER_QUALITIES,
+  type LightType,
+  type ObjectType,
+  type TransformMode,
+} from '@/domain/scene-models'
+import type { CaptureRef } from './EditorCanvas'
+import { QUALITY_LABELS } from './render-quality'
 
 interface EditorToolbarProps {
-  canvasRef: RefObject<HTMLCanvasElement>
+  captureRef: CaptureRef
 }
 
 const OBJECT_MENU: [ObjectType, string][] = [
@@ -50,7 +57,7 @@ const TRANSFORM_MODES: {
   { mode: 'scale', label: 'Échelle', shortcut: 'S', Icon: Maximize2 },
 ]
 
-export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
+export function EditorToolbar({ captureRef }: EditorToolbarProps) {
   const navigate = useNavigate()
   const {
     scene,
@@ -69,11 +76,11 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
   const pp = scene.rendering
 
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [showDisplayMenu, setShowDisplayMenu] = useState(false)
 
   function handleExport() {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const url = canvas.toDataURL('image/png')
+    const url = captureRef.current?.()
+    if (!url) return
     const a = document.createElement('a')
     a.href = url
     a.download = 'scene-export.png'
@@ -226,56 +233,72 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
 
       {/* ─ Right ────────────────────────────────────────────────────── */}
       <div className="ml-auto flex items-center gap-2">
-        {/* HD Quality toggle */}
-        <button
-          type="button"
-          aria-pressed={pp.highQuality}
-          onClick={() => updateRendering({ highQuality: !pp.highQuality })}
-          className="flex items-center gap-2"
-        >
-          <span className="hidden text-xs text-content-subtle md:inline">Qualité HD</span>
-          <span
-            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.highQuality ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
+        {/* Display settings */}
+        <div className="relative">
+          <button
+            type="button"
+            aria-expanded={showDisplayMenu}
+            onClick={() => setShowDisplayMenu((open) => !open)}
+            className="flex items-center gap-1.5 rounded-md border border-theme-border bg-theme-elevated px-3 py-1.5 text-xs font-medium text-content-muted hover:text-content-primary"
           >
-            <span
-              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.highQuality ? 'translate-x-4' : 'translate-x-0.5'}`}
-            />
-          </span>
-        </button>
-
-        {/* Bloom toggle */}
-        <button
-          type="button"
-          aria-pressed={pp.bloom}
-          onClick={() => updateRendering({ bloom: !pp.bloom })}
-          className="flex items-center gap-2"
-        >
-          <span className="hidden text-xs text-content-subtle md:inline">Bloom</span>
-          <span
-            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.bloom ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
-          >
-            <span
-              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.bloom ? 'translate-x-4' : 'translate-x-0.5'}`}
-            />
-          </span>
-        </button>
-
-        {/* Vignette toggle */}
-        <button
-          type="button"
-          aria-pressed={pp.vignette}
-          onClick={() => updateRendering({ vignette: !pp.vignette })}
-          className="flex items-center gap-2"
-        >
-          <span className="hidden text-xs text-content-subtle md:inline">Vignette</span>
-          <span
-            className={`relative h-4 w-8 cursor-pointer rounded-full transition-colors ${pp.vignette ? 'bg-[var(--brand-violet)]' : 'bg-theme-border'}`}
-          >
-            <span
-              className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${pp.vignette ? 'translate-x-4' : 'translate-x-0.5'}`}
-            />
-          </span>
-        </button>
+            <MonitorCog size={13} />
+            <span className="hidden md:inline">Affichage · {QUALITY_LABELS[pp.quality]}</span>
+            <ChevronDown size={11} />
+          </button>
+          {showDisplayMenu && (
+            <div
+              className="absolute right-0 top-10 z-50 w-64 rounded-md border border-theme-border bg-theme-elevated p-3 shadow-2xl"
+              onMouseLeave={() => setShowDisplayMenu(false)}
+            >
+              <p className="text-xs font-semibold text-content-subtle">Qualité</p>
+              <div role="radiogroup" aria-label="Qualité" className="mt-1.5 grid grid-cols-4 gap-1">
+                {RENDER_QUALITIES.map((quality) => (
+                  <button
+                    key={quality}
+                    type="button"
+                    role="radio"
+                    aria-checked={pp.quality === quality}
+                    onClick={() => updateRendering({ quality })}
+                    className={`rounded px-1 py-1 text-[11px] ${
+                      pp.quality === quality
+                        ? 'bg-[var(--brand-violet)] text-[#080a10]'
+                        : 'border border-theme-border text-content-muted hover:text-content-primary'
+                    }`}
+                  >
+                    {QUALITY_LABELS[quality]}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[10px] leading-snug text-content-subtle">
+                Auto adapte la qualité à l’ordinateur. Éco : sans ombres ni effets, pour les
+                portables de bureau.
+              </p>
+              <div className="mt-3 space-y-2">
+                {(
+                  [
+                    ['beams', 'Faisceaux visibles'],
+                    ['stageDressing', 'Habillage (cadre, pendrillons)'],
+                    ['bloom', 'Halo lumineux (bloom)'],
+                    ['vignette', 'Vignette'],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label
+                    key={key}
+                    className="flex cursor-pointer items-center gap-2 text-xs text-content-muted"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={pp[key]}
+                      onChange={(e) => updateRendering({ [key]: e.target.checked })}
+                      className="accent-[var(--brand-violet)]"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="h-6 w-px bg-theme-border" />
 

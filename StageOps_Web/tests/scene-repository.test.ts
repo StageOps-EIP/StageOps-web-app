@@ -147,3 +147,28 @@ test('the cue sheet round-trips and broken references are rejected', () => {
   assert.throws(broken((raw) => (raw.timeline.cues[0].time = -5)))
   assert.throws(broken((raw) => raw.timeline.keyframes.push(raw.timeline.keyframes[0])))
 })
+
+test('display preferences from before the render rework are migrated', () => {
+  const { rendering, ...content } = scene()
+  const legacy = (highQuality: boolean) =>
+    deserializeScene(
+      JSON.stringify({
+        ...content,
+        postProcessing: {
+          bloom: false,
+          bloomIntensity: 0.4,
+          ssao: false,
+          vignette: true,
+          highQuality,
+        },
+      }),
+    ).rendering
+  assert.equal(legacy(true).quality, 'hd')
+  assert.equal(legacy(false).quality, 'auto')
+  assert.equal(legacy(false).bloom, false)
+  assert.equal(legacy(false).beams, rendering.beams)
+  assert.equal(legacy(false).stageDressing, true)
+  const raw = JSON.parse(serializeScene(scene()))
+  raw.rendering.quality = 'ultra'
+  assert.throws(() => deserializeScene(JSON.stringify(raw)))
+})
