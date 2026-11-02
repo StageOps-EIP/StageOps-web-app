@@ -154,7 +154,7 @@ export function EditableLight({
           {isSelected && (
             <mesh position={light.position} raycast={() => null}>
               <sphereGeometry args={[0.45, 12, 8]} />
-              <meshBasicMaterial color="#7964ff" wireframe transparent opacity={0.6} />
+              <meshBasicMaterial color="#C9A14A" wireframe transparent opacity={0.6} />
             </mesh>
           )}
           {light.type === 'spot' && isSelected && <SpotGuide light={light} color={color} />}

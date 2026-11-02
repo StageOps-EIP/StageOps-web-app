@@ -1,8 +1,8 @@
 /** Shared colour values for code-driven styles (charts, badges and Three.js controls). */
 export const BRAND_COLORS = {
-  violet: '#7964ff',
-  violetHover: '#9586ff',
-  blue: '#3977ff',
+  violet: '#C9A14A',
+  violetHover: '#F2D79C',
+  blue: '#8E1B2E',
 } as const
 
 export const STATUS_COLORS = {
@@ -14,7 +14,7 @@ export const STATUS_COLORS = {
 } as const
 
 export const TEXT_COLORS = {
-  primary: '#f3f1eb',
-  muted: '#a4a9b7',
-  subtle: '#7f879b',
+  primary: '#F4EEE3',
+  muted: '#CBBCAF',
+  subtle: '#AB958D',
 } as const

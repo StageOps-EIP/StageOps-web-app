@@ -16,7 +16,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary:
-        'border-transparent bg-[var(--brand-violet)] text-[#080a10] hover:bg-[var(--brand-violet-hover)]',
+        'border-transparent bg-[var(--brand-violet)] text-[var(--brand-button-text)] hover:bg-[var(--brand-violet-hover)]',
       secondary:
         'border-theme-border bg-theme-elevated text-content-primary hover:border-theme-border-hover hover:bg-[var(--bg-hover)]',
       ghost:

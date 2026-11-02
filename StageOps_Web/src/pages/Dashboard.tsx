@@ -22,7 +22,7 @@ export function Dashboard() {
   const availableEquipment = equipment.filter((item) => item.status === 'ok').length
 
   return (
-    <div className="page-shell space-y-5">
+    <div className="page-shell dashboard-rideau space-y-5">
       <PageHeader
         context="Vue générale"
         title={activeEvent.title}
@@ -53,7 +53,7 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="self-end border-l-2 border-[var(--brand-violet)] pl-5">
+        <div className="self-end border-l border-[var(--brand-violet)] pl-5">
           <p className="text-xs leading-5 text-content-muted">
             La production est en phase d’installation. Les contrôles matériel et les incidents
             ouverts restent prioritaires avant l’entrée du public.

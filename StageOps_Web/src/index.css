@@ -1,68 +1,76 @@
-@import '@fontsource-variable/manrope';
-@import '@fontsource-variable/bricolage-grotesque';
-@import '@fontsource-variable/newsreader';
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource-variable/fraunces';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* StageOps brand — values already used by the logo and previous interface. */
-  --brand-violet: #7964ff;
-  --brand-violet-hover: #9586ff;
-  --brand-blue: #3977ff;
-  --brand-soft: rgba(121, 100, 255, 0.12);
-  --brand-border: rgba(121, 100, 255, 0.38);
+  /* Rideau palette. Legacy token names stay as aliases for existing components. */
+  --brand-violet: #c9a14a;
+  --brand-violet-hover: #f2d79c;
+  --brand-blue: #8e1b2e;
+  --brand-soft: rgba(201, 161, 74, 0.13);
+  --brand-border: rgba(201, 161, 74, 0.42);
+  --brand-button-text: #16100f;
+  --brand-velvet: #4a0d1a;
+  --brand-burgundy: #8e1b2e;
+  --brand-ivory: #f4eee3;
 
   /* Dark work surface. */
-  --bg-void: #05060a;
-  --bg-deeper: #080a10;
-  --bg-base: #0d1018;
-  --bg-elevated: #141824;
-  --bg-hover: #1a1f2d;
-  --border: #252b3a;
-  --border-hover: #3b4357;
-  --border-strong: #59647d;
-  --text-primary: #f3f1eb;
-  --text-muted: #a4a9b7;
-  --text-subtle: #7f879b;
-  --text-faint: #596174;
+  --bg-void: #160d0f;
+  --bg-deeper: #1e1015;
+  --bg-base: #29161b;
+  --bg-elevated: #362025;
+  --bg-hover: #42262c;
+  --border: #553a3c;
+  --border-hover: #785450;
+  --border-strong: #916f60;
+  --text-primary: #f4eee3;
+  --text-muted: #d0c1b2;
+  --text-subtle: #b49f92;
+  --text-faint: #9a8179;
 
   /* Semantic colours: never used as decoration. */
   --status-success: #22c55e;
   --status-warning: #f59e0b;
   --status-danger: #ef4444;
-  --status-info: #3977ff;
-  --status-neutral: #7f879b;
+  --status-info: #f2b134;
+  --status-neutral: #b49f92;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --panel-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
-  --font-ui: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
-  --font-editorial: 'Newsreader Variable', 'Newsreader', serif;
-  --font-data: 'Manrope Variable', 'Manrope', sans-serif;
+  --font-ui: 'DM Sans Variable', 'DM Sans', sans-serif;
+  --font-editorial: 'Fraunces Variable', 'Fraunces', serif;
+  --font-data: 'DM Sans Variable', 'DM Sans', sans-serif;
 }
 
 .light {
-  --bg-void: #e9e8e3;
-  --bg-deeper: #efeee9;
-  --bg-base: #f8f7f2;
-  --bg-elevated: #e2e1dc;
-  --bg-hover: #d9d8d2;
-  --border: #cac8c0;
-  --border-hover: #aba9a1;
-  --border-strong: #787a85;
-  --text-primary: #11131a;
-  --text-muted: #555b69;
-  --text-subtle: #686e7a;
-  --text-faint: #858991;
-  --brand-violet: #5844e6;
-  --brand-violet-hover: #4632d2;
-  --brand-blue: #205bdd;
-  --brand-soft: rgba(88, 68, 230, 0.09);
-  --brand-border: rgba(88, 68, 230, 0.34);
+  --bg-void: #f4eee3;
+  --bg-deeper: #eee5d6;
+  --bg-base: #fbf5ea;
+  --bg-elevated: #e9decb;
+  --bg-hover: #e2d4bd;
+  --border: #d8c9b4;
+  --border-hover: #b7a28b;
+  --border-strong: #947a69;
+  --text-primary: #241517;
+  --text-muted: #5b4444;
+  --text-subtle: #6e5552;
+  --text-faint: #826e65;
+  --brand-violet: #8e1b2e;
+  --brand-violet-hover: #711627;
+  --brand-blue: #8e1b2e;
+  --brand-soft: rgba(142, 27, 46, 0.09);
+  --brand-border: rgba(142, 27, 46, 0.34);
+  --brand-button-text: #fff8ee;
   --panel-shadow: 0 12px 30px rgba(24, 26, 35, 0.07);
+}
+
+.light .auth-rideau {
+  background: var(--bg-deeper);
 }
 
 @layer base {
@@ -94,8 +102,8 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-ui);
-    letter-spacing: -0.035em;
+    font-family: var(--font-editorial);
+    letter-spacing: -0.025em;
   }
 
   button,
@@ -151,7 +159,7 @@
     padding: 0.7rem 1rem;
     border-radius: var(--radius-sm);
     background: var(--brand-violet);
-    color: #080a10;
+    color: var(--brand-button-text);
     font-size: 0.8rem;
     font-weight: 700;
   }
@@ -177,7 +185,7 @@
     color: var(--text-primary);
     font-family: var(--font-editorial);
     font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-weight: 520;
+    font-weight: 600;
     line-height: 0.98;
     letter-spacing: -0.035em;
   }
@@ -187,6 +195,8 @@
     color: var(--brand-violet-hover);
     font-size: 0.67rem;
     font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
   .font-editorial {
@@ -211,7 +221,7 @@
     background: transparent;
     border: 0;
     border-top: 1px solid var(--border-strong);
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     box-shadow: none;
   }
 
@@ -356,7 +366,7 @@
     top: 0.15rem;
     bottom: 0.15rem;
     left: 0;
-    width: 2px;
+    width: 1px;
     background: var(--brand-violet);
     content: '';
   }
@@ -425,7 +435,7 @@
     font-size: clamp(3.75rem, 8vw, 7.5rem);
     font-weight: 430;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.075em;
+    letter-spacing: -0.035em;
     line-height: 0.76;
   }
 
@@ -464,16 +474,59 @@
   }
 
   .stageops-logo__wordmark {
-    font-family: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 720;
-    letter-spacing: -0.045em;
+    font-family: var(--font-editorial);
+    font-size: 1.34rem;
+    font-weight: 600;
+    letter-spacing: -0.035em;
     line-height: 1;
+  }
+
+  .stageops-logo__accent {
+    color: var(--brand-violet);
+    font-style: italic;
   }
 
   .stageops-logo--compact .stageops-logo__mark {
     width: 1.9rem;
     height: 1.9rem;
+  }
+
+  .dashboard-rideau {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .dashboard-rideau::before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    width: min(42vw, 31rem);
+    height: 18rem;
+    background: url('/brand/stageops-arches.svg') center top / contain no-repeat;
+    opacity: 0.3;
+    pointer-events: none;
+    content: '';
+  }
+
+  .auth-rideau {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--brand-velvet);
+  }
+
+  .auth-rideau::before {
+    position: absolute;
+    z-index: -1;
+    right: -10rem;
+    bottom: -9rem;
+    width: 34rem;
+    height: 35rem;
+    background: url('/brand/stageops-arches.svg') center / contain no-repeat;
+    opacity: 0.56;
+    pointer-events: none;
+    content: '';
   }
 }
 
@@ -485,12 +538,7 @@
 
 /* Legacy screens inherit the same editorial geometry and label casing. */
 :where(.app-surface, .auth-surface) :is(.rounded-xl, .rounded-2xl, .rounded-3xl) {
-  border-radius: 0;
-}
-
-:where(.app-surface, .auth-surface) .uppercase {
-  text-transform: none;
-  letter-spacing: normal;
+  border-radius: var(--radius-md);
 }
 
 @media (prefers-reduced-motion: reduce) {
