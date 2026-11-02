@@ -38,7 +38,7 @@ export function EventListView({ allEvents, onSelectEvent }: EventListViewProps) 
                   <span className="text-2xl text-content-primary">{evt.startDate.getDate()}</span>
                 </div>
 
-                <div className="h-10 w-px bg-[#27272e]" />
+                <div className="h-10 w-px bg-theme-border" />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

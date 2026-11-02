@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       )}
       <div className="group relative">
         {icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-faint transition-colors group-focus-within:text-cyan-300">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-faint transition-colors group-focus-within:text-[var(--brand-violet-hover)]">
             {icon}
           </div>
         )}

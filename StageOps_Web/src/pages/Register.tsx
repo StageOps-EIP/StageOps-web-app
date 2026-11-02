@@ -315,7 +315,7 @@ export function Register() {
                                 : form.password.length >= 8
                                   ? '#f59e0b'
                                   : '#ef4444'
-                              : '#27272e',
+                              : 'var(--border)',
                         }}
                       />
                     ))}
@@ -372,7 +372,7 @@ export function Register() {
           <div className="mt-6 pt-6 border-t border-theme-border text-center">
             <p className="text-sm text-content-subtle">
               Déjà un compte ?{' '}
-              <Link to="/login" className="text-[var(--brand-violet-hover)] hover:text-cyan-300 transition-colors">
+              <Link to="/login" className="text-[var(--brand-violet-hover)] hover:text-[var(--brand-violet-hover)] transition-colors">
                 Se connecter
               </Link>
             </p>

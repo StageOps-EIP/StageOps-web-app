@@ -67,7 +67,7 @@ export function Team() {
             />
             <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">
               {filtered.map((member) => {
-                const color = ROLE_COLORS[member.role] || '#71717a'
+                const color = ROLE_COLORS[member.role] || 'var(--text-subtle)'
                 const isSelected = selectedMember?.id === member.id
 
                 return (
@@ -176,7 +176,7 @@ function MemberDetail({
   onClose: () => void
   onEdit: () => void
 }) {
-  const color = ROLE_COLORS[member.role] || '#71717a'
+  const color = ROLE_COLORS[member.role] || 'var(--text-subtle)'
 
   return (
     <Card className="sticky top-4">

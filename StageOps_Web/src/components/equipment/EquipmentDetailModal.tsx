@@ -116,7 +116,7 @@ export function EquipmentDetailModal({
         <div className="px-8 py-6 space-y-6">
           {/* Nom & catégorie */}
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-theme-elevated rounded-xl flex items-center justify-center text-cyan-400">
+            <div className="p-3 bg-theme-elevated rounded-xl flex items-center justify-center text-[var(--brand-violet-hover)]">
               <CategoryIcon category={equipment.category} size={24} />
             </div>
             <div className="flex-1">
@@ -148,8 +148,8 @@ export function EquipmentDetailModal({
                         }
                       : {
                           backgroundColor: 'transparent',
-                          borderColor: '#27272e',
-                          color: '#71717a',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-subtle)',
                         }
                   }
                 >
@@ -184,7 +184,7 @@ export function EquipmentDetailModal({
                   value={editedLocation}
                   onChange={(e) => setEditedLocation(e.target.value)}
                   aria-label="Emplacement"
-                  className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                  className="w-full bg-transparent text-sm text-content-primary border-b border-theme-border focus:border-[var(--brand-violet)] focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
 
@@ -200,7 +200,7 @@ export function EquipmentDetailModal({
                   onChange={(e) => setEditedZone(e.target.value)}
                   placeholder="—"
                   aria-label="Zone"
-                  className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                  className="w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b border-theme-border focus:border-[var(--brand-violet)] focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
 
@@ -218,7 +218,7 @@ export function EquipmentDetailModal({
                   onChange={(e) => setEditedResponsible(e.target.value)}
                   placeholder="—"
                   aria-label="Responsable"
-                  className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                  className="w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b border-theme-border focus:border-[var(--brand-violet)] focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
 
@@ -246,10 +246,10 @@ export function EquipmentDetailModal({
           <div>
             <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">QR Code</p>
             <div className="flex items-center gap-3 p-4 bg-theme-elevated border border-theme-border rounded-xl">
-              <div className="p-2.5 bg-[#27272e] rounded-lg">
-                <QrCode size={18} className="text-cyan-400" />
+              <div className="p-2.5 bg-theme-border rounded-lg">
+                <QrCode size={18} className="text-[var(--brand-violet-hover)]" />
               </div>
-              <code className="text-sm text-cyan-400 font-mono">{equipment.qrCode}</code>
+              <code className="text-sm text-[var(--brand-violet-hover)] font-mono">{equipment.qrCode}</code>
             </div>
           </div>
 
@@ -263,7 +263,7 @@ export function EquipmentDetailModal({
                 placeholder="Ajouter une note sur cet équipement..."
                 rows={3}
                 aria-label="Notes"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 resize-none transition-colors"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] resize-none transition-colors"
               />
               <FileText
                 size={14}

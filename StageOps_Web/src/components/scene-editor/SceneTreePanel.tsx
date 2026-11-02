@@ -77,7 +77,7 @@ export function SceneTreePanel() {
 
       <div className="flex-1 overflow-y-auto">
         {/* ─ Objects section ────────────────────────────────────────── */}
-        <div className="border-b border-[#27272e]/60">
+        <div className="border-b border-theme-border/60">
           <div className="flex items-center px-2">
             <button
               className="flex flex-1 items-center gap-1.5 px-2 py-2.5 text-left text-xs font-semibold text-content-muted transition-colors hover:text-content-primary"
@@ -169,7 +169,7 @@ export function SceneTreePanel() {
         </div>
 
         {/* ─ Lights section ─────────────────────────────────────────── */}
-        <div className="border-b border-[#27272e]/60">
+        <div className="border-b border-theme-border/60">
           <div className="flex items-center px-2">
             <button
               className="flex flex-1 items-center gap-1.5 px-2 py-2.5 text-left text-xs font-semibold text-content-muted transition-colors hover:text-content-primary"
@@ -262,8 +262,8 @@ export function SceneTreePanel() {
                     onClick={() => select({ kind: 'surface', id: key })}
                     className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs text-left transition-colors ${
                       isActive
-                        ? 'bg-cyan-400/10 border-l-2 border-cyan-400 text-[#f5f5f7]'
-                        : 'border-l-2 border-transparent text-[#a1a1aa] hover:bg-[#1c1c21] hover:text-[#f5f5f7]'
+                        ? 'bg-[var(--brand-soft)] border-l-2 border-[var(--brand-violet)] text-content-primary'
+                        : 'border-l-2 border-transparent text-content-muted hover:bg-theme-elevated hover:text-content-primary'
                     }`}
                   >
                     <span

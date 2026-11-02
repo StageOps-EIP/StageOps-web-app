@@ -95,7 +95,7 @@ export function EditorToolbar({ captureRef }: EditorToolbarProps) {
           <Boxes size={18} className="text-[var(--brand-violet-hover)]" />
           <span className="text-sm font-semibold">Éditeur du plateau</span>
         </div>
-        <div className="w-px h-5 bg-[#27272e]" />
+        <div className="w-px h-5 bg-theme-border" />
         <button
           onClick={() => navigate('/stage')}
           className="flex items-center gap-1.5 text-xs text-content-subtle transition-colors hover:text-content-primary"

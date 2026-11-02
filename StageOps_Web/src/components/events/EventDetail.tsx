@@ -67,7 +67,7 @@ export function EventDetail({ event, onClose }: { event: Event; onClose: () => v
             <span>Checklist</span>
             <span>{event.checklistProgress}%</span>
           </div>
-          <div className="h-2 bg-[#27272e] rounded-full overflow-hidden">
+          <div className="h-2 bg-theme-border rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{
