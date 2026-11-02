@@ -16,7 +16,7 @@ export function StageOpsLogo({ compact = false, className = '', inverse = false 
       </span>
       {!compact && (
         <span className="stageops-logo__wordmark" aria-hidden="true">
-          <span className={inverse ? 'text-white' : 'text-content-primary'}>Stage</span>
+          <span className={inverse ? 'stageops-logo__base--inverse' : 'text-content-primary'}>Stage</span>
           <span className="stageops-logo__accent">Ops</span>
         </span>
       )}

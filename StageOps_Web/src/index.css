@@ -73,6 +73,10 @@
   background: var(--bg-deeper);
 }
 
+.light .stageops-logo__base--inverse {
+  color: var(--text-primary);
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -484,6 +488,10 @@
   .stageops-logo__accent {
     color: var(--brand-violet);
     font-style: italic;
+  }
+
+  .stageops-logo__base--inverse {
+    color: var(--brand-ivory);
   }
 
   .stageops-logo--compact .stageops-logo__mark {
