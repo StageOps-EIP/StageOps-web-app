@@ -1,7 +1,8 @@
 export type Vector3 = [number, number, number]
 export type TransformMode = 'translate' | 'rotate' | 'scale'
 export type LightType = 'directional' | 'spot' | 'point' | 'rect-area'
-export type ObjectType = 'equipment' | 'box' | 'plane' | 'cylinder'
+export type ObjectType = 'equipment' | 'box' | 'plane' | 'cylinder' | 'person' | 'chair' | 'table'
+export type Posture = 'standing' | 'sitting' | 'lying'
 export type MaterialPreset =
   | 'parquet'
   | 'beton'
@@ -13,7 +14,18 @@ export type MaterialPreset =
   | 'moquette'
 export type SurfaceKey = 'floor' | 'backWall' | 'leftWall' | 'rightWall' | 'ceiling'
 
-export const OBJECT_TYPES: readonly ObjectType[] = ['equipment', 'box', 'plane', 'cylinder']
+export const OBJECT_TYPES: readonly ObjectType[] = [
+  'equipment',
+  'box',
+  'plane',
+  'cylinder',
+  'person',
+  'chair',
+  'table',
+]
+export const POSTURES: readonly Posture[] = ['standing', 'sitting', 'lying']
+/** Objects built from several simple shapes, with their origin on the floor. */
+export const ASSEMBLED_OBJECT_TYPES: readonly ObjectType[] = ['person', 'chair', 'table']
 export const LIGHT_TYPES: readonly LightType[] = ['directional', 'spot', 'point', 'rect-area']
 export const SURFACE_KEYS: readonly SurfaceKey[] = [
   'floor',
@@ -43,6 +55,8 @@ export interface SceneObject {
   scale: Vector3
   material: SceneMaterial
   equipmentId?: string
+  /** Only for people. */
+  posture?: Posture
   geometry: { width: number; height: number; depth: number }
   visible: boolean
   locked: boolean
@@ -76,11 +90,65 @@ export interface RenderingSettings {
   highQuality: boolean
 }
 
-/** Editable content: what undo/redo restores. */
+/** A line of the stage manager's cue sheet: when (minute of the show) and which cue number. */
+export interface Cue {
+  id: string
+  number: number
+  /** Seconds since the start of the show. */
+  time: number
+  label: string
+  note: string
+}
+
+/**
+ * How an element reaches the state set by a cue:
+ * - cut: it keeps its previous state, then jumps at the cue time;
+ * - smooth: it moves/fades during `duration` seconds ending at the cue time,
+ *   or since its previous cue when `duration` is null.
+ */
+export type Transition = { kind: 'cut' } | { kind: 'smooth'; duration: number | null }
+
+export const OBJECT_ANIMATED_KEYS = ['position', 'rotation', 'visible', 'posture'] as const
+export const LIGHT_ANIMATED_KEYS = [
+  'position',
+  'targetPosition',
+  'intensity',
+  'temperature',
+  'color',
+  'angle',
+  'visible',
+] as const
+export type ObjectKeyValues = Partial<Pick<SceneObject, (typeof OBJECT_ANIMATED_KEYS)[number]>>
+export type LightKeyValues = Partial<Pick<SceneLight, (typeof LIGHT_ANIMATED_KEYS)[number]>>
+
+/** State of one element at one cue. */
+export type Keyframe =
+  | {
+      cueId: string
+      targetKind: 'object'
+      targetId: string
+      transition: Transition
+      values: ObjectKeyValues
+    }
+  | {
+      cueId: string
+      targetKind: 'light'
+      targetId: string
+      transition: Transition
+      values: LightKeyValues
+    }
+
+export interface Timeline {
+  cues: Cue[]
+  keyframes: Keyframe[]
+}
+
+/** Editable content: what undo/redo restores. The objects and lights are the base set-up. */
 export interface SceneContent {
   objects: SceneObject[]
   lights: SceneLight[]
   surfaces: SurfaceMaterials
+  timeline: Timeline
 }
 
 /** Persisted scene: content plus display preferences. */
@@ -203,7 +271,33 @@ const DEFAULT_OBJECT_NAMES: Record<ObjectType, string> = {
   box: 'Praticable',
   plane: 'Décor plan',
   cylinder: 'Colonne',
+  person: 'Personne',
+  chair: 'Chaise',
+  table: 'Table',
 }
+// Untextured materials: people are a flat neutral colour, furniture plain wood.
+const PERSON_MATERIAL: SceneMaterial = {
+  preset: 'custom',
+  color: '#c7ccd6',
+  roughness: 0.8,
+  metalness: 0,
+  emissive: '#000000',
+  emissiveIntensity: 0,
+  opacity: 1,
+  wireframe: false,
+}
+const ASSEMBLED_DEFAULTS: Partial<Record<ObjectType, Pick<SceneObject, 'geometry' | 'material'>>> =
+  {
+    person: { geometry: { width: 0.5, height: 1.75, depth: 0.3 }, material: PERSON_MATERIAL },
+    chair: {
+      geometry: { width: 0.45, height: 0.9, depth: 0.45 },
+      material: applyPreset('bois-brut'),
+    },
+    table: {
+      geometry: { width: 1.6, height: 0.75, depth: 0.8 },
+      material: applyPreset('bois-brut'),
+    },
+  }
 const DEFAULT_LIGHT_NAMES: Record<LightType, string> = {
   directional: 'Lumière directionnelle',
   spot: 'Spot',
@@ -212,6 +306,22 @@ const DEFAULT_LIGHT_NAMES: Record<LightType, string> = {
 }
 
 export function createSceneObject(type: ObjectType, id: string): SceneObject {
+  const assembled = ASSEMBLED_DEFAULTS[type]
+  if (assembled) {
+    return {
+      id,
+      name: DEFAULT_OBJECT_NAMES[type],
+      type,
+      position: [0, 0, 0],
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1],
+      material: { ...assembled.material },
+      geometry: { ...assembled.geometry },
+      visible: true,
+      locked: false,
+      ...(type === 'person' ? { posture: 'standing' as const } : {}),
+    }
+  }
   const flat = type === 'plane'
   return {
     id,
@@ -302,6 +412,7 @@ export function createDefaultScene(): Scene {
       rightWall: applyPreset('rideau'),
       ceiling: applyPreset('beton'),
     },
+    timeline: { cues: [], keyframes: [] },
     rendering: { ...DEFAULT_RENDERING },
   }
 }

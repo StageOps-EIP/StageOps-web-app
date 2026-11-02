@@ -12,6 +12,8 @@ import {
   Redo2,
   Camera,
   ChevronDown,
+  Clapperboard,
+  ListOrdered,
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -23,6 +25,9 @@ interface EditorToolbarProps {
 }
 
 const OBJECT_MENU: [ObjectType, string][] = [
+  ['person', 'Personne (mannequin)'],
+  ['chair', 'Chaise'],
+  ['table', 'Table'],
   ['box', 'Praticable (cube)'],
   ['plane', 'Décor plan'],
   ['cylinder', 'Colonne / cylindre'],
@@ -49,6 +54,8 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
   const navigate = useNavigate()
   const {
     scene,
+    mode,
+    setMode,
     transformMode,
     canUndo,
     canRedo,
@@ -93,6 +100,37 @@ export function EditorToolbar({ canvasRef }: EditorToolbarProps) {
 
       {/* ─ Centre ───────────────────────────────────────────────────── */}
       <div className="order-3 flex w-full items-center gap-2 overflow-x-auto pt-1 xl:order-none xl:w-auto xl:overflow-visible xl:pt-0">
+        {/* Décor edits the base set-up; Conduite records changes in cues */}
+        <div
+          role="group"
+          aria-label="Mode d’édition"
+          className="flex overflow-hidden rounded-md border border-theme-border"
+        >
+          {(
+            [
+              ['decor', 'Décor', ListOrdered],
+              ['conduite', 'Conduite', Clapperboard],
+            ] as const
+          ).map(([value, label, Icon], i) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={mode === value}
+              onClick={() => setMode(value)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium ${
+                mode === value
+                  ? 'bg-[var(--brand-violet)] text-[#080a10]'
+                  : 'bg-theme-elevated text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary'
+              } ${i > 0 ? 'border-l border-theme-border' : ''}`}
+            >
+              <Icon size={13} />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="h-6 w-px bg-theme-border" />
+
         {/* Mode badge */}
         {/* Transform modes — button group */}
         <div className="flex overflow-hidden rounded-md border border-theme-border">

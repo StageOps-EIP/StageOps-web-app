@@ -141,3 +141,20 @@ test('lights can be added, edited and removed immutably', () => {
   const removed = run(state, { type: 'light/deleted', id: 'p' })
   assert.equal(removed.scene.lights.length, 3)
 })
+
+test('people and furniture stand on the floor with simple untextured defaults', () => {
+  const kevin = createSceneObject('person', 'kevin')
+  assert.equal(kevin.posture, 'standing')
+  assert.deepEqual(kevin.position, [0, 0, 0])
+  assert.equal(kevin.material.preset, 'custom')
+  const chair = createSceneObject('chair', 'chair')
+  assert.equal(chair.posture, undefined)
+  assert.deepEqual(chair.position, [0, 0, 0])
+  const state = run(
+    initial(),
+    { type: 'object/added', object: kevin },
+    { type: 'object/updated', id: 'kevin', patch: { posture: 'sitting', name: 'Kevin' } },
+  )
+  assert.equal(state.scene.objects[0].posture, 'sitting')
+  assert.equal(state.scene.objects[0].name, 'Kevin')
+})

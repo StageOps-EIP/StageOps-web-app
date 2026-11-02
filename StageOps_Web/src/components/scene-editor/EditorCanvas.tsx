@@ -4,6 +4,7 @@ import type * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { useSceneEditor } from '@/hooks/useSceneEditor'
+import { useDisplayedScene } from '@/hooks/usePlayback'
 import { EditableObject } from './EditableObject'
 import { EditableLight } from './EditableLight'
 import { SurfaceObjects } from './SurfaceObjects'
@@ -16,7 +17,8 @@ interface EditorCanvasProps {
 
 export function EditorCanvas({ canvasRef, readOnly = false }: EditorCanvasProps) {
   const { scene, selection, transformMode, clearSelection } = useSceneEditor()
-  const { objects, lights, rendering: pp } = scene
+  const { objects, lights } = useDisplayedScene()
+  const pp = scene.rendering
 
   const [isDragging, setIsDragging] = useState(false)
 

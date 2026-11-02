@@ -1,6 +1,6 @@
 // crypto.randomUUID only exists in secure contexts (HTTPS or localhost); the fallback keeps
 // the editor usable when the dev server is opened from another machine on the network.
-export function createSceneId(kind: 'obj' | 'light'): string {
+export function createSceneId(kind: 'obj' | 'light' | 'cue'): string {
   const random =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()

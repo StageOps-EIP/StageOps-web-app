@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import {
+  Armchair,
+  PersonStanding,
+  Table,
   Box,
   Layers,
   Circle,
@@ -20,6 +23,9 @@ import { SURFACE_KEYS, kelvinToHex, type SceneLight, type SceneObject } from '@/
 import { SURFACE_LABELS } from './scene-editor.labels'
 
 function ObjectIcon({ type }: { type: SceneObject['type'] }) {
+  if (type === 'person') return <PersonStanding size={13} />
+  if (type === 'chair') return <Armchair size={13} />
+  if (type === 'table') return <Table size={13} />
   if (type === 'plane') return <Layers size={13} />
   if (type === 'cylinder') return <Circle size={13} />
   return <Box size={13} />
