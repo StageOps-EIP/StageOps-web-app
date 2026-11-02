@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router'
 import { Menu, X } from 'lucide-react'
 import { StageOpsLogo } from '@/components/brand/StageOpsLogo'
 import { useAuth } from '@/contexts/auth.context'
-import { useTheme } from '@/lib/use-theme'
 
 const navigation = [
   { name: 'Vue générale', mobileName: 'Accueil', href: '/' },
@@ -48,7 +47,6 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function Sidebar() {
-  const { theme, toggle } = useTheme()
   const { user } = useAuth()
 
   return (
@@ -76,12 +74,6 @@ export function Sidebar() {
       </div>
 
       <div className="px-5 pb-5 pt-3">
-        <button
-          onClick={toggle}
-          className="mb-4 text-left text-[11px] text-content-subtle transition-colors hover:text-content-primary"
-        >
-          {theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-        </button>
         <Link
           to="/profile"
           className="group flex items-center gap-3 border-t border-theme-border/70 pt-4"
@@ -105,7 +97,6 @@ export function Sidebar() {
 
 export function MobileHeader() {
   const [open, setOpen] = useState(false)
-  const { toggle } = useTheme()
 
   return (
     <>
@@ -129,13 +120,7 @@ export function MobileHeader() {
       {open && (
         <div className="absolute inset-x-0 top-16 z-50 border-b border-theme-border bg-theme-deeper p-4 shadow-xl lg:hidden">
           <NavigationLinks onNavigate={() => setOpen(false)} />
-          <div className="mt-3 grid grid-cols-2 gap-2 border-t border-theme-border pt-3">
-            <button
-              onClick={toggle}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-content-muted hover:bg-theme-elevated"
-            >
-              Apparence
-            </button>
+          <div className="mt-3 border-t border-theme-border pt-3">
             <Link
               to="/profile"
               onClick={() => setOpen(false)}

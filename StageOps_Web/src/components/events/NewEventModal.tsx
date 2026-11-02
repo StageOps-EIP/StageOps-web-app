@@ -105,7 +105,7 @@ export function NewEventModal({
             <Field label="Date de début">
               <input
                 type="datetime-local"
-                className="form-control px-3 [color-scheme:dark]"
+                className="form-control px-3"
                 value={form.start}
                 onChange={(event) => set('start', event.target.value)}
               />
@@ -113,7 +113,7 @@ export function NewEventModal({
             <Field label="Date de fin">
               <input
                 type="datetime-local"
-                className="form-control px-3 [color-scheme:dark]"
+                className="form-control px-3"
                 value={form.end}
                 onChange={(event) => set('end', event.target.value)}
               />

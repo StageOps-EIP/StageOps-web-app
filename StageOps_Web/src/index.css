@@ -6,48 +6,19 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   /* Rideau palette. Legacy token names stay as aliases for existing components. */
-  --brand-violet: #c9a14a;
-  --brand-violet-hover: #f2d79c;
+  --brand-violet: #8e1b2e;
+  --brand-violet-hover: #711627;
   --brand-blue: #8e1b2e;
-  --brand-soft: rgba(201, 161, 74, 0.13);
-  --brand-border: rgba(201, 161, 74, 0.42);
-  --brand-button-text: #16100f;
+  --brand-soft: rgba(142, 27, 46, 0.09);
+  --brand-border: rgba(142, 27, 46, 0.34);
+  --brand-button-text: #fff8ee;
   --brand-velvet: #4a0d1a;
   --brand-burgundy: #8e1b2e;
   --brand-ivory: #f4eee3;
 
-  /* Dark work surface. */
-  --bg-void: #160d0f;
-  --bg-deeper: #1e1015;
-  --bg-base: #29161b;
-  --bg-elevated: #362025;
-  --bg-hover: #42262c;
-  --border: #553a3c;
-  --border-hover: #785450;
-  --border-strong: #916f60;
-  --text-primary: #f4eee3;
-  --text-muted: #d0c1b2;
-  --text-subtle: #b49f92;
-  --text-faint: #9a8179;
-
-  /* Semantic colours: never used as decoration. */
-  --status-success: #22c55e;
-  --status-warning: #f59e0b;
-  --status-danger: #ef4444;
-  --status-info: #f2b134;
-  --status-neutral: #b49f92;
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --panel-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
-  --font-ui: 'DM Sans Variable', 'DM Sans', sans-serif;
-  --font-editorial: 'Fraunces Variable', 'Fraunces', serif;
-  --font-data: 'DM Sans Variable', 'DM Sans', sans-serif;
-}
-
-.light {
+  /* Single light work surface. */
   --bg-void: #f4eee3;
   --bg-deeper: #eee5d6;
   --bg-base: #fbf5ea;
@@ -60,21 +31,25 @@
   --text-muted: #5b4444;
   --text-subtle: #6e5552;
   --text-faint: #826e65;
-  --brand-violet: #8e1b2e;
-  --brand-violet-hover: #711627;
-  --brand-blue: #8e1b2e;
-  --brand-soft: rgba(142, 27, 46, 0.09);
-  --brand-border: rgba(142, 27, 46, 0.34);
-  --brand-button-text: #fff8ee;
+
+  /* Semantic colours: never used as decoration. */
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+  --status-info: #f2b134;
+  --status-neutral: #b49f92;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --panel-shadow: 0 12px 30px rgba(24, 26, 35, 0.07);
+  --font-ui: 'DM Sans Variable', 'DM Sans', sans-serif;
+  --font-editorial: 'Fraunces Variable', 'Fraunces', serif;
+  --font-data: 'DM Sans Variable', 'DM Sans', sans-serif;
 }
 
-.light .auth-rideau {
+.auth-rideau {
   background: var(--bg-deeper);
-}
-
-.light .stageops-logo__base--inverse {
-  color: var(--text-primary);
 }
 
 @layer base {
@@ -521,7 +496,7 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: var(--brand-velvet);
+    background: var(--bg-deeper);
   }
 
   .auth-rideau::before {

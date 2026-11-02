@@ -182,7 +182,7 @@ export function EditMemberModal({
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 aria-label="Rôle"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors [color-scheme:dark]"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
               >
                 {roleOptions.map((r) => (
                   <option key={r} value={r}>

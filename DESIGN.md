@@ -21,8 +21,8 @@ rounded:
   lg: "16px"
 components:
   button-primary:
-    backgroundColor: "{colors.or-de-scene}"
-    textColor: "{colors.coulisse}"
+    backgroundColor: "{colors.pourpre}"
+    textColor: "{colors.ivoire}"
     rounded: "{rounded.sm}"
 ---
 
@@ -34,7 +34,7 @@ La direction « Rideau » vient du fichier fourni par l'équipe, conservé dans 
 
 ## Colors
 
-Les couleurs de marque sont Velours `#4A0D1A`, Pourpre `#8E1B2E`, Or de scène `#C9A14A`, Coulisse `#16100F` et Ivoire `#F4EEE3`. Les surfaces de travail sombres et claires dérivent de cette palette dans `StageOps_Web/src/index.css`. Les couleurs d'état conservent une signification opérationnelle ; chaque état reste accompagné d'un libellé.
+Les couleurs de marque sont Velours `#4A0D1A`, Pourpre `#8E1B2E`, Or de scène `#C9A14A`, Coulisse `#16100F` et Ivoire `#F4EEE3`. L'interface utilise uniquement des surfaces claires, définies dans `StageOps_Web/src/index.css`. Le pourpre sert aux actions principales ; l'or reste un accent de marque. Les couleurs d'état conservent une signification opérationnelle ; chaque état reste accompagné d'un libellé.
 
 ## Typography
 
@@ -54,7 +54,7 @@ Le symbole reprend le rideau, l'écharpe et l'encadrement or du document source.
 
 ## Components
 
-Le bouton principal utilise l'or sur fond sombre, le pourpre sur fond clair. Le texte du bouton change avec le thème pour conserver le contraste. Les états hover, focus, disabled et erreur suivent les composants existants.
+Le bouton principal utilise le pourpre sur fond clair, avec un libellé ivoire. Les états hover, focus, disabled et erreur suivent les composants existants.
 
 ## Do's and Don'ts
 

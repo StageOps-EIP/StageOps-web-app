@@ -3,18 +3,16 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import {
   GeneralSettings,
   NotificationSettings,
-  AppearanceSettings,
   SecuritySettings,
   ExportSettings,
 } from './settings/index'
 import { PageHeader } from '@/components/design-system/PageHeader'
 
-type SettingsSection = 'general' | 'notifications' | 'appearance' | 'security' | 'export'
+type SettingsSection = 'general' | 'notifications' | 'security' | 'export'
 
 const sections: { key: SettingsSection; label: string; desc: string }[] = [
   { key: 'general', label: 'Général', desc: 'Lieu, langue, fuseau horaire' },
   { key: 'notifications', label: 'Notifications', desc: 'Alertes, emails, push' },
-  { key: 'appearance', label: 'Apparence', desc: 'Thème clair ou sombre' },
   { key: 'security', label: 'Sécurité', desc: 'Mot de passe, sessions' },
   { key: 'export', label: 'Export et données', desc: 'PDF, Excel, sauvegarde' },
 ]
@@ -68,7 +66,6 @@ export function Settings() {
         <div>
           {activeSection === 'general' && <GeneralSettings />}
           {activeSection === 'notifications' && <NotificationSettings />}
-          {activeSection === 'appearance' && <AppearanceSettings />}
           {activeSection === 'security' && <SecuritySettings />}
           {activeSection === 'export' && <ExportSettings />}
         </div>

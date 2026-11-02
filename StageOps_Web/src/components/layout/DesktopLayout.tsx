@@ -34,7 +34,7 @@ export function DesktopLayout() {
       </div>
       <MobileNav />
       <Toaster
-        theme="dark"
+        theme="light"
         position="bottom-right"
         toastOptions={{
           style: {

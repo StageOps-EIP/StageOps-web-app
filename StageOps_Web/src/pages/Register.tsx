@@ -94,7 +94,7 @@ export function Register() {
       <div className="mx-auto w-full max-w-lg">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <StageOpsLogo inverse className="mb-6" />
+          <StageOpsLogo className="mb-6" />
           <h1 className="mb-2 text-3xl font-semibold text-content-primary">Créer votre espace</h1>
           <p className="text-sm text-content-muted">
             Configurez votre profil de régie en quelques instants.

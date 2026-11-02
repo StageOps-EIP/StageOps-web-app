@@ -64,7 +64,7 @@ export function GeneralSettings() {
             aria-label="Langue de l'interface"
             value={language}
             onChange={(event) => setLanguage(event.target.value)}
-            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)] [color-scheme:dark]"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
           >
             <option>Français</option>
             <option>English</option>
@@ -75,7 +75,7 @@ export function GeneralSettings() {
             aria-label="Fuseau horaire"
             value={timezone}
             onChange={(event) => setTimezone(event.target.value)}
-            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)] [color-scheme:dark]"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
           >
             <option>Europe/Paris (CET)</option>
             <option>Europe/London (GMT)</option>
@@ -90,7 +90,7 @@ export function GeneralSettings() {
             aria-label="Convention scénique"
             value={convention}
             onChange={(event) => setConvention(event.target.value)}
-            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)] [color-scheme:dark]"
+            className="bg-theme-elevated border border-theme-border rounded-xl px-4 py-2 text-sm text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
           >
             <option>Cour / Jardin (FR)</option>
             <option>Stage Left / Stage Right (EN)</option>

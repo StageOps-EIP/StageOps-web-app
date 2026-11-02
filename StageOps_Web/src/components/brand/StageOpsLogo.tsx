@@ -1,10 +1,9 @@
 interface StageOpsLogoProps {
   compact?: boolean;
   className?: string;
-  inverse?: boolean;
 }
 
-export function StageOpsLogo({ compact = false, className = '', inverse = false }: StageOpsLogoProps) {
+export function StageOpsLogo({ compact = false, className = '' }: StageOpsLogoProps) {
   return (
     <div
       className={`stageops-logo ${compact ? 'stageops-logo--compact' : ''} ${className}`.trim()}
@@ -16,7 +15,7 @@ export function StageOpsLogo({ compact = false, className = '', inverse = false 
       </span>
       {!compact && (
         <span className="stageops-logo__wordmark" aria-hidden="true">
-          <span className={inverse ? 'stageops-logo__base--inverse' : 'text-content-primary'}>Stage</span>
+          <span className="text-content-primary">Stage</span>
           <span className="stageops-logo__accent">Ops</span>
         </span>
       )}

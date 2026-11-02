@@ -41,7 +41,7 @@ export function Login() {
       className="auth-surface grid min-h-dvh bg-theme-void text-content-primary lg:grid-cols-[22rem_minmax(32rem,1fr)]"
     >
       <section className="auth-rideau flex flex-col border-b border-theme-border bg-theme-deeper p-6 lg:border-b-0 lg:border-r lg:p-8">
-        <StageOpsLogo inverse />
+        <StageOpsLogo />
         <div className="my-auto py-10">
           <p className="text-[11px] font-semibold text-[var(--brand-violet-hover)]">
             Poste de travail
