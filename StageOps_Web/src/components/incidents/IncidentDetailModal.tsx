@@ -147,7 +147,7 @@ export function IncidentDetailModal({
                 Équipement concerné
               </p>
               <div className="flex items-center gap-4 p-4 bg-theme-elevated border border-theme-border rounded-xl">
-                <div className="p-2.5 bg-[#27272e] rounded-lg">
+                <div className="p-2.5 bg-theme-border rounded-lg">
                   <Wrench size={18} className="text-content-muted" />
                 </div>
                 <div className="flex-1">
@@ -169,8 +169,8 @@ export function IncidentDetailModal({
               </p>
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 size={14} className="text-green-400" />
-                  <p className="text-xs text-green-400">Résolu</p>
+                  <CheckCircle2 size={14} className="text-emerald-700" />
+                  <p className="text-xs text-emerald-700">Résolu</p>
                 </div>
                 <p className="text-sm text-content-muted leading-relaxed">
                   {incident.resolutionNotes}
@@ -242,7 +242,7 @@ function TimelineItem({ color, label, time }: { color: string; label: string; ti
     <div className="flex items-start gap-3 py-2">
       <div className="flex flex-col items-center mt-1">
         <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-        <div className="w-px h-6 bg-[#27272e]" />
+        <div className="w-px h-6 bg-theme-border" />
       </div>
       <div className="flex-1">
         <p className="text-sm text-content-primary">{label}</p>

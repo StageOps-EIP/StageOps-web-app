@@ -159,12 +159,14 @@ export function AddEquipmentModal({
               value={form.name}
               onChange={(e) => set('name', e.target.value)}
               placeholder="Ex : Console Son DiGiCo SD12"
-              className={`w-full bg-theme-elevated border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                errors.name ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400/50'
+              className={`w-full bg-theme-elevated border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
+                errors.name
+                  ? 'border-red-500/60'
+                  : 'border-theme-border focus:border-[var(--brand-border)]'
               }`}
             />
             {errors.name && (
-              <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+              <p className="text-xs text-red-700 mt-1.5 flex items-center gap-1">
                 <AlertCircle size={11} /> {errors.name}
               </p>
             )}
@@ -188,7 +190,7 @@ export function AddEquipmentModal({
                         }
                       : {
                           backgroundColor: 'transparent',
-                          borderColor: '#27272e',
+                          borderColor: 'var(--border)',
                           color: TEXT_COLORS.subtle,
                         }
                   }
@@ -220,8 +222,8 @@ export function AddEquipmentModal({
                         }
                       : {
                           backgroundColor: 'transparent',
-                          borderColor: '#27272e',
-                          color: '#71717a',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-subtle)',
                         }
                   }
                 >
@@ -257,14 +259,14 @@ export function AddEquipmentModal({
                   onChange={(e) => set('location', e.target.value)}
                   placeholder="Ex : Régie Son"
                   aria-label="Emplacement"
-                  className={`w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b focus:outline-none pb-0.5 transition-colors ${
+                  className={`w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b focus:outline-none pb-0.5 transition-colors ${
                     errors.location
                       ? 'border-red-500/60'
-                      : 'border-theme-border focus:border-cyan-400'
+                      : 'border-theme-border focus:border-[var(--brand-violet)]'
                   }`}
                 />
                 {errors.location && (
-                  <p className="text-[10px] text-red-400 mt-1">{errors.location}</p>
+                  <p className="text-[10px] text-red-700 mt-1">{errors.location}</p>
                 )}
               </div>
 
@@ -279,7 +281,7 @@ export function AddEquipmentModal({
                   onChange={(e) => set('zone', e.target.value)}
                   placeholder="Ex : FOH, Jardin…"
                   aria-label="Zone"
-                  className="w-full bg-transparent text-sm text-content-primary placeholder-[#35353e] border-b border-theme-border focus:border-cyan-400 focus:outline-none pb-0.5 transition-colors"
+                  className="w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b border-theme-border focus:border-[var(--brand-violet)] focus:outline-none pb-0.5 transition-colors"
                 />
               </div>
             </div>
@@ -299,7 +301,7 @@ export function AddEquipmentModal({
                 onChange={(e) => set('responsiblePerson', e.target.value)}
                 placeholder="Nom du responsable"
                 aria-label="Nom du responsable"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
               />
             </div>
           </div>
@@ -310,7 +312,7 @@ export function AddEquipmentModal({
             <div className="relative">
               <QrCode
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--brand-violet-hover)] pointer-events-none"
               />
               <input
                 type="text"
@@ -318,7 +320,7 @@ export function AddEquipmentModal({
                 onChange={(e) => set('qrCode', e.target.value)}
                 placeholder="Généré automatiquement si vide"
                 aria-label="Code QR"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle font-mono focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
               />
             </div>
             <p className="text-[11px] text-content-subtle mt-1.5">
@@ -335,7 +337,7 @@ export function AddEquipmentModal({
                 onChange={(e) => set('notes', e.target.value)}
                 placeholder="Observations, état général, points d'attention..."
                 rows={3}
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 resize-none transition-colors"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] resize-none transition-colors"
               />
               <FileText
                 size={14}
@@ -347,9 +349,9 @@ export function AddEquipmentModal({
           {/* Avertissements contextuels */}
           {form.status === 'hs' && (
             <div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-              <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
+              <AlertCircle size={16} className="text-red-700 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm text-red-400 font-medium">Équipement hors service</p>
+                <p className="text-sm text-red-700 font-medium">Équipement hors service</p>
                 <p className="text-xs text-content-muted mt-1">
                   Cet équipement sera ajouté comme HS. Pensez à créer un incident associé.
                 </p>

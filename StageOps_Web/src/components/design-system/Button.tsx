@@ -12,16 +12,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      'group relative inline-flex items-center justify-center rounded-none border font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none'
+      'group relative inline-flex min-h-10 items-center justify-center rounded-lg border font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40'
 
     const variants = {
       primary:
-        'border-transparent bg-[var(--brand-violet)] text-[#080a10] hover:bg-[var(--brand-violet-hover)]',
+        'border-transparent bg-[var(--brand-violet)] text-[var(--brand-button-text)] hover:bg-[var(--brand-violet-hover)]',
       secondary:
-        'border-theme-border bg-theme-elevated text-content-primary hover:border-theme-border-hover hover:bg-[var(--bg-hover)]',
+        'border-theme-border bg-theme-base text-content-primary hover:border-theme-border-hover hover:bg-theme-elevated',
       ghost:
         'border-transparent text-content-muted hover:border-theme-border hover:bg-theme-elevated hover:text-content-primary',
-      danger: 'border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500 hover:text-white',
+      danger: 'border-red-600/30 bg-red-50 text-red-800 hover:bg-red-100',
     }
 
     const sizes = {

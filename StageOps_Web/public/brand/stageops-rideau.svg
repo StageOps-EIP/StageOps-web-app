@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 224" role="img" aria-label="StageOps">
+  <path d="M20 216V95a80 80 0 0 1 160 0v121Z" fill="#8E1B2E"/>
+  <path d="M40 70c-6 50 2 100-4 146M162 62c-10 53 6 103-4 154M128 150c-8 25-4 46-10 66" fill="none" stroke="#4A0D1A" stroke-width="3"/>
+  <path d="M111 16c-11 44-16 76-35 114-15 30-23 56-26 86h39c3-30 12-56 24-80 17-36 25-70 37-103-12-9-25-15-39-17Z" fill="#F2D79C"/>
+  <path d="M20 216V95a80 80 0 0 1 160 0v121" fill="none" stroke="#C9A14A" stroke-width="9"/>
+  <path d="M8 212h184v11H8z" fill="#C9A14A"/>
+</svg>

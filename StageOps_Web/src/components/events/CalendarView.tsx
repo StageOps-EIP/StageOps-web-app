@@ -96,7 +96,7 @@ export function CalendarView({
                   <span
                     className={`flex h-6 w-6 items-center justify-center text-xs font-medium ${
                       isToday
-                        ? 'bg-[var(--brand-violet)] text-[#080a10] font-bold'
+                        ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)] font-bold'
                         : 'text-content-subtle'
                     }`}
                   >

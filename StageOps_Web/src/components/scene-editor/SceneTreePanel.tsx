@@ -77,7 +77,7 @@ export function SceneTreePanel() {
 
       <div className="flex-1 overflow-y-auto">
         {/* ─ Objects section ────────────────────────────────────────── */}
-        <div className="border-b border-[#27272e]/60">
+        <div className="border-b border-theme-border/60">
           <div className="flex items-center px-2">
             <button
               className="flex flex-1 items-center gap-1.5 px-2 py-2.5 text-left text-xs font-semibold text-content-muted transition-colors hover:text-content-primary"
@@ -99,7 +99,7 @@ export function SceneTreePanel() {
           {objectsOpen && (
             <ul className="pb-1">
               {objects.length === 0 && (
-                <li className="px-4 py-3 text-[11px] text-[#52525b] italic">
+                <li className="px-4 py-3 text-[11px] text-content-muted italic">
                   Aucun objet — cliquez + pour ajouter
                 </li>
               )}
@@ -131,7 +131,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateObject(obj.id, { visible: !obj.visible })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {obj.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                         </button>
@@ -144,7 +144,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateObject(obj.id, { locked: !obj.locked })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {obj.locked ? <Lock size={10} /> : <Unlock size={10} />}
                         </button>
@@ -155,7 +155,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             deleteObject(obj.id)
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-700"
                         >
                           <Trash2 size={10} />
                         </button>
@@ -169,7 +169,7 @@ export function SceneTreePanel() {
         </div>
 
         {/* ─ Lights section ─────────────────────────────────────────── */}
-        <div className="border-b border-[#27272e]/60">
+        <div className="border-b border-theme-border/60">
           <div className="flex items-center px-2">
             <button
               className="flex flex-1 items-center gap-1.5 px-2 py-2.5 text-left text-xs font-semibold text-content-muted transition-colors hover:text-content-primary"
@@ -225,7 +225,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateLight(light.id, { visible: !light.visible })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {light.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                         </button>
@@ -236,7 +236,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             deleteLight(light.id)
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-700"
                         >
                           <Trash2 size={10} />
                         </button>
@@ -262,8 +262,8 @@ export function SceneTreePanel() {
                     onClick={() => select({ kind: 'surface', id: key })}
                     className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs text-left transition-colors ${
                       isActive
-                        ? 'bg-cyan-400/10 border-l-2 border-cyan-400 text-[#f5f5f7]'
-                        : 'border-l-2 border-transparent text-[#a1a1aa] hover:bg-[#1c1c21] hover:text-[#f5f5f7]'
+                        ? 'bg-[var(--brand-soft)] border-l-2 border-[var(--brand-violet)] text-content-primary'
+                        : 'border-l-2 border-transparent text-content-muted hover:bg-theme-elevated hover:text-content-primary'
                     }`}
                   >
                     <span

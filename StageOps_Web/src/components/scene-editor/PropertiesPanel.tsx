@@ -57,8 +57,8 @@ function Slider({
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-[11px] text-[#71717a]">{label}</span>
-        <span className="text-[11px] text-[#a1a1aa] font-mono">{value.toFixed(2)}</span>
+        <span className="text-[11px] text-content-subtle">{label}</span>
+        <span className="text-[11px] text-content-muted font-mono">{value.toFixed(2)}</span>
       </div>
       <input
         type="range"
@@ -68,7 +68,7 @@ function Slider({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         {...gesture}
-        className="w-full h-1.5 rounded-full accent-cyan-400 bg-[#27272e]"
+        className="w-full h-1.5 rounded-full accent-[var(--brand-violet)] bg-theme-border"
       />
     </div>
   )
@@ -91,7 +91,7 @@ function NumInput({
   const gesture = useGestureHandlers()
   return (
     <div>
-      <label className="block text-[10px] text-[#52525b] mb-0.5">{label}</label>
+      <label className="block text-[10px] text-content-muted mb-0.5">{label}</label>
       <input
         type="number"
         step={step ?? 0.1}
@@ -99,7 +99,7 @@ function NumInput({
         value={Math.round(value * 100) / 100}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
         {...gesture}
-        className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+        className="w-full bg-theme-elevated border border-theme-border rounded-lg px-2 py-1 text-xs text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
       />
     </div>
   )
@@ -122,15 +122,15 @@ function MaterialPresetGrid({
           title={PRESET_LABELS[p]}
           className={`flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all ${
             current === p
-              ? 'border-cyan-400 bg-cyan-400/10'
-              : 'border-[#27272e] hover:border-[#35353e] bg-[#1c1c21]'
+              ? 'border-[var(--brand-violet)] bg-[var(--brand-soft)]'
+              : 'border-theme-border hover:border-theme-border-hover bg-theme-elevated'
           }`}
         >
           <span
             className="w-5 h-5 rounded"
             style={{ backgroundColor: MATERIAL_PRESETS[p].color }}
           />
-          <span className="text-[9px] text-[#71717a] truncate w-full text-center leading-none">
+          <span className="text-[9px] text-content-subtle truncate w-full text-center leading-none">
             {PRESET_LABELS[p].split(' ')[0]}
           </span>
         </button>
@@ -158,13 +158,13 @@ function MaterialEditor({
         }}
       />
 
-      <div className="h-px bg-[#27272e]" />
-      <p className="text-[10px] text-[#52525b] uppercase tracking-wider font-semibold">
+      <div className="h-px bg-theme-border" />
+      <p className="text-[10px] text-content-muted uppercase tracking-wider font-semibold">
         Personnaliser
       </p>
 
       <div>
-        <label className="block text-[11px] text-[#71717a] mb-1">Couleur</label>
+        <label className="block text-[11px] text-content-subtle mb-1">Couleur</label>
         <div className="flex items-center gap-2">
           <input
             type="color"
@@ -173,7 +173,7 @@ function MaterialEditor({
             {...gesture}
             className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
           />
-          <span className="text-xs text-[#52525b] font-mono">{material.color}</span>
+          <span className="text-xs text-content-muted font-mono">{material.color}</span>
         </div>
       </div>
 
@@ -195,7 +195,7 @@ function MaterialEditor({
       />
 
       <div>
-        <label className="block text-[11px] text-[#71717a] mb-1">Émissif</label>
+        <label className="block text-[11px] text-content-subtle mb-1">Émissif</label>
         <input
           type="color"
           value={material.emissive}
@@ -227,9 +227,9 @@ function MaterialEditor({
           type="checkbox"
           checked={material.wireframe}
           onChange={(e) => onChange({ wireframe: e.target.checked })}
-          className="accent-cyan-400"
+          className="accent-[var(--brand-violet)]"
         />
-        <span className="text-xs text-[#a1a1aa]">Wireframe</span>
+        <span className="text-xs text-content-muted">Wireframe</span>
       </label>
     </div>
   )
@@ -277,8 +277,8 @@ function CueSection({ target }: { target: TimelineTarget }) {
                 }
                 className={`flex-1 rounded-md border px-2 py-1 text-[11px] ${
                   transition.kind === kind
-                    ? 'border-cyan-400 bg-cyan-400/10 text-[#f5f5f7]'
-                    : 'border-[#27272e] text-[#a1a1aa] hover:text-[#f5f5f7]'
+                    ? 'border-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary'
+                    : 'border-theme-border text-content-muted hover:text-content-primary'
                 }`}
               >
                 {label}
@@ -305,7 +305,7 @@ function CueSection({ target }: { target: TimelineTarget }) {
                 }}
                 onFocus={beginGesture}
                 onBlur={endGesture}
-                className="w-16 rounded border border-[#27272e] bg-[#1c1c21] px-1.5 py-0.5 text-xs text-[#f5f5f7]"
+                className="w-16 rounded border border-theme-border bg-theme-elevated px-1.5 py-0.5 text-xs text-content-primary"
               />
               <span>
                 s {transition.duration === null ? '(depuis le cue précédent)' : 'avant le cue'}
@@ -315,7 +315,7 @@ function CueSection({ target }: { target: TimelineTarget }) {
           <button
             type="button"
             onClick={() => removeFromCue(cue.id, target)}
-            className="text-[11px] text-red-400 hover:underline"
+            className="text-[11px] text-red-700 hover:underline"
           >
             Retirer cet élément de Q{cue.number}
           </button>
@@ -354,9 +354,9 @@ function ObjectPanel() {
           value={obj.name}
           onChange={(e) => updateObj({ name: e.target.value })}
           {...gesture}
-          className="w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+          className="w-full bg-theme-elevated border border-theme-border rounded-lg px-2 py-1 text-xs text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
         />
-        <p className="mt-1 text-[10px] text-[#52525b]">{obj.type}</p>
+        <p className="mt-1 text-[10px] text-content-muted">{obj.type}</p>
         {obj.type === 'person' && (
           <div className="mt-3 flex gap-1" role="group" aria-label="Posture">
             {(Object.keys(POSTURE_LABELS) as Posture[]).map((posture) => (
@@ -367,8 +367,8 @@ function ObjectPanel() {
                 onClick={() => updateObj({ posture })}
                 className={`flex-1 rounded-md border px-2 py-1 text-[11px] ${
                   (obj.posture ?? 'standing') === posture
-                    ? 'border-cyan-400 bg-cyan-400/10 text-[#f5f5f7]'
-                    : 'border-[#27272e] text-[#a1a1aa] hover:text-[#f5f5f7]'
+                    ? 'border-[var(--brand-violet)] bg-[var(--brand-soft)] text-content-primary'
+                    : 'border-theme-border text-content-muted hover:text-content-primary'
                 }`}
               >
                 {POSTURE_LABELS[posture]}
@@ -381,15 +381,15 @@ function ObjectPanel() {
       <CueSection target={{ kind: 'object', id: obj.id }} />
 
       {/* Tabs */}
-      <div className="flex border-b border-[#27272e] mb-4 px-2">
+      <div className="flex border-b border-theme-border mb-4 px-2">
         {(['transform', 'material'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-3 py-2 text-xs font-medium capitalize transition-colors ${
               tab === t
-                ? 'text-cyan-400 border-b-2 border-cyan-400'
-                : 'text-[#71717a] hover:text-[#a1a1aa]'
+                ? 'text-[var(--brand-violet-hover)] border-b-2 border-[var(--brand-violet)]'
+                : 'text-content-subtle hover:text-content-muted'
             }`}
           >
             {t === 'transform' ? 'Transform' : 'Matériau'}
@@ -401,7 +401,7 @@ function ObjectPanel() {
         {tab === 'transform' && (
           <>
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Position
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -421,7 +421,7 @@ function ObjectPanel() {
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Rotation (°)
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -442,7 +442,7 @@ function ObjectPanel() {
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Échelle
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -471,7 +471,7 @@ function ObjectPanel() {
                   scale: [1, 1, 1],
                 })
               }
-              className="w-full px-3 py-1.5 rounded-lg text-xs text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] transition-colors"
+              className="w-full px-3 py-1.5 rounded-lg text-xs text-content-subtle bg-theme-elevated hover:bg-theme-border hover:text-content-primary transition-colors"
             >
               Réinitialiser transform
             </button>
@@ -482,18 +482,18 @@ function ObjectPanel() {
                   type="checkbox"
                   checked={obj.visible}
                   onChange={(e) => updateObj({ visible: e.target.checked })}
-                  className="accent-cyan-400"
+                  className="accent-[var(--brand-violet)]"
                 />
-                <span className="text-xs text-[#a1a1aa]">Visible</span>
+                <span className="text-xs text-content-muted">Visible</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={obj.locked}
                   onChange={(e) => updateObj({ locked: e.target.checked })}
-                  className="accent-cyan-400"
+                  className="accent-[var(--brand-violet)]"
                 />
-                <span className="text-xs text-[#a1a1aa]">Verrouillé</span>
+                <span className="text-xs text-content-muted">Verrouillé</span>
               </label>
             </div>
           </>
@@ -536,7 +536,7 @@ function LightPanel() {
       <div className="px-4 space-y-4">
         {/* En-tête : badge type + nom modifiable */}
         <div>
-          <span className="inline-block px-2 py-0.5 rounded-full bg-[#27272e] text-[10px] text-[#a1a1aa] font-medium">
+          <span className="inline-block px-2 py-0.5 rounded-full bg-theme-border text-[10px] text-content-muted font-medium">
             {typeLabels[light.type] ?? light.type}
           </span>
           <input
@@ -544,13 +544,13 @@ function LightPanel() {
             value={light.name}
             onChange={(e) => update({ name: e.target.value })}
             {...gesture}
-            className="mt-1 w-full bg-[#1c1c21] border border-[#27272e] rounded-lg px-2 py-1 text-xs text-[#f5f5f7] focus:outline-none focus:border-cyan-400/50"
+            className="mt-1 w-full bg-theme-elevated border border-theme-border rounded-lg px-2 py-1 text-xs text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
           />
         </div>
 
         {/* Position XYZ */}
         <div>
-          <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+          <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
             Position
           </p>
           <div className="grid grid-cols-3 gap-1.5">
@@ -572,7 +572,7 @@ function LightPanel() {
         {/* Target XYZ — spot uniquement */}
         {light.type === 'spot' && (
           <div>
-            <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+            <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
               Cible (Target)
             </p>
             <div className="grid grid-cols-3 gap-1.5">
@@ -604,9 +604,9 @@ function LightPanel() {
         {/* Température avec barre gradient */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-[#71717a]">Température (K)</span>
+            <span className="text-[11px] text-content-subtle">Température (K)</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-[#52525b] font-mono">{light.temperature}K</span>
+              <span className="text-[10px] text-content-muted font-mono">{light.temperature}K</span>
               <span
                 className="w-5 h-5 rounded border border-white/10"
                 style={{ backgroundColor: kelvinToHex(light.temperature) }}
@@ -624,7 +624,7 @@ function LightPanel() {
               update({ temperature: temp, color: kelvinToHex(temp) })
             }}
             {...gesture}
-            className="w-full h-1.5 rounded-full accent-cyan-400"
+            className="w-full h-1.5 rounded-full accent-[var(--brand-violet)]"
             style={{ background: 'transparent' }}
           />
           {/* Barre de visualisation couleur température */}
@@ -632,14 +632,14 @@ function LightPanel() {
             className="w-full h-2 rounded-full mt-1"
             style={{ background: 'linear-gradient(to right, #ff7700, #ffffff, #aaccff)' }}
           />
-          <div className="flex justify-between text-[9px] text-[#52525b] mt-0.5">
+          <div className="flex justify-between text-[9px] text-content-muted mt-0.5">
             <span>2700K</span>
             <span>10000K</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-[11px] text-[#71717a] mb-1">Couleur override</label>
+          <label className="block text-[11px] text-content-subtle mb-1">Couleur override</label>
           <input
             type="color"
             value={light.color}
@@ -655,9 +655,9 @@ function LightPanel() {
               type="checkbox"
               checked={light.castShadow}
               onChange={(e) => update({ castShadow: e.target.checked })}
-              className="accent-cyan-400"
+              className="accent-[var(--brand-violet)]"
             />
-            <span className="text-xs text-[#a1a1aa]">Projeter ombres</span>
+            <span className="text-xs text-content-muted">Projeter ombres</span>
           </label>
         )}
 
@@ -698,14 +698,14 @@ function LightPanel() {
             type="checkbox"
             checked={light.visible}
             onChange={(e) => update({ visible: e.target.checked })}
-            className="accent-cyan-400"
+            className="accent-[var(--brand-violet)]"
           />
-          <span className="text-xs text-[#a1a1aa]">Visible</span>
+          <span className="text-xs text-content-muted">Visible</span>
         </label>
 
         <button
           onClick={() => deleteLight(light.id)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-700 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
         >
           <Trash2 size={13} />
           Supprimer la lumière
@@ -729,14 +729,14 @@ function SurfacePanel() {
   return (
     <div className="px-4 space-y-4">
       <div>
-        <p className="text-xs text-[#a1a1aa] font-medium">Surface : {SURFACE_LABELS[key]}</p>
+        <p className="text-xs text-content-muted font-medium">Surface : {SURFACE_LABELS[key]}</p>
       </div>
 
       <MaterialEditor material={mat} onChange={update} />
 
       <button
         onClick={() => applyMaterialToAllSurfaces(mat)}
-        className="w-full px-3 py-2 rounded-lg text-xs font-medium text-[#71717a] bg-[#1c1c21] hover:bg-[#27272e] hover:text-[#f5f5f7] border border-[#27272e] transition-colors"
+        className="w-full px-3 py-2 rounded-lg text-xs font-medium text-content-subtle bg-theme-elevated hover:bg-theme-border hover:text-content-primary border border-theme-border transition-colors"
       >
         Appliquer à toutes les surfaces
       </button>

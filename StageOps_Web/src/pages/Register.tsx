@@ -94,9 +94,9 @@ export function Register() {
       <div className="mx-auto w-full max-w-lg">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <StageOpsLogo inverse className="mb-6" />
-          <h1 className="mb-2 text-3xl font-semibold text-white">Créer votre espace</h1>
-          <p className="text-sm text-blue-100/55">
+          <StageOpsLogo className="mb-6" />
+          <h1 className="mb-2 text-3xl font-semibold text-content-primary">Créer votre espace</h1>
+          <p className="text-sm text-content-muted">
             Configurez votre profil de régie en quelques instants.
           </p>
         </div>
@@ -107,25 +107,33 @@ export function Register() {
             <div className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                  step >= 1 ? 'bg-cyan-400 text-black' : 'bg-[#27272e] text-[#71717a]'
+                  step >= 1
+                    ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]'
+                    : 'bg-theme-border text-content-subtle'
                 }`}
               >
                 {step > 1 ? <CheckCircle2 size={14} /> : '1'}
               </div>
-              <span className={`text-sm ${step === 1 ? 'text-[#f5f5f7]' : 'text-[#71717a]'}`}>
+              <span
+                className={`text-sm ${step === 1 ? 'text-content-primary' : 'text-content-subtle'}`}
+              >
                 Informations
               </span>
             </div>
-            <div className="flex-1 h-px bg-[#27272e]" />
+            <div className="flex-1 h-px bg-theme-border" />
             <div className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                  step >= 2 ? 'bg-cyan-400 text-black' : 'bg-[#27272e] text-[#71717a]'
+                  step >= 2
+                    ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]'
+                    : 'bg-theme-border text-content-subtle'
                 }`}
               >
                 2
               </div>
-              <span className={`text-sm ${step === 2 ? 'text-[#f5f5f7]' : 'text-[#71717a]'}`}>
+              <span
+                className={`text-sm ${step === 2 ? 'text-content-primary' : 'text-content-subtle'}`}
+              >
                 Sécurité
               </span>
             </div>
@@ -134,104 +142,106 @@ export function Register() {
           {/* Step 1 */}
           {step === 1 && (
             <form onSubmit={handleNext} className="space-y-4">
-              <h2 className="text-xl font-semibold text-[#f5f5f7] mb-4">Vos informations</h2>
+              <h2 className="text-xl font-semibold text-content-primary mb-4">Vos informations</h2>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-[#a1a1aa] mb-1.5">Prénom *</label>
+                  <label className="block text-sm text-content-muted mb-1.5">Prénom *</label>
                   <div className="relative">
                     <User
                       size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
                     />
                     <input
                       type="text"
                       value={form.firstName}
                       onChange={(e) => set('firstName', e.target.value)}
                       placeholder="Prénom"
-                      className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                      className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                         errors.firstName
                           ? 'border-red-500/60'
-                          : 'border-[#27272e] focus:border-cyan-400/50'
+                          : 'border-theme-border focus:border-[var(--brand-violet)]'
                       }`}
                     />
                   </div>
                   {errors.firstName && (
-                    <p className="text-xs text-red-400 mt-1">{errors.firstName}</p>
+                    <p className="text-xs text-red-700 mt-1">{errors.firstName}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm text-[#a1a1aa] mb-1.5">Nom *</label>
+                  <label className="block text-sm text-content-muted mb-1.5">Nom *</label>
                   <input
                     type="text"
                     value={form.lastName}
                     onChange={(e) => set('lastName', e.target.value)}
                     placeholder="Nom"
-                    className={`w-full bg-[#1c1c21] border rounded-xl px-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                    className={`w-full bg-theme-elevated border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                       errors.lastName
                         ? 'border-red-500/60'
-                        : 'border-[#27272e] focus:border-cyan-400/50'
+                        : 'border-theme-border focus:border-[var(--brand-violet)]'
                     }`}
                   />
                   {errors.lastName && (
-                    <p className="text-xs text-red-400 mt-1">{errors.lastName}</p>
+                    <p className="text-xs text-red-700 mt-1">{errors.lastName}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">Email professionnel *</label>
+                <label className="block text-sm text-content-muted mb-1.5">
+                  Email professionnel *
+                </label>
                 <div className="relative">
                   <Mail
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
                   />
                   <input
                     type="email"
                     value={form.email}
                     onChange={(e) => set('email', e.target.value)}
                     placeholder="votre.email@theatre.fr"
-                    className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                    className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                       errors.email
                         ? 'border-red-500/60'
-                        : 'border-[#27272e] focus:border-cyan-400/50'
+                        : 'border-theme-border focus:border-[var(--brand-violet)]'
                     }`}
                   />
                 </div>
-                {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-red-700 mt-1">{errors.email}</p>}
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">Téléphone</label>
+                <label className="block text-sm text-content-muted mb-1.5">Téléphone</label>
                 <div className="relative">
                   <Phone
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
                   />
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => set('phone', e.target.value)}
                     placeholder="+33 6 00 00 00 00"
-                    className="w-full bg-[#1c1c21] border border-[#27272e] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
+                    className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-violet)] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">Rôle *</label>
+                <label className="block text-sm text-content-muted mb-1.5">Rôle *</label>
                 <div className="relative">
                   <Briefcase
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
                   />
                   <select
                     value={form.role}
                     onChange={(e) => set('role', e.target.value)}
-                    className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors [color-scheme:dark] ${
+                    className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors  ${
                       errors.role
                         ? 'border-red-500/60'
-                        : 'border-[#27272e] focus:border-cyan-400/50'
+                        : 'border-theme-border focus:border-[var(--brand-violet)]'
                     }`}
                   >
                     <option value="">Sélectionner un rôle</option>
@@ -242,7 +252,7 @@ export function Register() {
                     ))}
                   </select>
                 </div>
-                {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
+                {errors.role && <p className="text-xs text-red-700 mt-1">{errors.role}</p>}
               </div>
 
               <Button type="submit" variant="primary" size="lg" fullWidth className="mt-2">
@@ -258,48 +268,48 @@ export function Register() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="p-1.5 rounded-lg hover:bg-[#27272e] text-[#71717a] hover:text-[#f5f5f7] transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
-                <h2 className="text-xl font-semibold text-[#f5f5f7]">Sécurité du compte</h2>
+                <h2 className="text-xl font-semibold text-content-primary">Sécurité du compte</h2>
               </div>
 
               {/* Résumé step 1 */}
-              <div className="flex items-center gap-3 p-3 bg-cyan-400/5 border border-cyan-400/20 rounded-xl mb-2">
-                <div className="w-9 h-9 bg-cyan-400/10 rounded-xl flex items-center justify-center shrink-0">
-                  <User size={16} className="text-cyan-400" />
+              <div className="flex items-center gap-3 p-3 bg-[var(--brand-soft)] border border-[var(--brand-border)] rounded-xl mb-2">
+                <div className="w-9 h-9 bg-[var(--brand-soft)] rounded-xl flex items-center justify-center shrink-0">
+                  <User size={16} className="text-[var(--brand-violet-hover)]" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#f5f5f7]">
+                  <p className="text-sm text-content-primary">
                     {form.firstName} {form.lastName}
                   </p>
-                  <p className="text-xs text-[#71717a]">
+                  <p className="text-xs text-content-subtle">
                     {form.role} · {form.email}
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">Mot de passe *</label>
+                <label className="block text-sm text-content-muted mb-1.5">Mot de passe *</label>
                 <div className="relative">
                   <Lock
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
                   />
                   <input
                     type="password"
                     value={form.password}
                     onChange={(e) => set('password', e.target.value)}
                     placeholder="8 car. min, 1 maj, 1 chiffre, 1 spécial"
-                    className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                    className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                       errors.password
                         ? 'border-red-500/60'
-                        : 'border-[#27272e] focus:border-cyan-400/50'
+                        : 'border-theme-border focus:border-[var(--brand-violet)]'
                     }`}
                   />
                 </div>
-                {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-xs text-red-700 mt-1">{errors.password}</p>}
                 {/* Password strength */}
                 {form.password && (
                   <div className="flex gap-1 mt-2">
@@ -315,7 +325,7 @@ export function Register() {
                                 : form.password.length >= 8
                                   ? '#f59e0b'
                                   : '#ef4444'
-                              : '#27272e',
+                              : 'var(--border)',
                         }}
                       />
                     ))}
@@ -324,33 +334,33 @@ export function Register() {
               </div>
 
               <div>
-                <label className="block text-sm text-[#a1a1aa] mb-1.5">
+                <label className="block text-sm text-content-muted mb-1.5">
                   Confirmer le mot de passe *
                 </label>
                 <div className="relative">
                   <Lock
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle"
                   />
                   <input
                     type="password"
                     value={form.confirmPassword}
                     onChange={(e) => set('confirmPassword', e.target.value)}
                     placeholder="••••••••"
-                    className={`w-full bg-[#1c1c21] border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#f5f5f7] placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                    className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-2.5 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                       errors.confirmPassword
                         ? 'border-red-500/60'
-                        : 'border-[#27272e] focus:border-cyan-400/50'
+                        : 'border-theme-border focus:border-[var(--brand-violet)]'
                     }`}
                   />
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-400 mt-1">{errors.confirmPassword}</p>
+                  <p className="text-xs text-red-700 mt-1">{errors.confirmPassword}</p>
                 )}
               </div>
 
               {errors.general && (
-                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                <p className="text-sm text-red-700 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
                   {errors.general}
                 </p>
               )}
@@ -369,17 +379,20 @@ export function Register() {
             </form>
           )}
 
-          <div className="mt-6 pt-6 border-t border-[#27272e] text-center">
-            <p className="text-sm text-[#71717a]">
+          <div className="mt-6 pt-6 border-t border-theme-border text-center">
+            <p className="text-sm text-content-subtle">
               Déjà un compte ?{' '}
-              <Link to="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+              <Link
+                to="/login"
+                className="text-[var(--brand-violet-hover)] hover:text-[var(--brand-violet-hover)] transition-colors"
+              >
                 Se connecter
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-[#71717a] mt-8">
+        <p className="text-center text-xs text-content-subtle mt-8">
           © 2026 StageOps. Tous droits réservés.
         </p>
       </div>

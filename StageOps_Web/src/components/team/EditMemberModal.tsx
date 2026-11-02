@@ -162,12 +162,14 @@ export function EditMemberModal({
                 }}
                 placeholder="Prénom Nom"
                 aria-label="Nom complet"
-                className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
-                  errors.name ? 'border-red-500/60' : 'border-theme-border focus:border-cyan-400/50'
+                className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
+                  errors.name
+                    ? 'border-red-500/60'
+                    : 'border-theme-border focus:border-[var(--brand-border)]'
                 }`}
               />
             </div>
-            {errors.name && <p className="text-xs text-red-400 mt-1.5">{errors.name}</p>}
+            {errors.name && <p className="text-xs text-red-700 mt-1.5">{errors.name}</p>}
           </div>
 
           {/* Rôle */}
@@ -182,7 +184,7 @@ export function EditMemberModal({
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 aria-label="Rôle"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors [color-scheme:dark]"
+                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
               >
                 {roleOptions.map((r) => (
                   <option key={r} value={r}>
@@ -211,14 +213,14 @@ export function EditMemberModal({
                   }}
                   placeholder="email@theatre.fr"
                   aria-label="Email"
-                  className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 transition-colors ${
+                  className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
                     errors.email
                       ? 'border-red-500/60'
-                      : 'border-theme-border focus:border-cyan-400/50'
+                      : 'border-theme-border focus:border-[var(--brand-border)]'
                   }`}
                 />
               </div>
-              {errors.email && <p className="text-xs text-red-400 -mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-xs text-red-700 -mt-1">{errors.email}</p>}
               <div className="relative">
                 <Phone
                   size={15}
@@ -230,7 +232,7 @@ export function EditMemberModal({
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+33 6 00 00 00 00"
                   aria-label="Téléphone"
-                  className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder-[#35353e] focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-colors"
+                  className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
                 />
               </div>
             </div>
@@ -265,8 +267,8 @@ export function EditMemberModal({
                             }
                         : {
                             backgroundColor: 'transparent',
-                            borderColor: '#27272e',
-                            color: '#71717a',
+                            borderColor: 'var(--border)',
+                            color: 'var(--text-subtle)',
                           }
                     }
                   >

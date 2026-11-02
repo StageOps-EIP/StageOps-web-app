@@ -38,7 +38,7 @@ export function Toggle({
       aria-label={label}
       aria-pressed={checked}
       className={`relative h-6 w-11 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
-        checked ? 'bg-[var(--brand-violet)]' : 'bg-theme-raised'
+        checked ? 'bg-[var(--brand-violet)]' : 'bg-theme-elevated'
       }`}
     >
       <div

@@ -37,7 +37,7 @@ const battenSteel = new THREE.MeshStandardMaterial({
   roughness: 0.35,
   metalness: 0.8,
 })
-const marking = new THREE.MeshBasicMaterial({ color: '#3977ff', transparent: true, opacity: 0.18 })
+const marking = new THREE.MeshBasicMaterial({ color: '#C9A14A', transparent: true, opacity: 0.18 })
 
 function SurfaceMesh({
   surfaceKey,

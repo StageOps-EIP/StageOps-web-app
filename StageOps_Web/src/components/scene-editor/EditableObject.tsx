@@ -66,7 +66,7 @@ export function EditableObject({
         onPointerOut={readOnly ? undefined : () => setHovered(false)}
       >
         <ObjectShape object={object} castShadow={castShadow} />
-        {isSelected && !readOnly && <ObjectOutline object={object} color="#7964ff" opacity={0.6} />}
+        {isSelected && !readOnly && <ObjectOutline object={object} color="#C9A14A" opacity={0.6} />}
         {hovered && !isSelected && !readOnly && (
           <ObjectOutline object={object} color="#71717a" opacity={0.4} />
         )}

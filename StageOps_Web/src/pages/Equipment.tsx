@@ -123,7 +123,17 @@ export function Equipment() {
         <>
           <div className="work-register hidden overflow-hidden lg:block">
             <div className="overflow-x-auto">
-              <table className="work-table w-full min-w-[980px]">
+              <table className="work-table w-full min-w-[1060px] table-fixed">
+                <colgroup>
+                  <col style={{ width: '24%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '13%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '7%' }} />
+                </colgroup>
                 <thead>
                   <tr>
                     {[

@@ -92,7 +92,7 @@ function CueRow({ cue, active }: { cue: Cue; active: boolean }) {
         type="button"
         onClick={() => deleteCue(cue.id)}
         aria-label={`Supprimer le cue ${cue.number}`}
-        className="flex h-6 w-6 items-center justify-center rounded text-content-subtle hover:bg-red-500/15 hover:text-red-400"
+        className="flex h-6 w-6 items-center justify-center rounded text-content-subtle hover:bg-red-500/15 hover:text-red-700"
       >
         <Trash2 size={11} />
       </button>
@@ -179,7 +179,7 @@ export function ConduitePanel() {
             type="button"
             onClick={playing ? pause : play}
             aria-label={playing ? 'Pause' : 'Lecture'}
-            className="flex h-8 w-8 items-center justify-center rounded bg-[var(--brand-violet)] text-[#080a10]"
+            className="flex h-8 w-8 items-center justify-center rounded bg-[var(--brand-violet)] text-white"
           >
             {playing ? <Pause size={14} /> : <Play size={14} />}
           </button>
