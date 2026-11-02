@@ -39,7 +39,7 @@ export function ExportSettings() {
           <div className="p-4 bg-theme-elevated border border-theme-border rounded-xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-red-500/10 rounded-lg">
-                <Download size={18} className="text-red-400" />
+                <Download size={18} className="text-red-700" />
               </div>
               <div>
                 <p className="text-sm text-content-primary">Export PDF</p>
@@ -69,7 +69,7 @@ export function ExportSettings() {
           <div className="p-4 bg-theme-elevated border border-theme-border rounded-xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-green-500/10 rounded-lg">
-                <Download size={18} className="text-green-400" />
+                <Download size={18} className="text-emerald-700" />
               </div>
               <div>
                 <p className="text-sm text-content-primary">Export CSV</p>

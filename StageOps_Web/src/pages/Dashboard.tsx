@@ -1,253 +1,272 @@
-import { useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { Badge } from '@/components/design-system/Badge'
-import { Button } from '@/components/design-system/Button'
-import { PageHeader } from '@/components/design-system/PageHeader'
 import { useOperationalData } from '@/hooks/useOperationalData'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { mockEvents, mockTeamMembers } from '@/lib/mockData'
-import { formatTime, getSeverityColor, getSeverityLabel } from '@/lib/utils'
 import { SEVERITY_ORDER } from '@/lib/constants'
+import { formatTime, getSeverityColor, getSeverityLabel } from '@/lib/utils'
+
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
 
 export function Dashboard() {
   usePageTitle('Vue générale')
-  const navigate = useNavigate()
   const { equipment, incidents } = useOperationalData()
   const activeEvent = mockEvents[0]
-  const controls = equipment.filter(
-    (equipment) => equipment.status === 'to-check' || equipment.status === 'hs',
+  const upcomingEvents = [...mockEvents].sort(
+    (a, b) => a.startDate.getTime() - b.startDate.getTime(),
   )
+  const controls = equipment.filter((item) => item.status !== 'ok')
   const openIncidents = incidents
     .filter((incident) => incident.status === 'open' || incident.status === 'in-progress')
     .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity])
   const availableEquipment = equipment.filter((item) => item.status === 'ok').length
+  const needsCheck = equipment.filter((item) => item.status === 'to-check').length
+  const outOfService = equipment.filter((item) => item.status === 'hs').length
 
   return (
-    <div className="page-shell dashboard-rideau space-y-5">
-      <PageHeader
-        context="Vue générale"
-        title={activeEvent.title}
-        description={`Mercredi 11 février 2026 · ${activeEvent.venue}, ${activeEvent.stage}`}
-        actions={
-          <>
-            <Button variant="ghost" onClick={() => navigate('/events')}>
-              Voir le conducteur
-            </Button>
-            <Button onClick={() => navigate('/stage')}>Ouvrir le plateau 3D</Button>
-          </>
-        }
-      />
-
-      <section className="grid gap-8 pb-5 pt-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)] lg:gap-12">
+    <div className="page-shell dashboard-rideau space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="page-kicker">Prochaine échéance</p>
-          <div className="mt-7 flex flex-wrap items-end gap-x-7 gap-y-3">
-            <strong className="call-time font-data">20:00</strong>
-            <div className="max-w-sm pb-1">
-              <p className="font-editorial text-2xl leading-6 text-content-primary">
-                Début de la représentation
+          <h1 className="page-heading">La production en régie</h1>
+          <p className="mt-2 text-sm text-content-muted">
+            {dateFormatter.format(activeEvent.startDate)} · {activeEvent.venue}, {activeEvent.stage}
+          </p>
+        </div>
+        <Link
+          to="/stage"
+          className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+        >
+          Ouvrir le plateau 3D
+        </Link>
+      </header>
+
+      <section
+        aria-labelledby="featured-production"
+        className="overflow-hidden rounded-xl border border-theme-border bg-theme-base"
+      >
+        <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="border-l-[5px] border-[var(--brand-violet)] p-5 sm:p-8">
+            <p className="text-xs font-semibold text-[var(--brand-violet-hover)]">
+              Production sélectionnée
+            </p>
+            <h2
+              id="featured-production"
+              className="mt-2 text-4xl font-bold tracking-tight text-content-primary"
+            >
+              {activeEvent.title.replace(/ - .+$/, '')}
+            </h2>
+            <p className="mt-2 text-sm text-content-muted">
+              Représentation · {formatTime(activeEvent.startDate)}–{formatTime(activeEvent.endDate)}
+            </p>
+            <Link
+              to="/events"
+              className="mt-5 inline-flex min-h-10 items-center rounded-lg border border-theme-border bg-theme-base px-4 text-sm font-semibold text-content-primary hover:bg-theme-elevated"
+            >
+              Voir le conducteur
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 border-t border-theme-border lg:border-l lg:border-t-0">
+            <div className="p-4 sm:p-7">
+              <p className="text-sm font-semibold text-content-muted">Préparation</p>
+              <p className="mt-3 text-4xl font-bold text-content-primary">
+                {activeEvent.checklistProgress}
+                <span className="ml-1 text-xl text-content-muted">%</span>
               </p>
-              <p className="mt-2 text-xs text-content-muted">
-                Grande Salle · appel équipe confirmé
-              </p>
+              <div
+                role="progressbar"
+                aria-label="Progression de la checklist"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={activeEvent.checklistProgress}
+                className="mt-3 h-2 overflow-hidden rounded-full bg-theme-elevated"
+              >
+                <div
+                  className="h-full rounded-full bg-[#e7a93a]"
+                  style={{ width: `${activeEvent.checklistProgress}%` }}
+                />
+              </div>
+              <p className="mt-3 text-xs text-content-muted">Checklist de production</p>
+            </div>
+            <div className="border-l border-theme-border p-4 sm:p-7">
+              <p className="text-sm font-semibold text-content-muted">Repères de la fiche</p>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Début</dt>
+                  <dd className="font-bold text-content-primary">
+                    {formatTime(activeEvent.startDate)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Fin</dt>
+                  <dd className="font-bold text-content-primary">
+                    {formatTime(activeEvent.endDate)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Équipe</dt>
+                  <dd className="font-bold text-content-primary">
+                    {activeEvent.teamMembers.length} / {mockTeamMembers.length}
+                  </dd>
+                </div>
+              </dl>
             </div>
           </div>
         </div>
-
-        <div className="self-end border-l border-[var(--brand-violet)] pl-5">
-          <p className="text-xs leading-5 text-content-muted">
-            La production est en phase d’installation. Les contrôles matériel et les incidents
-            ouverts restent prioritaires avant l’entrée du public.
-          </p>
-          <p className="mt-3 text-xs font-semibold text-[var(--brand-violet-hover)]">
-            Installation en cours
-          </p>
-        </div>
       </section>
 
-      <section aria-label="Point de situation" className="border-y border-theme-border">
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-          <SituationItem
-            label="Matériel opérationnel"
-            value={`${availableEquipment} / ${equipment.length}`}
-          />
-          <SituationItem
-            label="Contrôles requis"
-            value={controls.length.toString()}
-            tone="warning"
-          />
-          <SituationItem
-            label="Incidents actifs"
-            value={openIncidents.length.toString()}
-            tone="danger"
-          />
-          <SituationItem
-            label="Équipe affectée"
-            value={`${activeEvent.teamMembers.length} / ${mockTeamMembers.length}`}
-          />
-        </div>
-      </section>
-
-      <div className="grid items-start gap-10 pt-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-14">
-        <div className="space-y-10">
-          <section className="editorial-section">
-            <div className="editorial-section-heading">
-              <div>
-                <h2 className="text-sm font-bold text-content-primary">Incidents à traiter</h2>
-                <p className="mt-1 text-[11px] text-content-subtle">Classés par niveau d’urgence</p>
-              </div>
-              <button
-                onClick={() => navigate('/incidents')}
-                className="text-xs font-semibold text-content-muted hover:text-content-primary"
-              >
-                Registre complet <span aria-hidden="true">→</span>
-              </button>
-            </div>
-
-            {openIncidents.map((incident, index) => {
-              const color = getSeverityColor(incident.severity)
-              return (
-                <button
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
+        <section aria-labelledby="action-title" className="min-w-0">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <h2 id="action-title" className="text-2xl font-bold text-content-primary">
+              À traiter maintenant
+            </h2>
+            <Link
+              to="/incidents"
+              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+            >
+              Voir tous les incidents
+            </Link>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-theme-border bg-theme-base">
+            {openIncidents.length ? (
+              openIncidents.slice(0, 3).map((incident) => (
+                <Link
                   key={incident.id}
-                  onClick={() => navigate(`/incidents?incident=${incident.id}`)}
-                  className="editorial-row grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 py-3 text-left transition-colors hover:bg-theme-elevated sm:grid-cols-[2rem_7rem_minmax(0,1fr)_auto]"
+                  to={`/incidents?incident=${incident.id}`}
+                  className="grid gap-2 border-b border-theme-border px-5 py-4 transition-colors last:border-b-0 hover:bg-theme-elevated sm:grid-cols-[6.5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-4"
                 >
-                  <span className="font-data text-[10px] text-content-faint">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span className="hidden text-[11px] font-semibold sm:block" style={{ color }}>
+                  <span
+                    className="text-xs font-bold"
+                    style={{ color: getSeverityColor(incident.severity) }}
+                  >
                     {getSeverityLabel(incident.severity)}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-[13px] font-semibold text-content-primary">
+                    <span className="block truncate text-sm font-semibold text-content-primary">
                       {incident.title}
                     </span>
-                    <span className="mt-0.5 block text-[11px] text-content-subtle">
+                    <span className="mt-1 block text-xs text-content-muted">
                       Signalé par {incident.reportedBy}
                     </span>
                   </span>
-                  <span className="pr-1 text-content-faint" aria-hidden="true">
-                    →
+                  <span className="text-xs font-semibold text-[var(--brand-violet-hover)]">
+                    Ouvrir
                   </span>
-                </button>
-              )
-            })}
-          </section>
-
-          <section className="editorial-section">
-            <div className="editorial-section-heading">
-              <div>
-                <h2 className="text-sm font-bold text-content-primary">Contrôles matériel</h2>
-                <p className="mt-1 text-[11px] text-content-subtle">
-                  Éléments qui demandent une intervention
-                </p>
-              </div>
-              <button
-                onClick={() => navigate('/equipment')}
-                className="text-xs font-semibold text-content-muted hover:text-content-primary"
-              >
-                Ouvrir le parc <span aria-hidden="true">→</span>
-              </button>
-            </div>
-
-            {controls.map((equipment, index) => (
-              <button
-                key={equipment.id}
-                onClick={() => navigate(`/equipment?equipment=${equipment.id}`)}
-                className="editorial-row grid w-full grid-cols-[2rem_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors hover:bg-theme-elevated"
-              >
-                <span className="font-data text-[10px] text-content-faint">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-[13px] font-semibold text-content-primary">
-                    {equipment.name}
-                  </span>
-                  <span className="mt-0.5 block text-[11px] text-content-subtle">
-                    {equipment.location}
-                    {equipment.responsiblePerson ? ` · ${equipment.responsiblePerson}` : ''}
-                  </span>
-                </span>
-                <Badge status={equipment.status} size="sm" />
-                <span className="pr-1 text-content-faint" aria-hidden="true">
-                  →
-                </span>
-              </button>
-            ))}
-          </section>
-        </div>
-
-        <aside className="editorial-section xl:sticky xl:top-5" aria-label="Feuille du jour">
-          <div className="editorial-section-heading">
-            <h2 className="text-sm font-bold text-content-primary">Feuille du jour</h2>
-            <span className="font-data text-[11px] text-content-subtle">11.02.2026</span>
+                </Link>
+              ))
+            ) : (
+              <p className="px-5 py-7 text-sm text-content-muted">
+                Aucun incident actif pour cette production.
+              </p>
+            )}
           </div>
+        </section>
 
-          <div className="space-y-0">
-            <DayLine
-              label="Horaire"
-              value={`${formatTime(activeEvent.startDate)} – ${formatTime(activeEvent.endDate)}`}
-            />
-            <DayLine label="Implantation" value={`${activeEvent.venue} · ${activeEvent.stage}`} />
-            <DayLine
-              label="Équipe"
-              value={`${activeEvent.teamMembers.length} personnes affectées`}
-            />
+        <section aria-labelledby="schedule-title" className="min-w-0">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <h2 id="schedule-title" className="text-2xl font-bold text-content-primary">
+              Programme enregistré
+            </h2>
+            <Link
+              to="/events"
+              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+            >
+              Voir le planning
+            </Link>
           </div>
-
-          <div className="mt-7 border-l border-theme-border pl-4">
-            <div className="flex items-baseline justify-between gap-3">
-              <span className="text-xs font-semibold text-content-primary">Checklist</span>
-              <strong className="font-data text-sm text-content-primary">
-                {activeEvent.checklistProgress}%
-              </strong>
-            </div>
-            <div className="mt-3 h-px bg-theme-elevated" aria-hidden="true">
+          <div className="rounded-xl border border-theme-border bg-theme-base px-5">
+            {upcomingEvents.map((event) => (
               <div
-                className="h-px bg-[var(--brand-violet)]"
-                style={{ width: `${activeEvent.checklistProgress}%` }}
-              />
-            </div>
-            <p className="mt-3 text-[11px] leading-4 text-content-subtle">
-              Progression calculée depuis la checklist associée à cet événement.
-            </p>
+                key={event.id}
+                className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 border-b border-theme-border py-4 last:border-b-0"
+              >
+                <time
+                  dateTime={event.startDate.toISOString()}
+                  className="text-sm font-bold text-content-primary"
+                >
+                  {formatTime(event.startDate)}
+                </time>
+                <div>
+                  <p className="text-sm font-semibold text-content-primary">{event.title}</p>
+                  <p className="mt-1 text-xs text-content-muted">
+                    {dateFormatter.format(event.startDate)} · {event.stage}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        </aside>
+        </section>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
+        <section
+          aria-labelledby="equipment-title"
+          className="rounded-xl border border-theme-border bg-theme-base p-5"
+        >
+          <div className="flex items-end justify-between gap-3 border-b border-theme-border pb-3">
+            <h2 id="equipment-title" className="text-xl font-bold text-content-primary">
+              Matériel
+            </h2>
+            <Link
+              to="/equipment"
+              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+            >
+              Ouvrir le parc
+            </Link>
+          </div>
+          <dl className="grid grid-cols-3 gap-3 pt-4">
+            <Stat value={availableEquipment} label="opérationnels" color="text-emerald-800" />
+            <Stat value={needsCheck} label="à vérifier" color="text-amber-800" />
+            <Stat value={outOfService} label="hors service" color="text-red-800" />
+          </dl>
+          {controls.length > 0 && (
+            <div className="mt-4 border-t border-theme-border pt-3">
+              <Link
+                to={`/equipment?equipment=${controls[0].id}`}
+                className="flex items-center justify-between gap-3 text-sm hover:underline"
+              >
+                <span className="truncate font-medium text-content-primary">
+                  {controls[0].name}
+                </span>
+                <Badge status={controls[0].status} size="sm" />
+              </Link>
+            </div>
+          )}
+        </section>
+        <section
+          aria-labelledby="stage-title"
+          className="rounded-xl border border-theme-border bg-theme-base p-5"
+        >
+          <div className="flex items-end justify-between gap-3 border-b border-theme-border pb-3">
+            <h2 id="stage-title" className="text-xl font-bold text-content-primary">
+              Plateau 3D
+            </h2>
+            <Link
+              to="/stage"
+              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+            >
+              Ouvrir
+            </Link>
+          </div>
+          <p className="pt-4 text-sm text-content-muted">
+            Visualisez la scène enregistrée et ouvrez l’éditeur pour la modifier.
+          </p>
+        </section>
       </div>
     </div>
   )
 }
 
-function DayLine({ label, value }: { label: string; value: string }) {
+function Stat({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="dashboard-state-line">
-      <span className="text-[11px] text-content-subtle">{label}</span>
-      <span className="max-w-[12rem] text-right text-xs font-semibold text-content-primary">
-        {value}
-      </span>
-    </div>
-  )
-}
-
-function SituationItem({
-  label,
-  value,
-  tone = 'brand',
-}: {
-  label: string
-  value: string
-  tone?: 'brand' | 'warning' | 'danger'
-}) {
-  const toneClass =
-    tone === 'danger'
-      ? 'text-red-400'
-      : tone === 'warning'
-        ? 'text-amber-400'
-        : 'text-[var(--brand-violet-hover)]'
-
-  return (
-    <div className="flex min-h-14 items-baseline justify-between gap-4 py-3 sm:pr-6 sm:odd:border-r sm:odd:border-theme-border sm:even:pl-6 xl:border-r xl:border-theme-border xl:px-6 xl:first:pl-0 xl:last:border-r-0 xl:last:pr-0">
-      <span className="text-[11px] leading-4 text-content-muted">{label}</span>
-      <strong className={`font-data text-base font-semibold ${toneClass}`}>{value}</strong>
+    <div>
+      <dt className="mt-1 text-xs text-content-muted">{label}</dt>
+      <dd className={`text-3xl font-bold ${color}`}>{value}</dd>
     </div>
   )
 }

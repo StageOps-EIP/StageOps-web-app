@@ -99,7 +99,7 @@ export function SceneTreePanel() {
           {objectsOpen && (
             <ul className="pb-1">
               {objects.length === 0 && (
-                <li className="px-4 py-3 text-[11px] text-[#52525b] italic">
+                <li className="px-4 py-3 text-[11px] text-content-muted italic">
                   Aucun objet — cliquez + pour ajouter
                 </li>
               )}
@@ -131,7 +131,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateObject(obj.id, { visible: !obj.visible })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {obj.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                         </button>
@@ -144,7 +144,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateObject(obj.id, { locked: !obj.locked })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {obj.locked ? <Lock size={10} /> : <Unlock size={10} />}
                         </button>
@@ -155,7 +155,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             deleteObject(obj.id)
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-700"
                         >
                           <Trash2 size={10} />
                         </button>
@@ -225,7 +225,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             updateLight(light.id, { visible: !light.visible })
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-raised hover:text-content-primary"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-theme-elevated hover:text-content-primary"
                         >
                           {light.visible ? <Eye size={10} /> : <EyeOff size={10} />}
                         </button>
@@ -236,7 +236,7 @@ export function SceneTreePanel() {
                             e.stopPropagation()
                             deleteLight(light.id)
                           }}
-                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-400"
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-content-subtle hover:bg-red-500/20 hover:text-red-700"
                         >
                           <Trash2 size={10} />
                         </button>

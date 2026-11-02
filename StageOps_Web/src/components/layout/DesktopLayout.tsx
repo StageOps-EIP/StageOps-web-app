@@ -1,6 +1,7 @@
 import { Outlet, useNavigation } from 'react-router'
 import { Toaster } from 'sonner'
 import { MobileHeader, MobileNav, Sidebar } from './Sidebar'
+import { WorkspaceTopbar } from './WorkspaceTopbar'
 import { useOperationalData } from '@/hooks/useOperationalData'
 
 export function DesktopLayout() {
@@ -11,6 +12,7 @@ export function DesktopLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileHeader />
+        <WorkspaceTopbar />
         <main
           id="main-content"
           aria-label="Contenu principal"
@@ -19,7 +21,7 @@ export function DesktopLayout() {
           {persistenceIssue && (
             <p
               role="alert"
-              className="m-4 border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-300"
+              className="m-4 rounded-lg border border-amber-700/30 bg-amber-50 p-3 text-sm text-amber-900"
             >
               {persistenceIssue}
             </p>

@@ -26,6 +26,16 @@ export function Incidents() {
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [showNewForm, setShowNewForm] = useState(false)
+  const newIncidentRequested = searchParams.get('new') === '1'
+
+  function closeNewForm() {
+    setShowNewForm(false)
+    if (searchParams.has('new')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('new')
+      setSearchParams(next, { replace: true })
+    }
+  }
 
   const requestedIncident =
     incidents.find((incident) => incident.id === searchParams.get('incident')) ?? null
@@ -230,13 +240,13 @@ export function Incidents() {
           }}
         />
       )}
-      {showNewForm && (
+      {(showNewForm || newIncidentRequested) && (
         <NewIncidentModal
           equipment={equipment}
-          onClose={() => setShowNewForm(false)}
+          onClose={closeNewForm}
           onCreate={(incident) => {
             addIncident(incident)
-            setShowNewForm(false)
+            closeNewForm()
             toast.success('Incident enregistré', {
               description:
                 'Le registre, le matériel associé et le tableau de bord ont été actualisés.',

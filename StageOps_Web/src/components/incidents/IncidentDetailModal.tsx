@@ -169,8 +169,8 @@ export function IncidentDetailModal({
               </p>
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 size={14} className="text-green-400" />
-                  <p className="text-xs text-green-400">Résolu</p>
+                  <CheckCircle2 size={14} className="text-emerald-700" />
+                  <p className="text-xs text-emerald-700">Résolu</p>
                 </div>
                 <p className="text-sm text-content-muted leading-relaxed">
                   {incident.resolutionNotes}

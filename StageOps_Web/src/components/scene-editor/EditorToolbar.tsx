@@ -126,7 +126,7 @@ export function EditorToolbar({ captureRef }: EditorToolbarProps) {
               onClick={() => setMode(value)}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium ${
                 mode === value
-                  ? 'bg-[var(--brand-violet)] text-[#080a10]'
+                  ? 'bg-[var(--brand-violet)] text-white'
                   : 'bg-theme-elevated text-content-muted hover:bg-[var(--bg-hover)] hover:text-content-primary'
               } ${i > 0 ? 'border-l border-theme-border' : ''}`}
             >
@@ -261,7 +261,7 @@ export function EditorToolbar({ captureRef }: EditorToolbarProps) {
                     onClick={() => updateRendering({ quality })}
                     className={`rounded px-1 py-1 text-[11px] ${
                       pp.quality === quality
-                        ? 'bg-[var(--brand-violet)] text-[#080a10]'
+                        ? 'bg-[var(--brand-violet)] text-white'
                         : 'border border-theme-border text-content-muted hover:text-content-primary'
                     }`}
                   >
@@ -314,7 +314,7 @@ export function EditorToolbar({ captureRef }: EditorToolbarProps) {
         {/* Close */}
         <button
           onClick={() => navigate('/stage')}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-content-subtle hover:bg-red-500/10 hover:text-red-400"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-content-subtle hover:bg-red-500/10 hover:text-red-700"
         >
           <X size={13} />
           <span className="hidden sm:inline">Fermer</span>

@@ -28,24 +28,22 @@ export function Settings() {
         title="Paramètres"
         description="Configuration du lieu et préférences de l’interface."
       />
-      <div className="grid gap-8 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-12">
+      <div className="grid gap-5 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-8">
         {/* Sidebar */}
-        <div className="flex overflow-x-auto border-y border-theme-border lg:block lg:overflow-visible lg:border-b-0">
-          {sections.map((section, index) => {
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-theme-border bg-theme-base p-2 lg:block lg:overflow-visible">
+          {sections.map((section) => {
             const isActive = activeSection === section.key
             return (
               <button
                 key={section.key}
                 onClick={() => setActiveSection(section.key)}
-                className={`flex shrink-0 items-center gap-3 border-b-2 px-3 py-3 text-left transition-colors lg:w-full lg:border-b lg:border-l-0 ${
+                aria-pressed={isActive}
+                className={`flex shrink-0 items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors lg:w-full ${
                   isActive
-                    ? 'border-b-[var(--brand-violet)] text-content-primary lg:border-b-theme-border'
-                    : 'border-b-transparent text-content-muted hover:text-content-primary lg:border-b-theme-border'
+                    ? 'bg-[var(--brand-soft)] font-semibold text-content-primary'
+                    : 'text-content-muted hover:bg-theme-elevated hover:text-content-primary'
                 }`}
               >
-                <span className="font-data text-[10px] text-content-faint">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">{section.label}</p>
                   <p className="hidden truncate text-[10px] text-content-subtle lg:block">
@@ -53,9 +51,10 @@ export function Settings() {
                   </p>
                 </div>
                 {isActive && (
-                  <span className="text-[var(--brand-violet-hover)]" aria-hidden="true">
-                    →
-                  </span>
+                  <span
+                    className="h-2 w-2 rounded-full bg-[var(--brand-violet)]"
+                    aria-hidden="true"
+                  />
                 )}
               </button>
             )

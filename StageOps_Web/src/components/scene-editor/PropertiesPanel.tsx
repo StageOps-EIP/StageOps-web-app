@@ -91,7 +91,7 @@ function NumInput({
   const gesture = useGestureHandlers()
   return (
     <div>
-      <label className="block text-[10px] text-[#52525b] mb-0.5">{label}</label>
+      <label className="block text-[10px] text-content-muted mb-0.5">{label}</label>
       <input
         type="number"
         step={step ?? 0.1}
@@ -159,7 +159,7 @@ function MaterialEditor({
       />
 
       <div className="h-px bg-theme-border" />
-      <p className="text-[10px] text-[#52525b] uppercase tracking-wider font-semibold">
+      <p className="text-[10px] text-content-muted uppercase tracking-wider font-semibold">
         Personnaliser
       </p>
 
@@ -173,7 +173,7 @@ function MaterialEditor({
             {...gesture}
             className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
           />
-          <span className="text-xs text-[#52525b] font-mono">{material.color}</span>
+          <span className="text-xs text-content-muted font-mono">{material.color}</span>
         </div>
       </div>
 
@@ -315,7 +315,7 @@ function CueSection({ target }: { target: TimelineTarget }) {
           <button
             type="button"
             onClick={() => removeFromCue(cue.id, target)}
-            className="text-[11px] text-red-400 hover:underline"
+            className="text-[11px] text-red-700 hover:underline"
           >
             Retirer cet élément de Q{cue.number}
           </button>
@@ -356,7 +356,7 @@ function ObjectPanel() {
           {...gesture}
           className="w-full bg-theme-elevated border border-theme-border rounded-lg px-2 py-1 text-xs text-content-primary focus:outline-none focus:border-[var(--brand-border)]"
         />
-        <p className="mt-1 text-[10px] text-[#52525b]">{obj.type}</p>
+        <p className="mt-1 text-[10px] text-content-muted">{obj.type}</p>
         {obj.type === 'person' && (
           <div className="mt-3 flex gap-1" role="group" aria-label="Posture">
             {(Object.keys(POSTURE_LABELS) as Posture[]).map((posture) => (
@@ -401,7 +401,7 @@ function ObjectPanel() {
         {tab === 'transform' && (
           <>
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Position
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -421,7 +421,7 @@ function ObjectPanel() {
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Rotation (°)
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -442,7 +442,7 @@ function ObjectPanel() {
             </div>
 
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+              <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
                 Échelle
               </p>
               <div className="grid grid-cols-3 gap-1.5">
@@ -550,7 +550,7 @@ function LightPanel() {
 
         {/* Position XYZ */}
         <div>
-          <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+          <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
             Position
           </p>
           <div className="grid grid-cols-3 gap-1.5">
@@ -572,7 +572,7 @@ function LightPanel() {
         {/* Target XYZ — spot uniquement */}
         {light.type === 'spot' && (
           <div>
-            <p className="text-[10px] text-[#52525b] uppercase tracking-wider mb-2 font-semibold">
+            <p className="text-[10px] text-content-muted uppercase tracking-wider mb-2 font-semibold">
               Cible (Target)
             </p>
             <div className="grid grid-cols-3 gap-1.5">
@@ -606,7 +606,7 @@ function LightPanel() {
           <div className="flex justify-between items-center mb-1">
             <span className="text-[11px] text-content-subtle">Température (K)</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-[#52525b] font-mono">{light.temperature}K</span>
+              <span className="text-[10px] text-content-muted font-mono">{light.temperature}K</span>
               <span
                 className="w-5 h-5 rounded border border-white/10"
                 style={{ backgroundColor: kelvinToHex(light.temperature) }}
@@ -632,7 +632,7 @@ function LightPanel() {
             className="w-full h-2 rounded-full mt-1"
             style={{ background: 'linear-gradient(to right, #ff7700, #ffffff, #aaccff)' }}
           />
-          <div className="flex justify-between text-[9px] text-[#52525b] mt-0.5">
+          <div className="flex justify-between text-[9px] text-content-muted mt-0.5">
             <span>2700K</span>
             <span>10000K</span>
           </div>
@@ -705,7 +705,7 @@ function LightPanel() {
 
         <button
           onClick={() => deleteLight(light.id)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-700 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
         >
           <Trash2 size={13} />
           Supprimer la lumière

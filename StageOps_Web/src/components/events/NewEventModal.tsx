@@ -150,7 +150,7 @@ export function NewEventModal({
           {error && (
             <p
               role="alert"
-              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-800"
             >
               {error}
             </p>

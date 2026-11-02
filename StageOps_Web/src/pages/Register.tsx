@@ -107,12 +107,16 @@ export function Register() {
             <div className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                  step >= 1 ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]' : 'bg-theme-border text-content-subtle'
+                  step >= 1
+                    ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]'
+                    : 'bg-theme-border text-content-subtle'
                 }`}
               >
                 {step > 1 ? <CheckCircle2 size={14} /> : '1'}
               </div>
-              <span className={`text-sm ${step === 1 ? 'text-content-primary' : 'text-content-subtle'}`}>
+              <span
+                className={`text-sm ${step === 1 ? 'text-content-primary' : 'text-content-subtle'}`}
+              >
                 Informations
               </span>
             </div>
@@ -120,12 +124,16 @@ export function Register() {
             <div className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                  step >= 2 ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]' : 'bg-theme-border text-content-subtle'
+                  step >= 2
+                    ? 'bg-[var(--brand-violet)] text-[var(--brand-button-text)]'
+                    : 'bg-theme-border text-content-subtle'
                 }`}
               >
                 2
               </div>
-              <span className={`text-sm ${step === 2 ? 'text-content-primary' : 'text-content-subtle'}`}>
+              <span
+                className={`text-sm ${step === 2 ? 'text-content-primary' : 'text-content-subtle'}`}
+              >
                 Sécurité
               </span>
             </div>
@@ -157,7 +165,7 @@ export function Register() {
                     />
                   </div>
                   {errors.firstName && (
-                    <p className="text-xs text-red-400 mt-1">{errors.firstName}</p>
+                    <p className="text-xs text-red-700 mt-1">{errors.firstName}</p>
                   )}
                 </div>
                 <div>
@@ -174,13 +182,15 @@ export function Register() {
                     }`}
                   />
                   {errors.lastName && (
-                    <p className="text-xs text-red-400 mt-1">{errors.lastName}</p>
+                    <p className="text-xs text-red-700 mt-1">{errors.lastName}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-content-muted mb-1.5">Email professionnel *</label>
+                <label className="block text-sm text-content-muted mb-1.5">
+                  Email professionnel *
+                </label>
                 <div className="relative">
                   <Mail
                     size={16}
@@ -198,7 +208,7 @@ export function Register() {
                     }`}
                   />
                 </div>
-                {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-red-700 mt-1">{errors.email}</p>}
               </div>
 
               <div>
@@ -242,7 +252,7 @@ export function Register() {
                     ))}
                   </select>
                 </div>
-                {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
+                {errors.role && <p className="text-xs text-red-700 mt-1">{errors.role}</p>}
               </div>
 
               <Button type="submit" variant="primary" size="lg" fullWidth className="mt-2">
@@ -299,7 +309,7 @@ export function Register() {
                     }`}
                   />
                 </div>
-                {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-xs text-red-700 mt-1">{errors.password}</p>}
                 {/* Password strength */}
                 {form.password && (
                   <div className="flex gap-1 mt-2">
@@ -345,12 +355,12 @@ export function Register() {
                   />
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-400 mt-1">{errors.confirmPassword}</p>
+                  <p className="text-xs text-red-700 mt-1">{errors.confirmPassword}</p>
                 )}
               </div>
 
               {errors.general && (
-                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                <p className="text-sm text-red-700 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
                   {errors.general}
                 </p>
               )}
@@ -372,7 +382,10 @@ export function Register() {
           <div className="mt-6 pt-6 border-t border-theme-border text-center">
             <p className="text-sm text-content-subtle">
               Déjà un compte ?{' '}
-              <Link to="/login" className="text-[var(--brand-violet-hover)] hover:text-[var(--brand-violet-hover)] transition-colors">
+              <Link
+                to="/login"
+                className="text-[var(--brand-violet-hover)] hover:text-[var(--brand-violet-hover)] transition-colors"
+              >
                 Se connecter
               </Link>
             </p>

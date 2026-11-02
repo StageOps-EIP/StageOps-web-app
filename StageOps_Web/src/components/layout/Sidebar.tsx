@@ -24,7 +24,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation()
 
   return (
-    <nav aria-label="Navigation principale" className="space-y-px">
+    <nav aria-label="Navigation principale" className="space-y-1 px-3">
       {navigation.map((item) => {
         const isActive = isCurrentPath(location.pathname, item.href)
         return (
@@ -52,31 +52,24 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navigation principale"
-      className="hidden h-dvh w-[13.75rem] shrink-0 flex-col bg-theme-deeper lg:flex"
+      className="hidden h-dvh w-[13.75rem] shrink-0 flex-col border-r border-theme-border bg-theme-base lg:flex"
     >
-      <div className="px-5 pb-7 pt-5">
+      <div className="px-5 pb-5 pt-5">
         <StageOpsLogo />
-        <div className="stage-production-context mt-9">
-          <p className="text-[10px] font-semibold text-[var(--brand-violet-hover)]">À l’affiche</p>
-          <p className="mt-2 font-editorial text-[1.7rem] leading-none text-content-primary">
-            Hamlet
-          </p>
-          <p className="mt-2 text-[11px] leading-4 text-content-muted">
-            Représentation
-            <br />
-            Théâtre National · Grande Salle
-          </p>
+        <div className="mt-6 border-t border-theme-border pt-5">
+          <p className="text-sm font-semibold text-content-primary">Théâtre National</p>
+          <p className="mt-1 text-xs text-content-muted">Grande Salle</p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-3">
+      <div className="flex-1 overflow-y-auto py-2">
         <NavigationLinks />
       </div>
 
       <div className="px-5 pb-5 pt-3">
         <Link
           to="/profile"
-          className="group flex items-center gap-3 border-t border-theme-border/70 pt-4"
+          className="group flex items-center gap-3 border-t border-theme-border pt-4"
         >
           <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--brand-soft)] text-[10px] font-semibold text-[var(--brand-violet-hover)]">
             SO
@@ -100,7 +93,7 @@ export function MobileHeader() {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-theme-border bg-theme-deeper px-4 lg:hidden">
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-theme-border bg-theme-base px-4 lg:hidden">
         <div className="flex min-w-0 items-center gap-3">
           <StageOpsLogo compact />
           <div className="hidden min-w-0 border-l border-theme-border pl-3 sm:block">
@@ -112,15 +105,15 @@ export function MobileHeader() {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          className="grid h-9 w-9 place-items-center border border-theme-border text-content-muted"
+          className="grid h-10 w-10 place-items-center rounded-lg border border-theme-border text-content-muted"
         >
           {open ? <X size={19} /> : <Menu size={19} />}
         </button>
       </header>
       {open && (
-        <div className="absolute inset-x-0 top-16 z-50 border-b border-theme-border bg-theme-deeper p-4 shadow-xl lg:hidden">
+        <div className="absolute inset-x-0 top-16 z-50 border-b border-theme-border bg-theme-base py-4 shadow-xl lg:hidden">
           <NavigationLinks onNavigate={() => setOpen(false)} />
-          <div className="mt-3 border-t border-theme-border pt-3">
+          <div className="mx-4 mt-3 border-t border-theme-border pt-3">
             <Link
               to="/profile"
               onClick={() => setOpen(false)}
@@ -141,7 +134,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Raccourcis mobiles"
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-theme-border bg-theme-deeper lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-theme-border bg-theme-base lg:hidden"
     >
       {mobileNavigation.map((item) => {
         const isActive = isCurrentPath(location.pathname, item.href)

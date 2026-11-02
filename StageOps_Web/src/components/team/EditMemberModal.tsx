@@ -163,11 +163,13 @@ export function EditMemberModal({
                 placeholder="Prénom Nom"
                 aria-label="Nom complet"
                 className={`w-full bg-theme-elevated border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
-                  errors.name ? 'border-red-500/60' : 'border-theme-border focus:border-[var(--brand-border)]'
+                  errors.name
+                    ? 'border-red-500/60'
+                    : 'border-theme-border focus:border-[var(--brand-border)]'
                 }`}
               />
             </div>
-            {errors.name && <p className="text-xs text-red-400 mt-1.5">{errors.name}</p>}
+            {errors.name && <p className="text-xs text-red-700 mt-1.5">{errors.name}</p>}
           </div>
 
           {/* Rôle */}
@@ -218,7 +220,7 @@ export function EditMemberModal({
                   }`}
                 />
               </div>
-              {errors.email && <p className="text-xs text-red-400 -mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-xs text-red-700 -mt-1">{errors.email}</p>}
               <div className="relative">
                 <Phone
                   size={15}

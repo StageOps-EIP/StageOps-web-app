@@ -160,11 +160,13 @@ export function AddEquipmentModal({
               onChange={(e) => set('name', e.target.value)}
               placeholder="Ex : Console Son DiGiCo SD12"
               className={`w-full bg-theme-elevated border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
-                errors.name ? 'border-red-500/60' : 'border-theme-border focus:border-[var(--brand-border)]'
+                errors.name
+                  ? 'border-red-500/60'
+                  : 'border-theme-border focus:border-[var(--brand-border)]'
               }`}
             />
             {errors.name && (
-              <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+              <p className="text-xs text-red-700 mt-1.5 flex items-center gap-1">
                 <AlertCircle size={11} /> {errors.name}
               </p>
             )}
@@ -264,7 +266,7 @@ export function AddEquipmentModal({
                   }`}
                 />
                 {errors.location && (
-                  <p className="text-[10px] text-red-400 mt-1">{errors.location}</p>
+                  <p className="text-[10px] text-red-700 mt-1">{errors.location}</p>
                 )}
               </div>
 
@@ -347,9 +349,9 @@ export function AddEquipmentModal({
           {/* Avertissements contextuels */}
           {form.status === 'hs' && (
             <div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-              <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
+              <AlertCircle size={16} className="text-red-700 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm text-red-400 font-medium">Équipement hors service</p>
+                <p className="text-sm text-red-700 font-medium">Équipement hors service</p>
                 <p className="text-xs text-content-muted mt-1">
                   Cet équipement sera ajouté comme HS. Pensez à créer un incident associé.
                 </p>

@@ -2,17 +2,16 @@
 name: StageOps Rideau
 description: Direction artistique de l'interface Web de régie
 colors:
-  velours: "#4A0D1A"
-  pourpre: "#8E1B2E"
-  or-de-scene: "#C9A14A"
-  or-pale: "#F2D79C"
-  ivoire: "#F4EEE3"
-  coulisse: "#16100F"
+  velours: "#3D0D17"
+  pourpre: "#CB2942"
+  or-de-scene: "#E7A93A"
+  ivoire: "#FFFDFB"
+  fond: "#F8F4F0"
 typography:
   display:
-    fontFamily: "Fraunces Variable, Fraunces, serif"
-    fontWeight: 600
-    letterSpacing: "-0.025em"
+    fontFamily: "DM Sans Variable, DM Sans, sans-serif"
+    fontWeight: 700
+    letterSpacing: "-0.03em"
   body:
     fontFamily: "DM Sans Variable, DM Sans, sans-serif"
 rounded:
@@ -28,36 +27,31 @@ components:
 
 # StageOps Rideau
 
-## Overview
+## Source et intention
 
-La direction « Rideau » vient du fichier fourni par l'équipe, conservé dans [docs/brand/StageOps_DA_Rideau_Figma.svg](docs/brand/StageOps_DA_Rideau_Figma.svg). L'interface reste un poste de régie dense et lisible : le caractère scénique se concentre dans le logo, les titres, la couleur d'action et les arches.
+La direction Rideau vient du fichier fourni par l'équipe, conservé dans [docs/brand/StageOps_DA_Rideau_Figma.svg](docs/brand/StageOps_DA_Rideau_Figma.svg). Cette évolution privilégie la lisibilité d'un poste de régie tout en conservant le logo, le pourpre et l'or de scène. Le tableau de bord sert à repérer une production, les incidents, le matériel et le planning en quelques secondes.
 
-## Colors
+## Couleurs
 
-Les couleurs de marque sont Velours `#4A0D1A`, Pourpre `#8E1B2E`, Or de scène `#C9A14A`, Coulisse `#16100F` et Ivoire `#F4EEE3`. L'interface utilise uniquement des surfaces claires, définies dans `StageOps_Web/src/index.css`. Le pourpre sert aux actions principales ; l'or reste un accent de marque. Les couleurs d'état conservent une signification opérationnelle ; chaque état reste accompagné d'un libellé.
+L'interface est exclusivement claire : fond `#F8F4F0`, panneaux `#FFFDFB`, texte velours `#3D0D17`, action pourpre `#CB2942` et accent or `#E7A93A`. Les couleurs d'état sont plus foncées pour rester lisibles sur fond clair. Chaque état garde un libellé, jamais la couleur seule.
 
-## Typography
+## Typographie
 
-Fraunces sert au logotype et aux titres. Le « Ops » est en italique. DM Sans sert au texte, aux contrôles et aux données. Les deux fontes sont chargées localement par Fontsource, sans requête de police externe.
+Fraunces reste réservé au logotype, avec « Ops » en italique. DM Sans sert aux titres, au texte, aux contrôles et aux données. Les deux fontes sont chargées localement par Fontsource.
 
-## Layout
+## Organisation
 
-Le panneau de navigation et les registres conservent leur organisation fonctionnelle. Les arches concentriques apparaissent uniquement sur la vue générale et l'écran de connexion ; elles restent décoratives et ignorées par les lecteurs d'écran.
+Le panneau latéral garde les sept sections existantes. Un en-tête commun indique la section active et rappelle que les données sont locales. Le bouton de signalement ouvre directement le formulaire d'incident. Sur la vue générale, la fiche de production précède les incidents actifs, les productions du jeu de démonstration et l'état du matériel. Les autres pages réutilisent les surfaces, les contrôles et les couleurs d'état partagés.
 
-## Elevation & Depth
+Les arches décoratives restent sur l'écran de connexion ; elles sont ignorées par les lecteurs d'écran. L'éditeur 3D conserve son espace de travail plein écran : ses panneaux et contrôles utilisent les mêmes surfaces claires, tandis que le canvas représente le plateau.
 
-La hiérarchie vient des fonds et des bordures chauds. Les ombres restent réservées aux surfaces qui se superposent au contenu.
+## Formes et profondeur
 
-## Shapes
+Les contrôles ont des rayons de 8 à 16 px. Les listes et tableaux gardent des séparateurs pour le balayage. Les bordures chaudes discrètes structurent les panneaux ; les ombres sont réservées aux surfaces superposées, comme les menus et les modales.
 
-Le symbole reprend le rideau, l'écharpe et l'encadrement or du document source. Les contrôles réutilisent des rayons de 8 à 16 px ; les lignes de registre restent droites pour faciliter le balayage.
+## Règles
 
-## Components
-
-Le bouton principal utilise le pourpre sur fond clair, avec un libellé ivoire. Les états hover, focus, disabled et erreur suivent les composants existants.
-
-## Do's and Don'ts
-
-- Employer les arches comme signature ponctuelle, jamais comme fond répété sur les données.
-- Garder les couleurs de sécurité et d'état liées à leur sens, avec un libellé visible.
-- Ne pas utiliser l'ancien violet/bleu de marque ou les anciennes fontes dans un nouvel écran.
+- Garder les faits de production liés aux données existantes ; ne pas inventer des horaires opérationnels.
+- Faire apparaître les états par texte et couleur, avec une lisibilité suffisante sur fond clair.
+- Conserver les parcours et la navigation clavier pendant la refonte visuelle.
+- Ne pas ajouter de thème sombre ou de commandes de bascule.

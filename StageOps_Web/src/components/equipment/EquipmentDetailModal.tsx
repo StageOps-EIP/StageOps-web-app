@@ -249,7 +249,9 @@ export function EquipmentDetailModal({
               <div className="p-2.5 bg-theme-border rounded-lg">
                 <QrCode size={18} className="text-[var(--brand-violet-hover)]" />
               </div>
-              <code className="text-sm text-[var(--brand-violet-hover)] font-mono">{equipment.qrCode}</code>
+              <code className="text-sm text-[var(--brand-violet-hover)] font-mono">
+                {equipment.qrCode}
+              </code>
             </div>
           </div>
 
@@ -275,9 +277,9 @@ export function EquipmentDetailModal({
           {/* Avertissement HS */}
           {editedStatus === 'hs' && (
             <div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-              <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
+              <AlertCircle size={16} className="text-red-700 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm text-red-400 font-medium">Équipement hors service</p>
+                <p className="text-sm text-red-700 font-medium">Équipement hors service</p>
                 <p className="text-xs text-content-muted mt-1">
                   Cet équipement est marqué HS. Pensez à créer un incident et à notifier le
                   responsable.
