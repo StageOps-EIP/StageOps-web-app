@@ -26,6 +26,7 @@ Cette commande contrôle l’architecture, exécute les tests, le lint, les type
 ## Architecture et contribution
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) : couches, responsabilités, données, navigation, limites et mesures.
+- [DESIGN.md](DESIGN.md) : direction artistique « Rideau », palette, fontes, logo et composants.
 - [ADR-001](docs/adr/001-web-architecture.md) : décision et compromis du refactoring.
 - [AGENTS.md](AGENTS.md) : règles pour les interventions dans ce dépôt.
 - [Méthodologie de l’équipe](https://github.com/StageOps-EIP/StageOps/blob/main/METHODOLOGIE_PROJET.md).
