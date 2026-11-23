@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AlertCircle, X } from 'lucide-react'
 import { Button } from '../design-system/Button'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -27,12 +27,17 @@ export function NewIncidentModal({
     equipmentId: initialEquipmentId ?? '',
     reportedBy: '',
   })
-  const [error, setError] = useState('')
+  const [errors, setErrors] = useState<Partial<Record<'title' | 'description' | 'reportedBy', string>>>({})
+  const titleRef = useRef<HTMLInputElement>(null)
+  const descriptionRef = useRef<HTMLTextAreaElement>(null)
+  const reporterRef = useRef<HTMLInputElement>(null)
   const existingIncidents = incidents.filter(
     (incident) =>
       incident.equipmentId === form.equipmentId &&
       (incident.status === 'open' || incident.status === 'in-progress'),
   )
+
+  useEffect(() => titleRef.current?.focus(), [])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -44,8 +49,18 @@ export function NewIncidentModal({
 
   function submit(event: React.FormEvent) {
     event.preventDefault()
-    if (!form.title.trim() || !form.description.trim() || !form.reportedBy.trim())
-      return setError('Renseignez le titre, la description et la personne qui signale l’incident.')
+    const nextErrors = {
+      title: form.title.trim() ? undefined : 'Indiquez ce qui s’est passé.',
+      description: form.description.trim() ? undefined : 'Décrivez le problème et son impact.',
+      reportedBy: form.reportedBy.trim() ? undefined : 'Indiquez qui signale l’incident.',
+    }
+    setErrors(nextErrors)
+    if (nextErrors.title || nextErrors.description || nextErrors.reportedBy) {
+      if (nextErrors.title) titleRef.current?.focus()
+      else if (nextErrors.description) descriptionRef.current?.focus()
+      else reporterRef.current?.focus()
+      return
+    }
     onCreate({
       id: `inc-${Date.now()}`,
       title: form.title.trim(),
@@ -60,7 +75,9 @@ export function NewIncidentModal({
 
   const set = (key: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [key]: value }))
-    setError('')
+    if (key === 'title' || key === 'description' || key === 'reportedBy') {
+      setErrors((current) => ({ ...current, [key]: undefined }))
+    }
   }
 
   return (
@@ -71,6 +88,7 @@ export function NewIncidentModal({
       <form
         ref={trapRef}
         onSubmit={submit}
+        noValidate
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-incident-title"
@@ -89,22 +107,32 @@ export function NewIncidentModal({
             type="button"
             aria-label="Fermer"
             onClick={onClose}
-            className="rounded-md p-2 text-content-subtle hover:bg-theme-elevated"
+            className="grid h-11 w-11 place-items-center rounded-md text-content-subtle hover:bg-theme-elevated"
           >
             <X size={17} />
           </button>
         </div>
         <div className="space-y-4">
-          <Field label="Titre">
+          <Field id="incident-title" label="Titre" error={errors.title} required>
             <input
+              id="incident-title"
+              ref={titleRef}
+              required
+              aria-invalid={Boolean(errors.title)}
+              aria-describedby={errors.title ? 'incident-title-error' : undefined}
               className="form-control px-3"
               value={form.title}
               onChange={(event) => set('title', event.target.value)}
               placeholder="Panne projecteur perche 2"
             />
           </Field>
-          <Field label="Description">
+          <Field id="incident-description" label="Description" error={errors.description} required>
             <textarea
+              id="incident-description"
+              ref={descriptionRef}
+              required
+              aria-invalid={Boolean(errors.description)}
+              aria-describedby={errors.description ? 'incident-description-error' : undefined}
               className="form-control min-h-24 resize-none px-3 py-2.5"
               value={form.description}
               onChange={(event) => set('description', event.target.value)}
@@ -112,8 +140,9 @@ export function NewIncidentModal({
             />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Priorité">
+            <Field id="incident-priority" label="Priorité">
               <select
+                id="incident-priority"
                 className="form-control px-3"
                 value={form.severity}
                 onChange={(event) => set('severity', event.target.value)}
@@ -124,8 +153,9 @@ export function NewIncidentModal({
                 <option value="critical">Critique</option>
               </select>
             </Field>
-            <Field label="Équipement">
+            <Field id="incident-equipment" label="Équipement">
               <select
+                id="incident-equipment"
                 className="form-control px-3"
                 value={form.equipmentId}
                 onChange={(event) => set('equipmentId', event.target.value)}
@@ -151,7 +181,7 @@ export function NewIncidentModal({
                     key={incident.id}
                     type="button"
                     onClick={() => onOpenIncident(incident.id)}
-                    className="rounded-md border border-amber-700/30 bg-white px-2.5 py-1.5 text-left text-xs font-semibold hover:bg-amber-100"
+                    className="min-h-11 rounded-md border border-amber-700/30 bg-white px-3 py-2 text-left text-sm font-semibold hover:bg-amber-100"
                   >
                     Voir « {incident.title} »
                   </button>
@@ -159,22 +189,19 @@ export function NewIncidentModal({
               </div>
             </div>
           )}
-          <Field label="Signalé par">
+          <Field id="incident-reporter" label="Signalé par" error={errors.reportedBy} required>
             <input
+              id="incident-reporter"
+              ref={reporterRef}
+              required
+              aria-invalid={Boolean(errors.reportedBy)}
+              aria-describedby={errors.reportedBy ? 'incident-reporter-error' : undefined}
               className="form-control px-3"
               value={form.reportedBy}
               onChange={(event) => set('reportedBy', event.target.value)}
               placeholder="Prénom Nom"
             />
           </Field>
-          {error && (
-            <p
-              role="alert"
-              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-800"
-            >
-              {error}
-            </p>
-          )}
           <div className="flex justify-end gap-2 border-t border-theme-border pt-4">
             <Button type="button" variant="secondary" onClick={onClose}>
               Annuler
@@ -189,11 +216,22 @@ export function NewIncidentModal({
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  id, label, children, error, required = false,
+}: {
+  id: string
+  label: string
+  children: React.ReactNode
+  error?: string
+  required?: boolean
+}) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-content-muted">{label}</span>
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-content-primary">
+        {label}{required && <span className="ml-1 text-[var(--status-danger)]" aria-hidden="true">*</span>}
+      </label>
       {children}
-    </label>
+      {error && <p id={id + '-error'} role="alert" className="mt-1 text-sm font-medium text-red-800">{error}</p>}
+    </div>
   )
 }

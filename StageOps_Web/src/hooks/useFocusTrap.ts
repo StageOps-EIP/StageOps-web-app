@@ -21,6 +21,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(active: boo
     if (!active || !ref.current) return
 
     const container = ref.current
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const firstFocusable = container.querySelectorAll<HTMLElement>(FOCUSABLE)[0]
     firstFocusable?.focus()
 
@@ -45,7 +46,10 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(active: boo
     }
 
     container.addEventListener('keydown', onKeyDown)
-    return () => container.removeEventListener('keydown', onKeyDown)
+    return () => {
+      container.removeEventListener('keydown', onKeyDown)
+      if (previousFocus?.isConnected) previousFocus.focus()
+    }
   }, [active])
 
   return ref

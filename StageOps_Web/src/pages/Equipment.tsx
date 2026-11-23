@@ -7,7 +7,7 @@ import { Badge, CategoryChip, CategoryIcon } from '@/components/design-system/Ba
 import { EmptyState } from '@/components/design-system/EmptyState'
 import { PageHeader } from '@/components/design-system/PageHeader'
 import { useOperationalData } from '@/hooks/useOperationalData'
-import { getCategoryLabel, formatRelativeTime } from '@/lib/utils'
+import { getCategoryLabel } from '@/lib/utils'
 import { buildCsvFilename, buildEquipmentCsv, downloadCsv } from '@/lib/csv-export'
 import { ChevronDown, Download, PackageSearch } from 'lucide-react'
 import type { EquipmentCategory, EquipmentStatus, Equipment as EquipmentType } from '@/lib/types'
@@ -128,32 +128,29 @@ export function Equipment() {
         <>
           <div className="work-register hidden overflow-hidden lg:block">
             <div className="overflow-x-auto">
-              <table className="work-table w-full min-w-[1060px] table-fixed">
+              <table className="work-table w-full min-w-[850px] table-fixed">
                 <colgroup>
-                  <col style={{ width: '24%' }} />
-                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '29%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '19%' }} />
+                  <col style={{ width: '16%' }} />
                   <col style={{ width: '12%' }} />
-                  <col style={{ width: '13%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '10%' }} />
-                  <col style={{ width: '7%' }} />
+                  <col style={{ width: '9%' }} />
                 </colgroup>
                 <thead>
                   <tr>
                     {[
                       'Équipement',
-                      'Catégorie',
-                      'Identifiant',
-                      'Emplacement',
                       'Statut',
+                      'Emplacement',
+                      'Catégorie',
                       'Responsable',
-                      'Dernier contrôle',
-                      '',
+                      'Action',
                     ].map((heading) => (
                       <th
                         key={heading}
-                        className="px-4 py-3 text-left text-xs font-semibold text-content-subtle last:text-right"
+                        scope="col"
+                        className="px-4 py-3 text-left text-sm font-semibold text-content-muted last:text-right"
                       >
                         {heading}
                       </th>
@@ -164,11 +161,21 @@ export function Equipment() {
                   {filteredEquipment.map((equipment) => (
                     <tr key={equipment.id} className="hover:bg-theme-elevated">
                       <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-content-primary">{equipment.name}</p>
+                        <p className="text-sm font-semibold text-content-primary">{equipment.name}</p>
+                        <code className="mt-1 block text-xs text-content-muted">{equipment.qrCode}</code>
                         {equipment.notes && (
                           <p className="mt-0.5 max-w-xs truncate text-xs text-content-subtle">
                             {equipment.notes}
                           </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge status={equipment.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-content-primary">{equipment.location}</p>
+                        {equipment.zone && (
+                          <p className="text-xs text-content-subtle">{equipment.zone}</p>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -178,32 +185,14 @@ export function Equipment() {
                           icon={<CategoryIcon category={equipment.category} />}
                         />
                       </td>
-                      <td className="px-4 py-3">
-                        <code className="whitespace-nowrap text-xs text-[var(--brand-violet-hover)]">
-                          {equipment.qrCode}
-                        </code>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-content-primary">{equipment.location}</p>
-                        {equipment.zone && (
-                          <p className="text-xs text-content-subtle">{equipment.zone}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge status={equipment.status} />
-                      </td>
                       <td className="px-4 py-3 text-sm text-content-muted">
                         {equipment.responsiblePerson || 'Non affecté'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-content-muted">
-                        {equipment.lastCheck
-                          ? formatRelativeTime(equipment.lastCheck)
-                          : 'Non renseigné'}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Button
                           variant="ghost"
                           size="sm"
+                          aria-label={'Détails de ' + equipment.name}
                           onClick={() => setSelectedEquipment(equipment)}
                         >
                           Détails

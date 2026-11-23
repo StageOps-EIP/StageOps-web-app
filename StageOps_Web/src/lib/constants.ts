@@ -52,12 +52,7 @@ export const INCIDENT_COLUMNS: {
   { key: 'closed', label: 'Clos', icon: Archive, color: STATUS_COLORS.neutral },
 ]
 
-export const SEVERITY_ORDER: Record<string, number> = {
-  critical: 0,
-  high: 1,
-  medium: 2,
-  low: 3,
-}
+export { SEVERITY_ORDER } from './incident-order'
 
 // ─── Équipe ────────────────────────────────────────────────────────────────
 

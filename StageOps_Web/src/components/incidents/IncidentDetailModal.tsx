@@ -63,7 +63,7 @@ export function IncidentDetailModal({
           <button
             aria-label="Fermer"
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl hover:bg-theme-elevated text-content-subtle hover:text-content-primary transition-colors"
           >
             <X size={18} />
           </button>
@@ -73,7 +73,7 @@ export function IncidentDetailModal({
           {/* Status badges */}
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className="text-xs px-3 py-1 rounded-full"
+              className="text-sm font-semibold px-3 py-1.5 rounded-full"
               style={{
                 backgroundColor: `${sevColor}15`,
                 color: sevColor,
@@ -83,7 +83,7 @@ export function IncidentDetailModal({
               {getSeverityLabel(incident.severity)}
             </span>
             <span
-              className="text-xs px-3 py-1 rounded-full"
+              className="text-sm font-semibold px-3 py-1.5 rounded-full"
               style={{
                 backgroundColor: `${statusCol.color}15`,
                 color: statusCol.color,
@@ -108,13 +108,13 @@ export function IncidentDetailModal({
             <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
               Informations
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <div className="p-4 bg-theme-elevated rounded-xl">
-                <p className="text-[10px] text-content-subtle mb-1">Signalé par</p>
+                <p className="text-sm text-content-muted mb-1">Signalé par</p>
                 <p className="text-sm text-content-primary">{incident.reportedBy}</p>
               </div>
               <div className="p-4 bg-theme-elevated rounded-xl">
-                <p className="text-[10px] text-content-subtle mb-1">Date du signalement</p>
+                <p className="text-sm text-content-muted mb-1">Date du signalement</p>
                 <p className="text-sm text-content-primary">
                   {formatRelativeTime(incident.timestamp)}
                 </p>
@@ -122,13 +122,13 @@ export function IncidentDetailModal({
               {incident.resolvedAt && (
                 <>
                   <div className="p-4 bg-theme-elevated rounded-xl">
-                    <p className="text-[10px] text-content-subtle mb-1">Résolu le</p>
+                    <p className="text-sm text-content-muted mb-1">Résolu le</p>
                     <p className="text-sm text-content-primary">
                       {formatRelativeTime(incident.resolvedAt)}
                     </p>
                   </div>
                   <div className="p-4 bg-theme-elevated rounded-xl">
-                    <p className="text-[10px] text-content-subtle mb-1">Durée de résolution</p>
+                    <p className="text-sm text-content-muted mb-1">Durée de résolution</p>
                     <p className="text-sm text-content-primary">
                       {Math.round(
                         (incident.resolvedAt.getTime() - incident.timestamp.getTime()) / 3600000,

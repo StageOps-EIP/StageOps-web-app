@@ -8,7 +8,8 @@ import { useOperationalData } from '@/hooks/useOperationalData'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '../lib/utils'
 import { IncidentDetailModal } from '../components/incidents/IncidentDetailModal'
 import type { Incident, IncidentStatus } from '../lib/types'
-import { INCIDENT_COLUMNS, SEVERITY_ORDER } from '../lib/constants'
+import { INCIDENT_COLUMNS } from '../lib/constants'
+import { isActiveIncident, sortIncidentsForAttention } from '@/lib/incident-order'
 import { IncidentCard } from '../components/incidents/IncidentCard'
 import { NewIncidentModal } from '../components/incidents/NewIncidentModal'
 import { toast } from 'sonner'
@@ -22,7 +23,7 @@ export function Incidents() {
   usePageTitle('Incidents')
   const [searchParams, setSearchParams] = useSearchParams()
   const { equipment, incidents, addIncident, updateIncident } = useOperationalData()
-  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list')
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [showNewForm, setShowNewForm] = useState(false)
@@ -49,12 +50,16 @@ export function Incidents() {
     ? incidents.filter((i) => i.severity === filterSeverity)
     : incidents
 
-  const getByStatus = (status: IncidentStatus) => filtered.filter((i) => i.status === status)
+  const getByStatus = (status: IncidentStatus) =>
+    sortIncidentsForAttention(filtered.filter((i) => i.status === status))
+  const ordered = sortIncidentsForAttention(filtered)
 
   const openCount = incidents.filter((i) => i.status === 'open').length
   const inProgressCount = incidents.filter((i) => i.status === 'in-progress').length
-  const criticalCount = incidents.filter(
-    (i) => i.severity === 'critical' || i.severity === 'high',
+  const priorityCount = incidents.filter(
+    (i) =>
+      isActiveIncident(i) &&
+      (i.severity === 'critical' || i.severity === 'high'),
   ).length
 
   function exportIncidents() {
@@ -73,7 +78,7 @@ export function Incidents() {
         description={
           <>
             {openCount} ouvert{openCount > 1 ? 's' : ''} · {inProgressCount} en cours ·{' '}
-            {criticalCount} critique{criticalCount > 1 ? 's' : ''}
+            {priorityCount} à priorité élevée
           </>
         }
         actions={
@@ -99,8 +104,8 @@ export function Incidents() {
         }
       />
       <div className="toolbar">
-        <span className="text-sm font-medium text-content-muted">Priorité</span>
-        <div className="segmented-control overflow-x-auto">
+        <span id="incident-priority-label" className="text-sm font-medium text-content-muted">Priorité</span>
+        <div className="segmented-control overflow-x-auto" role="group" aria-labelledby="incident-priority-label">
           <button onClick={() => setFilterSeverity(null)} aria-pressed={!filterSeverity}>
             Toutes
           </button>
@@ -124,14 +129,14 @@ export function Incidents() {
           {columns.map((col) => {
             const items = getByStatus(col.key)
             return (
-              <section key={col.key} className="work-register min-w-0">
+              <section key={col.key} aria-labelledby={'incident-column-' + col.key} className="work-register min-w-0">
                 <div className="flex min-h-10 items-center gap-2 border-b border-theme-border px-3 py-2">
                   <span
                     className="h-3 w-0.5"
                     style={{ backgroundColor: col.color }}
                     aria-hidden="true"
                   />
-                  <span className="text-xs font-semibold text-content-primary">{col.label}</span>
+                  <h2 id={'incident-column-' + col.key} className="text-sm font-semibold text-content-primary">{col.label}</h2>
                   <span className="ml-auto border-l border-theme-border pl-2 text-xs text-content-subtle">
                     {items.length}
                   </span>
@@ -158,12 +163,7 @@ export function Incidents() {
       ) : (
         <Card>
           <div className="space-y-1">
-            {filtered
-              .slice()
-              .sort((a, b) => {
-                return (SEVERITY_ORDER[a.severity] ?? 4) - (SEVERITY_ORDER[b.severity] ?? 4)
-              })
-              .map((inc) => {
+            {ordered.map((inc) => {
                 const sevColor = getSeverityColor(inc.severity)
                 const statusCol = columns.find((c) => c.key === inc.status)
                 const eq = inc.equipmentId
@@ -173,21 +173,20 @@ export function Incidents() {
                   <button
                     key={inc.id}
                     onClick={() => setSelectedIncident(inc)}
-                    className="work-row flex w-full items-center gap-4 p-3 text-left transition-colors hover:bg-theme-elevated"
+                    className="work-row flex w-full flex-wrap items-center gap-3 p-4 text-left transition-colors hover:bg-theme-elevated sm:flex-nowrap"
                   >
-                    <div className="h-10 w-0.5 shrink-0" style={{ backgroundColor: sevColor }} />
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm text-content-primary truncate block">
+                      <span className="block text-base font-semibold text-content-primary">
                         {inc.title}
                       </span>
-                      <div className="flex items-center gap-3 text-xs text-content-subtle mt-0.5">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-content-muted">
                         <span>{formatRelativeTime(inc.timestamp)}</span>
                         {eq && <span>Matériel · {eq.name}</span>}
                         <span>Par {inc.reportedBy}</span>
                       </div>
                     </div>
                     <span
-                      className="shrink-0 border-l border-theme-border px-2 py-0.5 text-[10px]"
+                      className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
                       style={{
                         backgroundColor: `${sevColor}15`,
                         color: sevColor,
@@ -196,7 +195,7 @@ export function Incidents() {
                       {getSeverityLabel(inc.severity)}
                     </span>
                     <span
-                      className="shrink-0 border-l border-theme-border px-2 py-0.5 text-[10px]"
+                      className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
                       style={{
                         backgroundColor: `${statusCol?.color}15`,
                         color: statusCol?.color,
@@ -204,9 +203,7 @@ export function Incidents() {
                     >
                       {statusCol?.label}
                     </span>
-                    <span className="shrink-0 text-content-faint" aria-hidden="true">
-                      →
-                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-[var(--brand-violet-hover)]" aria-hidden="true">Voir</span>
                   </button>
                 )
               })}

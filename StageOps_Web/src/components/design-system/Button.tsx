@@ -12,7 +12,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      'group relative inline-flex min-h-10 items-center justify-center rounded-lg border font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40'
+      'group relative inline-flex min-h-11 items-center justify-center rounded-lg border font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40'
 
     const variants = {
       primary:
@@ -25,8 +25,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     const sizes = {
-      sm: 'gap-1.5 px-2.5 py-1.5 text-xs',
-      md: 'gap-2 px-3.5 py-2 text-[13px]',
+      sm: 'gap-1.5 px-3 py-2 text-sm',
+      md: 'gap-2 px-3.5 py-2 text-sm',
       lg: 'gap-2 px-4 py-2.5 text-sm',
     }
 
