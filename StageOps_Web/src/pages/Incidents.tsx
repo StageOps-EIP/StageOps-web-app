@@ -105,7 +105,7 @@ export function Incidents() {
       />
       <div className="toolbar">
         <span id="incident-priority-label" className="text-sm font-medium text-content-muted">Priorité</span>
-        <div className="segmented-control overflow-x-auto" role="group" aria-labelledby="incident-priority-label">
+        <div className="segmented-control max-w-full min-w-0 overflow-x-auto" role="group" aria-labelledby="incident-priority-label">
           <button onClick={() => setFilterSeverity(null)} aria-pressed={!filterSeverity}>
             Toutes
           </button>

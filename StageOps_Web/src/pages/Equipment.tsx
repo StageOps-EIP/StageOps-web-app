@@ -126,7 +126,7 @@ export function Equipment() {
 
       {filteredEquipment.length > 0 ? (
         <>
-          <div className="work-register hidden overflow-hidden lg:block">
+          <div className="work-register hidden overflow-hidden xl:block">
             <div className="overflow-x-auto">
               <table className="work-table w-full min-w-[850px] table-fixed">
                 <colgroup>
@@ -205,7 +205,7 @@ export function Equipment() {
             </div>
           </div>
 
-          <div className="grid gap-3 lg:hidden sm:grid-cols-2">
+          <div className="grid gap-3 xl:hidden sm:grid-cols-2">
             {filteredEquipment.map((equipment) => (
               <button
                 key={equipment.id}
