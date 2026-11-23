@@ -48,7 +48,11 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(active: boo
     container.addEventListener('keydown', onKeyDown)
     return () => {
       container.removeEventListener('keydown', onKeyDown)
-      if (previousFocus?.isConnected) previousFocus.focus()
+      if (previousFocus?.isConnected && previousFocus !== document.body) {
+        previousFocus.focus()
+      } else {
+        document.getElementById('main-content')?.focus()
+      }
     }
   }, [active])
 
