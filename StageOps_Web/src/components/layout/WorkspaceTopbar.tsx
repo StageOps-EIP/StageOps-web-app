@@ -18,12 +18,12 @@ export function WorkspaceTopbar() {
   return (
     <header className="hidden h-[4.5rem] shrink-0 items-center justify-between gap-5 border-b border-theme-border bg-theme-base px-8 lg:flex">
       <p className="min-w-0 truncate text-sm font-semibold text-content-muted">
-        Théâtre National <span className="mx-2 text-content-subtle">/</span>
+        Scénario d’exemple <span className="mx-2 text-content-subtle">/</span>
         <span className="text-content-primary">{currentPage}</span>
       </p>
       <div className="flex shrink-0 items-center gap-3">
-        <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
-          Données locales
+        <span className="rounded-full bg-[var(--brand-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--brand-violet-hover)]">
+          Données de démonstration
         </span>
         {pathname !== '/incidents' && (
           <Link

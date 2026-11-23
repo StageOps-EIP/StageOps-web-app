@@ -17,7 +17,7 @@ export function Dashboard() {
   usePageTitle('Vue générale')
   const { equipment, incidents } = useOperationalData()
   const activeEvent = mockEvents[0]
-  const upcomingEvents = [...mockEvents].sort(
+  const exampleEvents = [...mockEvents].sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime(),
   )
   const controls = equipment.filter((item) => item.status !== 'ok')
@@ -32,92 +32,29 @@ export function Dashboard() {
     <div className="page-shell dashboard-rideau space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="page-heading">La production en régie</h1>
+          <h1 className="page-heading">Vue générale</h1>
           <p className="mt-2 text-sm text-content-muted">
-            {dateFormatter.format(activeEvent.startDate)} · {activeEvent.venue}, {activeEvent.stage}
+            Incidents, matériel et programme de l’espace de régie.
           </p>
         </div>
         <Link
-          to="/stage"
-          className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+          to="/incidents?new=1"
+          className="inline-flex min-h-10 items-center rounded-lg bg-[var(--brand-violet)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-violet-hover)] lg:hidden"
         >
-          Ouvrir le plateau 3D
+          Signaler un incident
         </Link>
       </header>
 
-      <section
-        aria-labelledby="featured-production"
-        className="overflow-hidden rounded-xl border border-theme-border bg-theme-base"
+      <aside
+        aria-label="Contexte des données"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-theme-border bg-theme-elevated px-4 py-3 text-sm"
       >
-        <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <div className="border-l-[5px] border-[var(--brand-violet)] p-5 sm:p-8">
-            <p className="text-xs font-semibold text-[var(--brand-violet-hover)]">
-              Production sélectionnée
-            </p>
-            <h2
-              id="featured-production"
-              className="mt-2 text-4xl font-bold tracking-tight text-content-primary"
-            >
-              {activeEvent.title.replace(/ - .+$/, '')}
-            </h2>
-            <p className="mt-2 text-sm text-content-muted">
-              Représentation · {formatTime(activeEvent.startDate)}–{formatTime(activeEvent.endDate)}
-            </p>
-            <Link
-              to="/events"
-              className="mt-5 inline-flex min-h-10 items-center rounded-lg border border-theme-border bg-theme-base px-4 text-sm font-semibold text-content-primary hover:bg-theme-elevated"
-            >
-              Voir le conducteur
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 border-t border-theme-border lg:border-l lg:border-t-0">
-            <div className="p-4 sm:p-7">
-              <p className="text-sm font-semibold text-content-muted">Préparation</p>
-              <p className="mt-3 text-4xl font-bold text-content-primary">
-                {activeEvent.checklistProgress}
-                <span className="ml-1 text-xl text-content-muted">%</span>
-              </p>
-              <div
-                role="progressbar"
-                aria-label="Progression de la checklist"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={activeEvent.checklistProgress}
-                className="mt-3 h-2 overflow-hidden rounded-full bg-theme-elevated"
-              >
-                <div
-                  className="h-full rounded-full bg-[#e7a93a]"
-                  style={{ width: `${activeEvent.checklistProgress}%` }}
-                />
-              </div>
-              <p className="mt-3 text-xs text-content-muted">Checklist de production</p>
-            </div>
-            <div className="border-l border-theme-border p-4 sm:p-7">
-              <p className="text-sm font-semibold text-content-muted">Repères de la fiche</p>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Début</dt>
-                  <dd className="font-bold text-content-primary">
-                    {formatTime(activeEvent.startDate)}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Fin</dt>
-                  <dd className="font-bold text-content-primary">
-                    {formatTime(activeEvent.endDate)}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Équipe</dt>
-                  <dd className="font-bold text-content-primary">
-                    {activeEvent.teamMembers.length} / {mockTeamMembers.length}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </section>
+        <strong className="text-content-primary">Scénario d’exemple · février 2026</strong>
+        <span className="text-content-muted">
+          Ce programme est fictif. Les modifications du matériel et des incidents restent dans ce
+          navigateur.
+        </span>
+      </aside>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
         <section aria-labelledby="action-title" className="min-w-0">
@@ -161,7 +98,7 @@ export function Dashboard() {
               ))
             ) : (
               <p className="px-5 py-7 text-sm text-content-muted">
-                Aucun incident actif pour cette production.
+                Aucun incident actif dans le registre.
               </p>
             )}
           </div>
@@ -170,7 +107,7 @@ export function Dashboard() {
         <section aria-labelledby="schedule-title" className="min-w-0">
           <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
             <h2 id="schedule-title" className="text-2xl font-bold text-content-primary">
-              Programme enregistré
+              Programme d’exemple
             </h2>
             <Link
               to="/events"
@@ -180,7 +117,7 @@ export function Dashboard() {
             </Link>
           </div>
           <div className="rounded-xl border border-theme-border bg-theme-base px-5">
-            {upcomingEvents.map((event) => (
+            {exampleEvents.map((event) => (
               <div
                 key={event.id}
                 className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 border-b border-theme-border py-4 last:border-b-0"
@@ -202,6 +139,82 @@ export function Dashboard() {
           </div>
         </section>
       </div>
+
+      <section
+        aria-labelledby="featured-production"
+        className="overflow-hidden rounded-xl border border-theme-border bg-theme-base"
+      >
+        <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="p-5">
+            <p className="text-xs font-semibold text-[var(--brand-violet-hover)]">
+              Fiche du scénario
+            </p>
+            <h2
+              id="featured-production"
+              className="mt-2 text-2xl font-bold tracking-tight text-content-primary"
+            >
+              {activeEvent.title.replace(/ - .+$/, '')}
+            </h2>
+            <p className="mt-2 text-sm text-content-muted">
+              {dateFormatter.format(activeEvent.startDate)} · {activeEvent.venue},{' '}
+              {activeEvent.stage} · {formatTime(activeEvent.startDate)}–
+              {formatTime(activeEvent.endDate)}
+            </p>
+            <Link
+              to="/events"
+              className="mt-5 inline-flex min-h-10 items-center rounded-lg border border-theme-border bg-theme-base px-4 text-sm font-semibold text-content-primary hover:bg-theme-elevated"
+            >
+              Voir le conducteur
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 border-t border-theme-border lg:border-l lg:border-t-0">
+            <div className="p-4 sm:p-5">
+              <p className="text-sm font-semibold text-content-muted">Préparation enregistrée</p>
+              <p className="mt-2 text-2xl font-bold text-content-primary">
+                {activeEvent.checklistProgress}
+                <span className="ml-1 text-base text-content-muted">%</span>
+              </p>
+              <div
+                role="progressbar"
+                aria-label="Progression de la checklist"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={activeEvent.checklistProgress}
+                className="mt-3 h-2 overflow-hidden rounded-full bg-theme-elevated"
+              >
+                <div
+                  className="h-full rounded-full bg-[#e7a93a]"
+                  style={{ width: `${activeEvent.checklistProgress}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-content-muted">Checklist du scénario</p>
+            </div>
+            <div className="border-l border-theme-border p-4 sm:p-5">
+              <p className="text-sm font-semibold text-content-muted">Repères de la fiche</p>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Début</dt>
+                  <dd className="font-bold text-content-primary">
+                    {formatTime(activeEvent.startDate)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Fin</dt>
+                  <dd className="font-bold text-content-primary">
+                    {formatTime(activeEvent.endDate)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-content-muted">Équipe</dt>
+                  <dd className="font-bold text-content-primary">
+                    {activeEvent.teamMembers.length} / {mockTeamMembers.length}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
         <section

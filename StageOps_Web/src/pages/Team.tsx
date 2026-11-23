@@ -27,7 +27,7 @@ export function Team() {
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context="Théâtre National"
+        context="Scénario d’exemple"
         title="Équipe et droits"
         description={`${teamList.length} membres · ${roles.length} rôles`}
         actions={

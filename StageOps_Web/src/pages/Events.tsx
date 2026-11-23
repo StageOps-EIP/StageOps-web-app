@@ -100,7 +100,11 @@ export function Events() {
   usePageTitle('Conducteur')
   const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)) // Feb 2026
   const [events, setEvents] = useState<Event[]>(allEvents)
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+      ? 'list'
+      : 'calendar',
+  )
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [showNewForm, setShowNewForm] = useState(false)
 
@@ -108,7 +112,7 @@ export function Events() {
   const month = currentDate.getMonth()
   const days = getCalendarDays(year, month)
   const conflicts = getConflicts(events)
-  const today = new Date(2026, 1, 11)
+  const today = new Date()
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1))
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1))
@@ -120,9 +124,9 @@ export function Events() {
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context="Théâtre National"
+        context="Scénario d’exemple"
         title="Conducteur et planning"
-        description={`${eventsThisMonth.length} événements en février 2026`}
+        description={`${eventsThisMonth.length} événement${eventsThisMonth.length > 1 ? 's' : ''} en ${currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
         actions={
           <>
             {/* View toggle */}
@@ -143,6 +147,10 @@ export function Events() {
           </>
         }
       />
+      <p className="rounded-lg border border-theme-border bg-theme-elevated px-4 py-3 text-sm text-content-muted">
+        Les événements préchargés illustrent un scénario de février 2026. Les dates affichées
+        suivent le mois choisi.
+      </p>
       {/* Conflicts warning */}
       {conflicts.length > 0 && (
         <Card className="border-amber-500/30 bg-amber-500/[0.04]">

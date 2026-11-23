@@ -57,8 +57,8 @@ export function Sidebar() {
       <div className="px-5 pb-5 pt-5">
         <StageOpsLogo />
         <div className="mt-6 border-t border-theme-border pt-5">
-          <p className="text-sm font-semibold text-content-primary">Théâtre National</p>
-          <p className="mt-1 text-xs text-content-muted">Grande Salle</p>
+          <p className="text-sm font-semibold text-content-primary">Scénario d’exemple</p>
+          <p className="mt-1 text-xs text-content-muted">Programme de février 2026</p>
         </div>
       </div>
 
@@ -97,8 +97,10 @@ export function MobileHeader() {
         <div className="flex min-w-0 items-center gap-3">
           <StageOpsLogo compact />
           <div className="hidden min-w-0 border-l border-theme-border pl-3 sm:block">
-            <p className="truncate text-[11px] font-semibold text-content-primary">Hamlet</p>
-            <p className="truncate text-[10px] text-content-subtle">Grande Salle</p>
+            <p className="truncate text-[11px] font-semibold text-content-primary">
+              Scénario d’exemple
+            </p>
+            <p className="truncate text-[10px] text-content-subtle">Février 2026</p>
           </div>
         </div>
         <button

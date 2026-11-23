@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router'
 import { Button } from '@/components/design-system/Button'
 import { CategoryIcon } from '@/components/design-system/Badge'
-import { getStatusColor, getCategoryLabel, formatRelativeTime, formatDateTime } from '@/lib/utils'
-import type { Equipment, EquipmentStatus } from '@/lib/types'
+import {
+  getStatusColor,
+  getCategoryLabel,
+  formatRelativeTime,
+  formatDateTime,
+  getSeverityLabel,
+} from '@/lib/utils'
+import type { Equipment, EquipmentStatus, Incident } from '@/lib/types'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { STATUS_COLORS, TEXT_COLORS } from '@/lib/design-tokens'
 import {
@@ -27,10 +34,12 @@ const statusOptions: { value: EquipmentStatus; label: string; color: string }[] 
 
 export function EquipmentDetailModal({
   equipment,
+  incidents,
   onClose,
   onSave,
 }: {
   equipment: Equipment
+  incidents: Incident[]
   onClose: () => void
   onSave?: (updated: Equipment) => void
 }) {
@@ -43,6 +52,16 @@ export function EquipmentDetailModal({
   const trapRef = useFocusTrap(true)
 
   const statusColor = getStatusColor(editedStatus)
+  const relatedIncidents = incidents
+    .filter((incident) => incident.equipmentId === equipment.id)
+    .sort((a, b) => {
+      const aActive = a.status === 'open' || a.status === 'in-progress'
+      const bActive = b.status === 'open' || b.status === 'in-progress'
+      return Number(bActive) - Number(aActive) || b.timestamp.getTime() - a.timestamp.getTime()
+    })
+  const hasActiveIncident = relatedIncidents.some(
+    (incident) => incident.status === 'open' || incident.status === 'in-progress',
+  )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -75,7 +94,7 @@ export function EquipmentDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(61,13,23,0.4)] p-3 sm:p-6"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -85,10 +104,10 @@ export function EquipmentDetailModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="equipment-detail-title"
-        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-theme-border bg-theme-base shadow-[0_20px_50px_rgba(61,13,23,0.18)]"
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-theme-border bg-theme-base px-5 py-4 sm:px-8 sm:py-5">
           <div className="flex items-center gap-3">
             <div
               className="w-2 h-8 rounded-full transition-colors duration-300"
@@ -113,7 +132,7 @@ export function EquipmentDetailModal({
           </button>
         </div>
 
-        <div className="px-8 py-6 space-y-6">
+        <div className="space-y-6 px-5 py-5 sm:px-8 sm:py-6">
           {/* Nom & catégorie */}
           <div className="flex items-start gap-4">
             <div className="p-3 bg-theme-elevated rounded-xl flex items-center justify-center text-[var(--brand-violet-hover)]">
@@ -129,6 +148,62 @@ export function EquipmentDetailModal({
               </div>
             </div>
           </div>
+
+          <section
+            aria-labelledby="equipment-incidents-title"
+            className="rounded-xl border border-theme-border bg-theme-elevated p-4"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 id="equipment-incidents-title" className="text-sm font-bold text-content-primary">
+                Incidents liés · {relatedIncidents.length}
+              </h3>
+              <Link
+                to={`/incidents?new=1&equipment=${encodeURIComponent(equipment.id)}`}
+                className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
+              >
+                {relatedIncidents.length ? 'Signaler un autre incident' : 'Signaler un incident'}
+              </Link>
+            </div>
+            {hasActiveIncident && (
+              <p className="mt-2 text-xs text-content-muted">
+                Un signalement est déjà actif pour ce matériel. Consultez-le avant d’en créer un
+                autre.
+              </p>
+            )}
+            {relatedIncidents.length ? (
+              <div className="mt-3 overflow-hidden rounded-lg border border-theme-border bg-theme-base">
+                {relatedIncidents.map((incident) => (
+                  <Link
+                    key={incident.id}
+                    to={`/incidents?incident=${encodeURIComponent(incident.id)}`}
+                    className="flex min-h-14 items-center justify-between gap-3 border-b border-theme-border px-3 py-2 last:border-b-0 hover:bg-theme-elevated"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-content-primary">
+                        {incident.title}
+                      </span>
+                      <span className="block text-xs text-content-muted">
+                        {getSeverityLabel(incident.severity)}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-xs font-semibold text-[var(--brand-violet-hover)]">
+                      {incident.status === 'open'
+                        ? 'Ouvert'
+                        : incident.status === 'in-progress'
+                          ? 'En cours'
+                          : incident.status === 'resolved'
+                            ? 'Résolu'
+                            : 'Clos'}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-content-muted">
+                Aucun incident associé à cet équipement.
+              </p>
+            )}
+          </section>
 
           {/* Statut */}
           <div>
@@ -281,8 +356,9 @@ export function EquipmentDetailModal({
               <div>
                 <p className="text-sm text-red-700 font-medium">Équipement hors service</p>
                 <p className="text-xs text-content-muted mt-1">
-                  Cet équipement est marqué HS. Pensez à créer un incident et à notifier le
-                  responsable.
+                  {hasActiveIncident
+                    ? 'Un incident actif est lié à cet équipement. Consultez son suivi ci-dessus.'
+                    : 'Aucun incident actif n’est lié à cet équipement. Vous pouvez en signaler un ci-dessus.'}
                 </p>
               </div>
             </div>
