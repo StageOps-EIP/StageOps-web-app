@@ -27,12 +27,16 @@ export function Incidents() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [showNewForm, setShowNewForm] = useState(false)
   const newIncidentRequested = searchParams.get('new') === '1'
+  const requestedEquipmentId = equipment.find(
+    (item) => item.id === searchParams.get('equipment'),
+  )?.id
 
   function closeNewForm() {
     setShowNewForm(false)
     if (searchParams.has('new')) {
       const next = new URLSearchParams(searchParams)
       next.delete('new')
+      next.delete('equipment')
       setSearchParams(next, { replace: true })
     }
   }
@@ -64,7 +68,7 @@ export function Incidents() {
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context={PROJECT_NAME}
+        context="Scénario d’exemple"
         title="Incidents et maintenance"
         description={
           <>
@@ -243,7 +247,13 @@ export function Incidents() {
       {(showNewForm || newIncidentRequested) && (
         <NewIncidentModal
           equipment={equipment}
+          incidents={incidents}
+          initialEquipmentId={requestedEquipmentId}
           onClose={closeNewForm}
+          onOpenIncident={(id) => {
+            setShowNewForm(false)
+            setSearchParams({ incident: id })
+          }}
           onCreate={(incident) => {
             addIncident(incident)
             closeNewForm()

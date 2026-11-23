@@ -41,7 +41,7 @@ Fraunces reste réservé au logotype, avec « Ops » en italique. DM Sans sert a
 
 ## Organisation
 
-Le panneau latéral garde les sept sections existantes. Un en-tête commun indique la section active et rappelle que les données sont locales. Le bouton de signalement ouvre directement le formulaire d'incident. Sur la vue générale, la fiche de production précède les incidents actifs, les productions du jeu de démonstration et l'état du matériel. Les autres pages réutilisent les surfaces, les contrôles et les couleurs d'état partagés.
+Le panneau latéral garde les sept sections existantes. L'en-tête commun indique la section active et nomme explicitement le scénario de démonstration. Sur la vue générale, les incidents actifs précèdent le programme et la fiche de production d'exemple : une urgence doit être visible sans parcourir tout l'écran. Le bouton de signalement ouvre directement le formulaire d'incident. La fiche matériel montre les incidents associés avant les réglages et permet d'ouvrir un signalement existant ou d'en créer un avec le matériel prérempli. Sur téléphone, le conducteur s'ouvre en liste ; le calendrier reste disponible à la demande. Les autres pages réutilisent les surfaces, les contrôles et les couleurs d'état partagés.
 
 Les arches décoratives restent sur l'écran de connexion ; elles sont ignorées par les lecteurs d'écran. L'éditeur 3D conserve son espace de travail plein écran : ses panneaux et contrôles utilisent les mêmes surfaces claires, tandis que le canvas représente le plateau.
 

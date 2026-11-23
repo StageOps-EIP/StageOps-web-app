@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router'
 import { Button } from '@/components/design-system/Button'
 import { getSeverityColor, getSeverityLabel, formatRelativeTime } from '@/lib/utils'
 import type { Equipment, Incident } from '@/lib/types'
@@ -39,7 +40,7 @@ export function IncidentDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(61,13,23,0.4)] p-3 sm:p-6"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -49,10 +50,10 @@ export function IncidentDetailModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="incident-modal-title"
-        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-theme-border bg-theme-base shadow-[0_20px_50px_rgba(61,13,23,0.18)]"
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-theme-border bg-theme-base px-5 py-4 sm:px-8 sm:py-5">
           <div className="flex items-center gap-3">
             <div className="w-2 h-8 rounded-full" style={{ backgroundColor: sevColor }} />
             <h2 id="incident-modal-title" className="text-lg text-content-primary">
@@ -68,7 +69,7 @@ export function IncidentDetailModal({
           </button>
         </div>
 
-        <div className="px-8 py-6 space-y-6">
+        <div className="space-y-6 px-5 py-5 sm:px-8 sm:py-6">
           {/* Status badges */}
           <div className="flex items-center gap-2 flex-wrap">
             <span
@@ -146,7 +147,10 @@ export function IncidentDetailModal({
               <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
                 Équipement concerné
               </p>
-              <div className="flex items-center gap-4 p-4 bg-theme-elevated border border-theme-border rounded-xl">
+              <Link
+                to={`/equipment?equipment=${encodeURIComponent(equipment.id)}`}
+                className="flex items-center gap-4 rounded-xl border border-theme-border bg-theme-elevated p-4 hover:border-theme-border-hover"
+              >
                 <div className="p-2.5 bg-theme-border rounded-lg">
                   <Wrench size={18} className="text-content-muted" />
                 </div>
@@ -157,7 +161,10 @@ export function IncidentDetailModal({
                     {equipment.zone ? ` · ${equipment.zone}` : ''}
                   </p>
                 </div>
-              </div>
+                <span className="text-xs font-semibold text-[var(--brand-violet-hover)]">
+                  Voir la fiche
+                </span>
+              </Link>
             </div>
           )}
 

@@ -20,7 +20,12 @@ const PROJECT_NAME = 'Théâtre National'
 export function Equipment() {
   usePageTitle('Parc matériel')
   const [searchParams, setSearchParams] = useSearchParams()
-  const { equipment: equipmentList, addEquipment, updateEquipment } = useOperationalData()
+  const {
+    equipment: equipmentList,
+    incidents,
+    addEquipment,
+    updateEquipment,
+  } = useOperationalData()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<EquipmentStatus | 'all'>('all')
@@ -64,7 +69,7 @@ export function Equipment() {
   return (
     <div className="page-shell space-y-5">
       <PageHeader
-        context={PROJECT_NAME}
+        context="Scénario d’exemple"
         title="Parc matériel"
         description={`${equipmentList.length} équipements référencés`}
         actions={
@@ -267,6 +272,7 @@ export function Equipment() {
       {activeEquipment && (
         <EquipmentDetailModal
           equipment={activeEquipment}
+          incidents={incidents}
           onClose={closeDetail}
           onSave={(updated) => {
             updateEquipment(updated)

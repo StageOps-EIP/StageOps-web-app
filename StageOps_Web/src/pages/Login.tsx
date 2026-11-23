@@ -51,7 +51,7 @@ export function Login() {
           </h1>
           <div className="mt-8 border-y border-theme-border">
             <div className="border-b border-theme-border py-3">
-              <p className="text-[10px] text-content-subtle">Production active</p>
+              <p className="text-[10px] text-content-subtle">Fiche du scénario d’exemple</p>
               <p className="font-editorial mt-1 text-xl font-medium text-content-primary">
                 Hamlet — Représentation
               </p>

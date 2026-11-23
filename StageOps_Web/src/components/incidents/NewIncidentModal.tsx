@@ -7,21 +7,32 @@ import type { Equipment, Incident, IncidentSeverity } from '@/lib/types'
 export function NewIncidentModal({
   onClose,
   onCreate,
+  onOpenIncident,
   equipment,
+  incidents,
+  initialEquipmentId,
 }: {
   onClose: () => void
   onCreate: (incident: Incident) => void
+  onOpenIncident: (id: string) => void
   equipment: Equipment[]
+  incidents: Incident[]
+  initialEquipmentId?: string
 }) {
   const trapRef = useFocusTrap<HTMLFormElement>(true)
   const [form, setForm] = useState({
     title: '',
     description: '',
     severity: 'medium' as IncidentSeverity,
-    equipmentId: '',
+    equipmentId: initialEquipmentId ?? '',
     reportedBy: '',
   })
   const [error, setError] = useState('')
+  const existingIncidents = incidents.filter(
+    (incident) =>
+      incident.equipmentId === form.equipmentId &&
+      (incident.status === 'open' || incident.status === 'in-progress'),
+  )
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -54,7 +65,7 @@ export function NewIncidentModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(61,13,23,0.4)] p-4"
       onClick={(event) => event.target === event.currentTarget && onClose()}
     >
       <form
@@ -63,7 +74,7 @@ export function NewIncidentModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-incident-title"
-        className="panel w-full max-w-lg p-5 shadow-2xl sm:p-6"
+        className="panel max-h-[90vh] w-full max-w-lg overflow-y-auto p-5 shadow-[0_20px_50px_rgba(61,13,23,0.18)] sm:p-6"
       >
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
@@ -128,6 +139,26 @@ export function NewIncidentModal({
               </select>
             </Field>
           </div>
+          {existingIncidents.length > 0 && (
+            <div className="rounded-lg border border-amber-700/30 bg-amber-50 p-3 text-sm text-amber-950">
+              <p className="font-semibold">
+                {existingIncidents.length} incident{existingIncidents.length > 1 ? 's' : ''} déjà
+                actif{existingIncidents.length > 1 ? 's' : ''} pour ce matériel
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {existingIncidents.map((incident) => (
+                  <button
+                    key={incident.id}
+                    type="button"
+                    onClick={() => onOpenIncident(incident.id)}
+                    className="rounded-md border border-amber-700/30 bg-white px-2.5 py-1.5 text-left text-xs font-semibold hover:bg-amber-100"
+                  >
+                    Voir « {incident.title} »
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <Field label="Signalé par">
             <input
               className="form-control px-3"

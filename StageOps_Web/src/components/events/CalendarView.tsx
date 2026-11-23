@@ -38,6 +38,9 @@ export function CalendarView({
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_340px]">
       {/* Calendar */}
       <Card className="overflow-x-auto">
+        <p className="mb-3 text-xs text-content-muted md:hidden">
+          Faites défiler le calendrier horizontalement pour voir toute la semaine.
+        </p>
         <div className="mb-4 flex items-center justify-between border-b border-theme-border pb-3">
           <h2 className="text-sm font-semibold text-content-primary">
             {MONTHS_FR[month]} {year}
@@ -134,7 +137,7 @@ export function CalendarView({
       {/* Sidebar — upcoming events */}
       <div className="space-y-4">
         <Card>
-          <CardHeader title="Prochains événements" subtitle={`${MONTHS_FR[month]} ${year}`} />
+          <CardHeader title="Événements du mois" subtitle={`${MONTHS_FR[month]} ${year}`} />
           <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">
             {eventsThisMonth
               .slice()
