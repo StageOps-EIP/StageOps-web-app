@@ -27,6 +27,7 @@
   --border: #e7dad5;
   --border-hover: #cdb8ae;
   --border-strong: #d6c4ba;
+  --control-border: #a38f86;
   --text-primary: #3d0d17;
   --text-muted: #625654;
   --text-subtle: #716765;
@@ -219,7 +220,7 @@
   .form-control {
     width: 100%;
     min-height: 2.75rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--control-border);
     border-radius: var(--radius-sm);
     background: var(--bg-base);
     color: var(--text-primary);
@@ -230,7 +231,7 @@
   }
 
   .form-control:hover {
-    border-color: var(--border-hover);
+    border-color: var(--brand-violet-hover);
   }
   .form-control:focus {
     border-color: var(--brand-violet);
@@ -656,6 +657,10 @@
 @media (max-width: 480px) {
   .dashboard-program li { grid-template-columns: 1fr; gap: 0.4rem; }
   .segmented-control > button { padding-inline: 0.5rem; }
+}
+
+@media (max-width: 1023px) {
+  .auth-rideau::before { display: none; }
 }
 
 @media (min-width: 768px) {

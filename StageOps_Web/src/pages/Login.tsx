@@ -40,16 +40,19 @@ export function Login() {
       id="main-content"
       className="auth-surface grid min-h-dvh bg-theme-void text-content-primary lg:grid-cols-[22rem_minmax(32rem,1fr)]"
     >
-      <section className="auth-rideau flex flex-col border-b border-theme-border bg-theme-deeper p-6 lg:border-b-0 lg:border-r lg:p-8">
+      <section className="auth-rideau flex flex-col border-b border-theme-border bg-theme-deeper p-5 lg:border-b-0 lg:border-r lg:p-8">
         <StageOpsLogo />
-        <div className="my-auto py-10">
-          <p className="text-[11px] font-semibold text-[var(--brand-violet-hover)]">
+        <div className="my-auto py-4 lg:py-10">
+          <p className="text-xs font-semibold text-[var(--brand-violet-hover)]">
             Poste de travail
           </p>
-          <h1 className="font-editorial mt-2 text-4xl font-medium leading-none text-content-primary">
+          <h1 className="font-editorial mt-2 text-3xl font-medium leading-none text-content-primary lg:text-4xl">
             Régie générale
           </h1>
-          <div className="mt-8 border-y border-theme-border">
+          <p className="mt-3 text-sm text-content-muted lg:hidden">
+            Scénario d’exemple · Hamlet — Représentation
+          </p>
+          <div className="mt-8 hidden border-y border-theme-border lg:block">
             <div className="border-b border-theme-border py-3">
               <p className="text-[10px] text-content-subtle">Fiche du scénario d’exemple</p>
               <p className="font-editorial mt-1 text-xl font-medium text-content-primary">
@@ -70,17 +73,17 @@ export function Login() {
             </div>
           </div>
         </div>
-        <p className="text-xs text-content-subtle">StageOps · Projet EIP</p>
+        <p className="hidden text-xs text-content-subtle lg:block">StageOps · Projet EIP</p>
       </section>
 
-      <section className="flex items-center justify-center px-5 py-10 lg:justify-start lg:px-20">
+      <section className="flex items-center justify-center px-5 py-7 lg:justify-start lg:px-20 lg:py-10">
         <div className="w-full max-w-sm">
           <div className="mb-7">
-            <p className="text-[11px] text-content-subtle">Identification</p>
+            <p className="text-xs text-content-subtle">Identification</p>
             <h2 className="font-editorial mt-1 text-3xl font-medium text-content-primary">
               Ouvrir une session
             </h2>
-            <p className="mt-2 text-xs text-content-muted">
+            <p className="mt-2 text-sm text-content-muted">
               Connectez-vous ou utilisez l’espace local hors-ligne sur cet appareil.
             </p>
           </div>
@@ -111,7 +114,7 @@ export function Login() {
                   type="button"
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   onClick={() => setShowPassword((visible) => !visible)}
-                  className="absolute bottom-2.5 right-3 rounded p-1 text-content-subtle hover:text-content-primary"
+                  className="absolute bottom-0 right-1 grid h-11 w-11 place-items-center rounded-lg text-content-subtle hover:text-content-primary"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -120,7 +123,7 @@ export function Login() {
             {error && (
               <p
                 role="alert"
-                className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+                className="rounded-lg border border-red-700/30 bg-red-50 px-4 py-3 text-sm text-red-800"
               >
                 {error}
               </p>
@@ -137,7 +140,7 @@ export function Login() {
 
           <Link
             to="/"
-            className="flex w-full items-center justify-between border border-theme-border bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-border)] hover:bg-[var(--brand-soft)]"
+            className="flex min-h-11 w-full items-center justify-between border border-[var(--control-border)] bg-theme-base px-4 py-3 text-sm font-semibold text-content-primary transition-colors hover:border-[var(--brand-violet-hover)] hover:bg-[var(--brand-soft)]"
           >
             Continuer dans l’espace local <span aria-hidden="true">→</span>
           </Link>

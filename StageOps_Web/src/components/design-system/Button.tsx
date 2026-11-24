@@ -18,7 +18,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary:
         'border-transparent bg-[var(--brand-violet)] text-[var(--brand-button-text)] hover:bg-[var(--brand-violet-hover)]',
       secondary:
-        'border-theme-border bg-theme-base text-content-primary hover:border-theme-border-hover hover:bg-theme-elevated',
+        'border-[var(--control-border)] bg-theme-base text-content-primary hover:border-[var(--brand-violet-hover)] hover:bg-theme-elevated',
       ghost:
         'border-transparent text-content-muted hover:border-theme-border hover:bg-theme-elevated hover:text-content-primary',
       danger: 'border-red-600/30 bg-red-50 text-red-800 hover:bg-red-100',
