@@ -70,7 +70,7 @@ Les commandes principales et les champs ont une hauteur minimale de 44 px. Les m
 
 ## Itération UX 3 — accès et contrôles
 
-Sur téléphone, l'écran de connexion donne immédiatement accès aux champs : la fiche détaillée du scénario et les arches restent sur ordinateur ; un rappel court du scénario demeure en haut de la version mobile. L'inscription demande l'adresse e-mail, le mot de passe et sa confirmation sur un seul écran. Ce sont les seules données nécessaires à la création des accès ; le prénom, le nom, le téléphone et le rôle ont été retirés car l'API de création de compte ne les enregistre pas. Les exemples de saisie ne servent plus de libellés.
+Sur téléphone, l'écran de connexion donne immédiatement accès aux champs : la fiche détaillée du scénario et les arches restent sur ordinateur ; un rappel court du scénario demeure en haut de la version mobile. L'inscription demande l'adresse e-mail, le mot de passe et sa confirmation sur un seul écran. Ce sont les seules données nécessaires à la création des accès ; le prénom, le nom, le téléphone et le rôle ont été retirés car le parcours actuel ne les transmet pas à l'API. Les exemples de saisie ne servent plus de libellés.
 
 Les libellés des champs partagés sont reliés aux contrôles. Les erreurs de validation sont associées au champ, annoncées et le focus va au premier champ à corriger. Les règles du mot de passe sont écrites en texte plutôt que résumées par une jauge colorée. La commande pour afficher le mot de passe a une cible de 44 × 44 px.
 
