@@ -16,6 +16,7 @@ export function DesktopLayout() {
         <main
           id="main-content"
           aria-label="Contenu principal"
+          tabIndex={-1}
           className="app-surface min-h-0 flex-1 overflow-y-auto pb-20 lg:pb-0"
         >
           {persistenceIssue && (

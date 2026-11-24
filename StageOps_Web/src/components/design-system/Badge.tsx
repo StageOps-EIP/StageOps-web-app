@@ -13,7 +13,7 @@ export function CategoryIcon({ category }: { category: string; size?: number }) 
   }
 
   return (
-    <span className="font-data text-[9px] font-bold text-content-subtle" aria-hidden="true">
+    <span className="font-data text-[11px] font-bold text-content-subtle" aria-hidden="true">
       {shortLabels[category] ?? 'EQ'}
     </span>
   )
@@ -29,8 +29,8 @@ export function Badge({ status, size = 'md', showLabel = true }: BadgeProps) {
   const color = getStatusColor(status)
   const label = getStatusLabel(status)
   const sizeClasses = {
-    sm: 'text-[11px] gap-1.5',
-    md: 'text-xs gap-2',
+    sm: 'text-xs gap-1.5',
+    md: 'text-sm gap-2',
   }
 
   return (
@@ -57,7 +57,7 @@ interface CategoryChipProps {
 
 export function CategoryChip({ category, label, icon, onRemove }: CategoryChipProps) {
   return (
-    <div className="inline-flex items-center gap-1.5 text-xs text-content-primary">
+    <div className="inline-flex items-center gap-1.5 text-sm text-content-primary">
       {icon && <span className="text-base">{icon}</span>}
       <span>{label || category}</span>
       {onRemove && (

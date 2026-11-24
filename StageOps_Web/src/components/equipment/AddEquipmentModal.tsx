@@ -1,27 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
-import { CategoryIcon } from '@/components/design-system/Badge'
-import type { Equipment, EquipmentStatus, EquipmentCategory } from '@/lib/types'
-import { getStatusColor } from '@/lib/utils'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import { BRAND_COLORS, STATUS_COLORS, TEXT_COLORS } from '@/lib/design-tokens'
-import { X, MapPin, User, FileText, QrCode, Plus, AlertCircle, Wrench } from 'lucide-react'
-
-const statusOptions: { value: EquipmentStatus; label: string; color: string }[] = [
-  { value: 'ok', label: 'Opérationnel', color: STATUS_COLORS.success },
-  { value: 'to-check', label: 'À vérifier', color: STATUS_COLORS.warning },
-  { value: 'hs', label: 'Hors service', color: STATUS_COLORS.danger },
-  { value: 'repair', label: 'En réparation', color: STATUS_COLORS.warning },
-]
-
-const categoryOptions: { value: EquipmentCategory; label: string }[] = [
-  { value: 'sound', label: 'Son' },
-  { value: 'light', label: 'Lumière' },
-  { value: 'video', label: 'Vidéo' },
-  { value: 'set', label: 'Plateau' },
-  { value: 'safety', label: 'Sécurité' },
-  { value: 'rigging', label: 'Accroche' },
-]
+import type { Equipment, EquipmentCategory, EquipmentStatus } from '@/lib/types'
 
 interface FormState {
   name: string
@@ -35,64 +16,60 @@ interface FormState {
 }
 
 const emptyForm: FormState = {
-  name: '',
-  category: 'sound',
-  status: 'ok',
-  location: '',
-  zone: '',
-  responsiblePerson: '',
-  notes: '',
-  qrCode: '',
+  name: '', category: 'sound', status: 'ok', location: '',
+  zone: '', responsiblePerson: '', notes: '', qrCode: '',
 }
 
-function generateQrCode(name: string, category: EquipmentCategory): string {
+function generateQrCode(category: EquipmentCategory): string {
   const prefix = category.slice(0, 3).toUpperCase()
-  const rand = Math.floor(Math.random() * 900) + 100
-  return `QR-${prefix}-${rand}`
+  return 'QR-' + prefix + '-' + (Math.floor(Math.random() * 900) + 100)
 }
 
 function generateId(): string {
-  return `eq-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+  return 'eq-' + Date.now() + '-' + Math.floor(Math.random() * 1000)
 }
 
 export function AddEquipmentModal({
-  onClose,
-  onAdd,
+  onClose, onAdd,
 }: {
   onClose: () => void
   onAdd: (equipment: Equipment) => void
 }) {
   const [form, setForm] = useState<FormState>(emptyForm)
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
-  const trapRef = useFocusTrap(true)
+  const [errors, setErrors] = useState<Partial<Record<'name' | 'location', string>>>({})
+  const trapRef = useFocusTrap<HTMLFormElement>(true)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const locationRef = useRef<HTMLInputElement>(null)
 
-  const statusColor = getStatusColor(form.status)
-
+  useEffect(() => nameRef.current?.focus(), [])
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }))
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
+    setForm((current) => ({ ...current, [key]: value }))
+    if (key === 'name' || key === 'location') {
+      setErrors((current) => ({ ...current, [key]: undefined }))
+    }
   }
 
-  function validate(): boolean {
-    const newErrors: Partial<Record<keyof FormState, string>> = {}
-    if (!form.name.trim()) newErrors.name = 'Le nom est requis'
-    if (!form.location.trim()) newErrors.location = "L'emplacement est requis"
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  function handleSubmit() {
-    if (!validate()) return
-    const qrCode = form.qrCode.trim() || generateQrCode(form.name, form.category)
-    const newEquipment: Equipment = {
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    const nextErrors = {
+      name: form.name.trim() ? undefined : 'Indiquez le nom de l’équipement.',
+      location: form.location.trim() ? undefined : 'Indiquez où se trouve l’équipement.',
+    }
+    setErrors(nextErrors)
+    if (nextErrors.name || nextErrors.location) {
+      if (nextErrors.name) nameRef.current?.focus()
+      else locationRef.current?.focus()
+      return
+    }
+    onAdd({
       id: generateId(),
       name: form.name.trim(),
       category: form.category,
@@ -101,287 +78,119 @@ export function AddEquipmentModal({
       zone: form.zone.trim() || undefined,
       responsiblePerson: form.responsiblePerson.trim() || undefined,
       notes: form.notes.trim() || undefined,
-      qrCode,
+      qrCode: form.qrCode.trim() || generateQrCode(form.category),
       lastCheck: new Date(),
-    }
-    onAdd(newEquipment)
+    })
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(61,13,23,0.4)] p-3 sm:p-6"
+      onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div
+      <form
         ref={trapRef}
+        onSubmit={submit}
+        noValidate
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-equipment-title"
-        className="w-full max-w-2xl bg-theme-base border border-theme-border rounded-2xl shadow-2xl shadow-black/50 max-h-[85vh] overflow-y-auto"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-theme-border bg-theme-base shadow-[0_20px_50px_rgba(61,13,23,0.18)]"
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-theme-base flex items-center justify-between px-8 py-5 border-b border-theme-border">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-2 h-8 rounded-full transition-colors duration-300"
-              style={{ backgroundColor: statusColor }}
-            />
-            <div>
-              <h2 id="add-equipment-title" className="text-lg font-semibold text-content-primary">
-                Ajouter un équipement
-              </h2>
-              <p className="text-xs text-content-subtle">Nouvel équipement dans l'inventaire</p>
-            </div>
-          </div>
-          <button
-            aria-label="Fermer"
-            onClick={onClose}
-            className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="px-8 py-6 space-y-6">
-          {/* Nom */}
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-theme-border bg-theme-base px-5 py-4 sm:px-7">
           <div>
-            <label
-              htmlFor="equipment-name"
-              className="text-xs text-content-subtle uppercase tracking-wider mb-3 block"
-            >
-              Nom de l'équipement *
+            <h2 id="add-equipment-title" className="text-xl font-bold text-content-primary">
+              Ajouter un équipement
+            </h2>
+            <p className="mt-1 text-sm text-content-muted">Renseignez le matériel à suivre dans le parc.</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Fermer" className="grid h-11 w-11 shrink-0 place-items-center rounded-lg hover:bg-theme-elevated">
+            <X size={20} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="space-y-5 px-5 py-5 sm:px-7">
+          <div>
+            <label htmlFor="equipment-name" className="mb-1.5 block text-sm font-semibold text-content-primary">
+              Nom de l’équipement <span aria-hidden="true" className="text-[var(--status-danger)]">*</span>
             </label>
             <input
-              id="equipment-name"
-              type="text"
-              value={form.name}
-              onChange={(e) => set('name', e.target.value)}
-              placeholder="Ex : Console Son DiGiCo SD12"
-              className={`w-full bg-theme-elevated border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] transition-colors ${
-                errors.name
-                  ? 'border-red-500/60'
-                  : 'border-theme-border focus:border-[var(--brand-border)]'
-              }`}
+              id="equipment-name" ref={nameRef} required
+              value={form.name} onChange={(event) => set('name', event.target.value)}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? 'equipment-name-error' : undefined}
+              placeholder="Ex. Console son DiGiCo SD12" className="form-control px-3"
             />
-            {errors.name && (
-              <p className="text-xs text-red-700 mt-1.5 flex items-center gap-1">
-                <AlertCircle size={11} /> {errors.name}
-              </p>
-            )}
+            {errors.name && <p id="equipment-name-error" role="alert" className="mt-1 text-sm text-red-800">{errors.name}</p>}
           </div>
 
-          {/* Catégorie */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Catégorie</p>
-            <div className="grid grid-cols-3 gap-2">
-              {categoryOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => set('category', opt.value)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200"
-                  style={
-                    form.category === opt.value
-                      ? {
-                          backgroundColor: `${BRAND_COLORS.violet}14`,
-                          borderColor: `${BRAND_COLORS.violet}66`,
-                          color: BRAND_COLORS.violetHover,
-                        }
-                      : {
-                          backgroundColor: 'transparent',
-                          borderColor: 'var(--border)',
-                          color: TEXT_COLORS.subtle,
-                        }
-                  }
-                >
-                  <CategoryIcon category={opt.value} size={13} />
-                  <span>{opt.label}</span>
-                </button>
-              ))}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="equipment-category" className="mb-1.5 block text-sm font-semibold text-content-primary">Catégorie</label>
+              <select id="equipment-category" value={form.category} onChange={(event) => set('category', event.target.value as EquipmentCategory)} className="form-control px-3">
+                <option value="sound">Son</option><option value="light">Lumière</option>
+                <option value="video">Vidéo</option><option value="set">Plateau</option>
+                <option value="safety">Sécurité</option><option value="rigging">Accroche</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="equipment-status" className="mb-1.5 block text-sm font-semibold text-content-primary">État initial</label>
+              <select id="equipment-status" value={form.status} onChange={(event) => set('status', event.target.value as EquipmentStatus)} className="form-control px-3">
+                <option value="ok">Opérationnel</option><option value="to-check">À vérifier</option>
+                <option value="hs">Hors service</option><option value="repair">En réparation</option>
+              </select>
             </div>
           </div>
 
-          {/* Statut */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
-              Statut initial
+          {(form.status === 'hs' || form.status === 'repair') && (
+            <p className="rounded-lg border border-amber-700/30 bg-amber-50 p-3 text-sm text-amber-950">
+              Ce matériel sera indiqué comme indisponible. Pensez à associer un incident si un suivi est nécessaire.
             </p>
-            <div className="flex gap-2 flex-wrap">
-              {statusOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => set('status', opt.value)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200"
-                  style={
-                    form.status === opt.value
-                      ? {
-                          backgroundColor: `${opt.color}20`,
-                          borderColor: `${opt.color}60`,
-                          color: opt.color,
-                        }
-                      : {
-                          backgroundColor: 'transparent',
-                          borderColor: 'var(--border)',
-                          color: 'var(--text-subtle)',
-                        }
-                  }
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{
-                      backgroundColor: form.status === opt.value ? opt.color : TEXT_COLORS.subtle,
-                    }}
-                  />
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Emplacement & Zone */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">
-              Localisation
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-theme-elevated rounded-xl">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <MapPin size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">
-                    Emplacement *
-                  </p>
-                </div>
-                <input
-                  id="equipment-location"
-                  type="text"
-                  value={form.location}
-                  onChange={(e) => set('location', e.target.value)}
-                  placeholder="Ex : Régie Son"
-                  aria-label="Emplacement"
-                  className={`w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b focus:outline-none pb-0.5 transition-colors ${
-                    errors.location
-                      ? 'border-red-500/60'
-                      : 'border-theme-border focus:border-[var(--brand-violet)]'
-                  }`}
-                />
-                {errors.location && (
-                  <p className="text-[10px] text-red-700 mt-1">{errors.location}</p>
-                )}
-              </div>
-
-              <div className="p-4 bg-theme-elevated rounded-xl">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <MapPin size={12} className="text-content-subtle" />
-                  <p className="text-[10px] text-content-subtle uppercase tracking-wider">Zone</p>
-                </div>
-                <input
-                  type="text"
-                  value={form.zone}
-                  onChange={(e) => set('zone', e.target.value)}
-                  placeholder="Ex : FOH, Jardin…"
-                  aria-label="Zone"
-                  className="w-full bg-transparent text-sm text-content-primary placeholder:text-content-subtle border-b border-theme-border focus:border-[var(--brand-violet)] focus:outline-none pb-0.5 transition-colors"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Responsable */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Responsable</p>
-            <div className="relative">
-              <User
-                size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
-              />
-              <input
-                type="text"
-                value={form.responsiblePerson}
-                onChange={(e) => set('responsiblePerson', e.target.value)}
-                placeholder="Nom du responsable"
-                aria-label="Nom du responsable"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
-              />
-            </div>
-          </div>
-
-          {/* QR Code */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">QR Code</p>
-            <div className="relative">
-              <QrCode
-                size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--brand-violet-hover)] pointer-events-none"
-              />
-              <input
-                type="text"
-                value={form.qrCode}
-                onChange={(e) => set('qrCode', e.target.value)}
-                placeholder="Généré automatiquement si vide"
-                aria-label="Code QR"
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-subtle font-mono focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] transition-colors"
-              />
-            </div>
-            <p className="text-[11px] text-content-subtle mt-1.5">
-              Laissez vide pour générer un code automatiquement basé sur la catégorie.
-            </p>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <p className="text-xs text-content-subtle uppercase tracking-wider mb-3">Notes</p>
-            <div className="relative">
-              <textarea
-                value={form.notes}
-                onChange={(e) => set('notes', e.target.value)}
-                placeholder="Observations, état général, points d'attention..."
-                rows={3}
-                className="w-full bg-theme-elevated border border-theme-border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--brand-violet)] focus:border-[var(--brand-border)] resize-none transition-colors"
-              />
-              <FileText
-                size={14}
-                className="absolute top-3.5 right-3.5 text-[#35353e] pointer-events-none"
-              />
-            </div>
-          </div>
-
-          {/* Avertissements contextuels */}
-          {form.status === 'hs' && (
-            <div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-              <AlertCircle size={16} className="text-red-700 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm text-red-700 font-medium">Équipement hors service</p>
-                <p className="text-xs text-content-muted mt-1">
-                  Cet équipement sera ajouté comme HS. Pensez à créer un incident associé.
-                </p>
-              </div>
-            </div>
-          )}
-          {form.status === 'repair' && (
-            <div className="flex items-start gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
-              <Wrench size={16} className="text-amber-400 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm text-amber-400 font-medium">En cours de réparation</p>
-                <p className="text-xs text-content-muted mt-1">
-                  Cet équipement ne sera pas disponible jusqu'à sa remise en service.
-                </p>
-              </div>
-            </div>
           )}
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-theme-border">
-            <Button variant="primary" className="flex-1" onClick={handleSubmit}>
-              <Plus size={16} />
-              Ajouter l'équipement
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Annuler
-            </Button>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="equipment-location" className="mb-1.5 block text-sm font-semibold text-content-primary">
+                Emplacement <span aria-hidden="true" className="text-[var(--status-danger)]">*</span>
+              </label>
+              <input
+                id="equipment-location" ref={locationRef} required
+                value={form.location} onChange={(event) => set('location', event.target.value)}
+                aria-invalid={Boolean(errors.location)}
+                aria-describedby={errors.location ? 'equipment-location-error' : undefined}
+                placeholder="Ex. Régie son" className="form-control px-3"
+              />
+              {errors.location && <p id="equipment-location-error" role="alert" className="mt-1 text-sm text-red-800">{errors.location}</p>}
+            </div>
+            <div>
+              <label htmlFor="equipment-zone" className="mb-1.5 block text-sm font-semibold text-content-primary">Zone</label>
+              <input id="equipment-zone" value={form.zone} onChange={(event) => set('zone', event.target.value)} placeholder="Ex. Jardin" className="form-control px-3" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="equipment-responsible" className="mb-1.5 block text-sm font-semibold text-content-primary">Responsable</label>
+              <input id="equipment-responsible" value={form.responsiblePerson} onChange={(event) => set('responsiblePerson', event.target.value)} placeholder="Nom du responsable" className="form-control px-3" />
+            </div>
+            <div>
+              <label htmlFor="equipment-qr" className="mb-1.5 block text-sm font-semibold text-content-primary">Code QR</label>
+              <input id="equipment-qr" value={form.qrCode} onChange={(event) => set('qrCode', event.target.value)} aria-describedby="equipment-qr-help" placeholder="Généré si vide" className="form-control px-3" />
+              <p id="equipment-qr-help" className="mt-1 text-sm text-content-muted">Laissez vide pour générer un identifiant.</p>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="equipment-notes" className="mb-1.5 block text-sm font-semibold text-content-primary">Notes</label>
+            <textarea id="equipment-notes" value={form.notes} onChange={(event) => set('notes', event.target.value)} rows={3} className="form-control resize-y px-3 py-2.5" />
+          </div>
+
+          <div className="flex flex-wrap justify-end gap-2 border-t border-theme-border pt-4">
+            <Button type="button" variant="secondary" onClick={onClose}>Annuler</Button>
+            <Button type="submit">Ajouter l’équipement</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   )
 }

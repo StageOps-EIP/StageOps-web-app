@@ -1,285 +1,171 @@
+import { ArrowRight, CalendarDays, PackageCheck, TriangleAlert } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '@/components/design-system/Badge'
 import { useOperationalData } from '@/hooks/useOperationalData'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { mockEvents, mockTeamMembers } from '@/lib/mockData'
-import { SEVERITY_ORDER } from '@/lib/constants'
-import { formatTime, getSeverityColor, getSeverityLabel } from '@/lib/utils'
+import { mockEvents } from '@/lib/mockData'
+import { isActiveIncident, sortIncidentsForAttention } from '@/lib/incident-order'
+import { formatTime, getSeverityLabel } from '@/lib/utils'
 
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
+  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
 })
 
 export function Dashboard() {
   usePageTitle('Vue générale')
   const { equipment, incidents } = useOperationalData()
-  const activeEvent = mockEvents[0]
-  const exampleEvents = [...mockEvents].sort(
-    (a, b) => a.startDate.getTime() - b.startDate.getTime(),
-  )
-  const controls = equipment.filter((item) => item.status !== 'ok')
-  const openIncidents = incidents
-    .filter((incident) => incident.status === 'open' || incident.status === 'in-progress')
-    .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity])
-  const availableEquipment = equipment.filter((item) => item.status === 'ok').length
-  const needsCheck = equipment.filter((item) => item.status === 'to-check').length
-  const outOfService = equipment.filter((item) => item.status === 'hs').length
+  const events = [...mockEvents].sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+  const production = events[0]
+  const active = sortIncidentsForAttention(incidents.filter(isActiveIncident))
+  const urgent = active[0]
+  const linkedEquipment = equipment.find((item) => item.id === urgent?.equipmentId)
+  const attention = equipment
+    .filter((item) => item.status !== 'ok')
+    .sort((a, b) => {
+      const rank = { hs: 0, repair: 1, 'to-check': 2, ok: 3 }
+      return rank[a.status] - rank[b.status]
+    })
+  const available = equipment.filter((item) => item.status === 'ok').length
+  const check = equipment.filter((item) => item.status === 'to-check').length
+  const unavailable = equipment.filter((item) => item.status === 'hs' || item.status === 'repair').length
 
   return (
-    <div className="page-shell dashboard-rideau space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+    <div className="page-shell dashboard-rideau space-y-7">
+      <header className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <h1 className="page-heading">Vue générale</h1>
-          <p className="mt-2 text-sm text-content-muted">
-            Incidents, matériel et programme de l’espace de régie.
-          </p>
+          <p className="mt-2 text-base text-content-muted">Les points à suivre pour préparer la régie.</p>
         </div>
-        <Link
-          to="/incidents?new=1"
-          className="inline-flex min-h-10 items-center rounded-lg bg-[var(--brand-violet)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-violet-hover)] lg:hidden"
-        >
-          Signaler un incident
+        <Link to="/incidents?new=1" className="dashboard-primary-action lg:hidden">
+          Signaler un incident <ArrowRight size={17} aria-hidden="true" />
         </Link>
       </header>
 
-      <aside
-        aria-label="Contexte des données"
-        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-theme-border bg-theme-elevated px-4 py-3 text-sm"
-      >
-        <strong className="text-content-primary">Scénario d’exemple · février 2026</strong>
-        <span className="text-content-muted">
-          Ce programme est fictif. Les modifications du matériel et des incidents restent dans ce
-          navigateur.
-        </span>
-      </aside>
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
-        <section aria-labelledby="action-title" className="min-w-0">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-            <h2 id="action-title" className="text-2xl font-bold text-content-primary">
-              À traiter maintenant
-            </h2>
-            <Link
-              to="/incidents"
-              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
-            >
-              Voir tous les incidents
-            </Link>
-          </div>
-          <div className="overflow-hidden rounded-xl border border-theme-border bg-theme-base">
-            {openIncidents.length ? (
-              openIncidents.slice(0, 3).map((incident) => (
-                <Link
-                  key={incident.id}
-                  to={`/incidents?incident=${incident.id}`}
-                  className="grid gap-2 border-b border-theme-border px-5 py-4 transition-colors last:border-b-0 hover:bg-theme-elevated sm:grid-cols-[6.5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-4"
-                >
-                  <span
-                    className="text-xs font-bold"
-                    style={{ color: getSeverityColor(incident.severity) }}
-                  >
-                    {getSeverityLabel(incident.severity)}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-content-primary">
-                      {incident.title}
-                    </span>
-                    <span className="mt-1 block text-xs text-content-muted">
-                      Signalé par {incident.reportedBy}
-                    </span>
-                  </span>
-                  <span className="text-xs font-semibold text-[var(--brand-violet-hover)]">
-                    Ouvrir
-                  </span>
-                </Link>
-              ))
-            ) : (
-              <p className="px-5 py-7 text-sm text-content-muted">
-                Aucun incident actif dans le registre.
-              </p>
-            )}
-          </div>
-        </section>
-
-        <section aria-labelledby="schedule-title" className="min-w-0">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-            <h2 id="schedule-title" className="text-2xl font-bold text-content-primary">
-              Programme d’exemple
-            </h2>
-            <Link
-              to="/events"
-              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
-            >
-              Voir le planning
-            </Link>
-          </div>
-          <div className="rounded-xl border border-theme-border bg-theme-base px-5">
-            {exampleEvents.map((event) => (
-              <div
-                key={event.id}
-                className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 border-b border-theme-border py-4 last:border-b-0"
-              >
-                <time
-                  dateTime={event.startDate.toISOString()}
-                  className="text-sm font-bold text-content-primary"
-                >
-                  {formatTime(event.startDate)}
-                </time>
-                <div>
-                  <p className="text-sm font-semibold text-content-primary">{event.title}</p>
-                  <p className="mt-1 text-xs text-content-muted">
-                    {dateFormatter.format(event.startDate)} · {event.stage}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section
-        aria-labelledby="featured-production"
-        className="overflow-hidden rounded-xl border border-theme-border bg-theme-base"
-      >
-        <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <div className="p-5">
-            <p className="text-xs font-semibold text-[var(--brand-violet-hover)]">
-              Fiche du scénario
-            </p>
-            <h2
-              id="featured-production"
-              className="mt-2 text-2xl font-bold tracking-tight text-content-primary"
-            >
-              {activeEvent.title.replace(/ - .+$/, '')}
-            </h2>
-            <p className="mt-2 text-sm text-content-muted">
-              {dateFormatter.format(activeEvent.startDate)} · {activeEvent.venue},{' '}
-              {activeEvent.stage} · {formatTime(activeEvent.startDate)}–
-              {formatTime(activeEvent.endDate)}
-            </p>
-            <Link
-              to="/events"
-              className="mt-5 inline-flex min-h-10 items-center rounded-lg border border-theme-border bg-theme-base px-4 text-sm font-semibold text-content-primary hover:bg-theme-elevated"
-            >
-              Voir le conducteur
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 border-t border-theme-border lg:border-l lg:border-t-0">
-            <div className="p-4 sm:p-5">
-              <p className="text-sm font-semibold text-content-muted">Préparation enregistrée</p>
-              <p className="mt-2 text-2xl font-bold text-content-primary">
-                {activeEvent.checklistProgress}
-                <span className="ml-1 text-base text-content-muted">%</span>
-              </p>
-              <div
-                role="progressbar"
-                aria-label="Progression de la checklist"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={activeEvent.checklistProgress}
-                className="mt-3 h-2 overflow-hidden rounded-full bg-theme-elevated"
-              >
-                <div
-                  className="h-full rounded-full bg-[#e7a93a]"
-                  style={{ width: `${activeEvent.checklistProgress}%` }}
-                />
-              </div>
-              <p className="mt-2 text-xs text-content-muted">Checklist du scénario</p>
-            </div>
-            <div className="border-l border-theme-border p-4 sm:p-5">
-              <p className="text-sm font-semibold text-content-muted">Repères de la fiche</p>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Début</dt>
-                  <dd className="font-bold text-content-primary">
-                    {formatTime(activeEvent.startDate)}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Fin</dt>
-                  <dd className="font-bold text-content-primary">
-                    {formatTime(activeEvent.endDate)}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-content-muted">Équipe</dt>
-                  <dd className="font-bold text-content-primary">
-                    {activeEvent.teamMembers.length} / {mockTeamMembers.length}
-                  </dd>
-                </div>
-              </dl>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.8fr)]">
+        <section aria-labelledby="priority-title" className="dashboard-section min-w-0">
+          <div className="dashboard-section-header">
+            <div className="flex items-center gap-3">
+              <TriangleAlert size={22} className="text-[var(--status-danger)]" aria-hidden="true" />
+              <h2 id="priority-title">À traiter maintenant</h2>
             </div>
           </div>
-        </div>
-      </section>
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(19rem,1fr)]">
-        <section
-          aria-labelledby="equipment-title"
-          className="rounded-xl border border-theme-border bg-theme-base p-5"
-        >
-          <div className="flex items-end justify-between gap-3 border-b border-theme-border pb-3">
-            <h2 id="equipment-title" className="text-xl font-bold text-content-primary">
-              Matériel
-            </h2>
-            <Link
-              to="/equipment"
-              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
-            >
-              Ouvrir le parc
-            </Link>
-          </div>
-          <dl className="grid grid-cols-3 gap-3 pt-4">
-            <Stat value={availableEquipment} label="opérationnels" color="text-emerald-800" />
-            <Stat value={needsCheck} label="à vérifier" color="text-amber-800" />
-            <Stat value={outOfService} label="hors service" color="text-red-800" />
-          </dl>
-          {controls.length > 0 && (
-            <div className="mt-4 border-t border-theme-border pt-3">
-              <Link
-                to={`/equipment?equipment=${controls[0].id}`}
-                className="flex items-center justify-between gap-3 text-sm hover:underline"
-              >
-                <span className="truncate font-medium text-content-primary">
-                  {controls[0].name}
+          {urgent ? (
+            <>
+              <div className="dashboard-priority">
+                <span className="dashboard-priority-label">
+                  {getSeverityLabel(urgent.severity)} · {urgent.status === 'open' ? 'Ouvert' : 'En cours'}
                 </span>
-                <Badge status={controls[0].status} size="sm" />
+                <h3>{urgent.title}</h3>
+                <p className="mt-2 max-w-[65ch] text-sm text-content-muted">{urgent.description}</p>
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm text-content-primary">
+                    {linkedEquipment ? 'Matériel concerné : ' + linkedEquipment.name : 'Signalé par ' + urgent.reportedBy}
+                  </p>
+                  <Link to={'/incidents?incident=' + urgent.id} className="dashboard-primary-action">
+                    Ouvrir le suivi <ArrowRight size={17} aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
+              {active.length > 1 && (
+                <div className="dashboard-secondary-list">
+                  {active.slice(1, 3).map((incident) => (
+                    <Link key={incident.id} to={'/incidents?incident=' + incident.id}>
+                      <span className="min-w-0">
+                        <strong>{incident.title}</strong>
+                        <span>{getSeverityLabel(incident.severity)} · {incident.status === 'open' ? 'Ouvert' : 'En cours'}</span>
+                      </span>
+                      <ArrowRight size={17} aria-hidden="true" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="dashboard-priority">
+              <h3>Aucun incident actif</h3>
+              <p className="mt-2 text-sm text-content-muted">Le registre ne contient rien à traiter pour le moment.</p>
+            </div>
+          )}
+          <Link to="/incidents" className="dashboard-section-footer">
+            Tous les incidents <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </section>
+
+        <section aria-labelledby="equipment-title" className="dashboard-section">
+          <div className="dashboard-section-header">
+            <div className="flex items-center gap-3">
+              <PackageCheck size={22} className="text-[var(--brand-violet-hover)]" aria-hidden="true" />
+              <h2 id="equipment-title">État du matériel</h2>
+            </div>
+          </div>
+          <p className="px-5 pt-5 text-sm text-content-muted">
+            {equipment.length} équipements dans le parc
+          </p>
+          <dl className="dashboard-equipment-stats">
+            <div><dt>Opérationnels</dt><dd>{available}</dd></div>
+            <div><dt>À vérifier</dt><dd>{check}</dd></div>
+            <div><dt>Indisponibles</dt><dd>{unavailable}</dd></div>
+          </dl>
+          {attention.length > 0 && (
+            <div className="dashboard-equipment-attention">
+              <p className="font-semibold text-content-primary">À contrôler en priorité</p>
+              <Link to={'/equipment?equipment=' + attention[0].id}>
+                <span>{attention[0].name}</span>
+                <Badge status={attention[0].status} size="sm" />
               </Link>
             </div>
           )}
-        </section>
-        <section
-          aria-labelledby="stage-title"
-          className="rounded-xl border border-theme-border bg-theme-base p-5"
-        >
-          <div className="flex items-end justify-between gap-3 border-b border-theme-border pb-3">
-            <h2 id="stage-title" className="text-xl font-bold text-content-primary">
-              Plateau 3D
-            </h2>
-            <Link
-              to="/stage"
-              className="text-sm font-semibold text-[var(--brand-violet-hover)] hover:underline"
-            >
-              Ouvrir
-            </Link>
-          </div>
-          <p className="pt-4 text-sm text-content-muted">
-            Visualisez la scène enregistrée et ouvrez l’éditeur pour la modifier.
-          </p>
+          <Link to="/equipment" className="dashboard-section-footer">
+            Ouvrir le parc matériel <ArrowRight size={17} aria-hidden="true" />
+          </Link>
         </section>
       </div>
-    </div>
-  )
-}
 
-function Stat({ value, label, color }: { value: number; label: string; color: string }) {
-  return (
-    <div>
-      <dt className="mt-1 text-xs text-content-muted">{label}</dt>
-      <dd className={`text-3xl font-bold ${color}`}>{value}</dd>
+      <p className="dashboard-demo-note">
+        <strong>Scénario d’exemple</strong>
+        <span>Programme fictif. Matériel et incidents conservés dans ce navigateur.</span>
+      </p>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
+        <section aria-labelledby="program-title" className="dashboard-section">
+          <div className="dashboard-section-header">
+            <div className="flex items-center gap-3">
+              <CalendarDays size={22} className="text-[var(--brand-violet-hover)]" aria-hidden="true" />
+              <h2 id="program-title">Programme du scénario</h2>
+            </div>
+            <Link to="/events" className="dashboard-text-link">
+              Conducteur <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <ol className="dashboard-program">
+            {events.map((event) => (
+              <li key={event.id}>
+                <time dateTime={event.startDate.toISOString()}>
+                  <strong>{formatTime(event.startDate)}</strong>
+                  <span>{dateFormatter.format(event.startDate)}</span>
+                </time>
+                <div><strong>{event.title}</strong><span>{event.stage}</span></div>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section aria-labelledby="production-title" className="dashboard-section">
+          <div className="dashboard-section-header"><h2 id="production-title">Fiche de production</h2></div>
+          <div className="px-5 py-5">
+            <h3 className="text-xl font-bold text-content-primary">{production.title.replace(/ - .+$/, '')}</h3>
+            <p className="mt-1 text-sm text-content-muted">
+              {dateFormatter.format(production.startDate)} · {production.stage}
+            </p>
+            <dl className="mt-5 space-y-3 border-t border-theme-border pt-4 text-sm">
+              <div className="flex justify-between gap-4"><dt>Horaire</dt><dd>{formatTime(production.startDate)}–{formatTime(production.endDate)}</dd></div>
+              <div className="flex justify-between gap-4"><dt>Préparation enregistrée</dt><dd>{production.checklistProgress} %</dd></div>
+            </dl>
+          </div>
+          <Link to="/stage" className="dashboard-section-footer">
+            Voir le plateau 3D <ArrowRight size={17} aria-hidden="true" />
+          </Link>
+        </section>
+      </div>
     </div>
   )
 }

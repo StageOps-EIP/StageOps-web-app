@@ -126,7 +126,7 @@ export function EquipmentDetailModal({
           <button
             aria-label="Fermer"
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-theme-border text-content-subtle hover:text-content-primary transition-colors"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl hover:bg-theme-elevated text-content-subtle hover:text-content-primary transition-colors"
           >
             <X size={18} />
           </button>

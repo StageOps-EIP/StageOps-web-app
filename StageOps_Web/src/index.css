@@ -27,6 +27,7 @@
   --border: #e7dad5;
   --border-hover: #cdb8ae;
   --border-strong: #d6c4ba;
+  --control-border: #a38f86;
   --text-primary: #3d0d17;
   --text-muted: #625654;
   --text-subtle: #716765;
@@ -156,7 +157,8 @@
 
   .page-shell {
     width: 100%;
-    max-width: 100rem;
+    max-width: 88rem;
+    margin-inline: auto;
     padding: 1.5rem 1rem 4rem;
   }
 
@@ -217,8 +219,8 @@
 
   .form-control {
     width: 100%;
-    min-height: 2.5rem;
-    border: 1px solid var(--border);
+    min-height: 2.75rem;
+    border: 1px solid var(--control-border);
     border-radius: var(--radius-sm);
     background: var(--bg-base);
     color: var(--text-primary);
@@ -229,11 +231,12 @@
   }
 
   .form-control:hover {
-    border-color: var(--border-hover);
+    border-color: var(--brand-violet-hover);
   }
   .form-control:focus {
     border-color: var(--brand-violet);
-    outline: none;
+    outline: 2px solid var(--brand-violet-hover);
+    outline-offset: 2px;
   }
 
   .segmented-control {
@@ -250,12 +253,12 @@
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    min-height: 2.1rem;
+    min-height: 2.75rem;
     padding: 0.35rem 0.7rem;
     border-right: 0;
     border-radius: 6px;
     color: var(--text-muted);
-    font-size: 0.78rem;
+    font-size: 0.875rem;
     font-weight: 600;
   }
 
@@ -313,9 +316,9 @@
   }
 
   .work-table th {
-    height: 2.4rem;
+    height: 2.75rem;
     color: var(--text-subtle);
-    font-size: 0.66rem;
+    font-size: 0.75rem;
     font-weight: 650;
   }
 
@@ -348,7 +351,7 @@
 
   .stage-nav-link {
     display: flex;
-    min-height: 2.9rem;
+    min-height: 3rem;
     align-items: center;
     gap: 0.85rem;
     padding: 0.65rem 0.8rem;
@@ -498,6 +501,166 @@
     pointer-events: none;
     content: '';
   }
+}
+
+@layer components {
+  .dashboard-demo-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .dashboard-demo-note strong { color: var(--text-primary); }
+
+  .dashboard-section {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-base);
+  }
+
+  .dashboard-section-header {
+    display: flex;
+    min-height: 4.25rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.8rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dashboard-section-header h2 {
+    color: var(--text-primary);
+    font-size: 1.16rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .dashboard-text-link,
+  .dashboard-section-footer {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--brand-violet-hover);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .dashboard-text-link:hover,
+  .dashboard-section-footer:hover { text-decoration: underline; }
+
+  .dashboard-section-footer {
+    display: flex;
+    padding: 0.7rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .dashboard-primary-action {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--brand-violet-hover);
+    color: var(--brand-button-text);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .dashboard-primary-action:hover { background: var(--brand-velvet); }
+
+  .dashboard-priority { padding: clamp(1.25rem, 3vw, 2rem); }
+  .dashboard-priority-label {
+    color: var(--status-danger);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  .dashboard-priority h3 {
+    max-width: 26ch;
+    margin-top: 0.55rem;
+    color: var(--text-primary);
+    font-size: clamp(1.55rem, 2.3vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .dashboard-secondary-list { border-top: 1px solid var(--border); }
+  .dashboard-secondary-list a {
+    display: flex;
+    min-height: 4.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .dashboard-secondary-list a:last-child { border-bottom: 0; }
+  .dashboard-secondary-list a:hover { background: var(--bg-elevated); }
+  .dashboard-secondary-list strong,
+  .dashboard-secondary-list span span { display: block; }
+  .dashboard-secondary-list strong { font-size: 0.875rem; }
+  .dashboard-secondary-list span span { margin-top: 0.2rem; color: var(--text-muted); font-size: 0.8rem; }
+
+  .dashboard-equipment-stats { padding: 0.65rem 1.25rem 1.25rem; }
+  .dashboard-equipment-stats > div {
+    display: flex;
+    min-height: 2.8rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .dashboard-equipment-stats dt { color: var(--text-muted); font-size: 0.875rem; }
+  .dashboard-equipment-stats dd { color: var(--text-primary); font-size: 1.15rem; font-weight: 700; }
+  .dashboard-equipment-attention { padding: 0 1.25rem 1.25rem; font-size: 0.875rem; }
+  .dashboard-equipment-attention a {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--brand-violet-hover);
+  }
+  .dashboard-equipment-attention a:hover { text-decoration: underline; }
+
+  .dashboard-program { padding: 0 1.25rem; }
+  .dashboard-program li {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.55fr) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .dashboard-program li:last-child { border-bottom: 0; }
+  .dashboard-program time,
+  .dashboard-program li > div { display: flex; flex-direction: column; gap: 0.2rem; }
+  .dashboard-program strong { color: var(--text-primary); font-size: 0.875rem; }
+  .dashboard-program span { color: var(--text-muted); font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-program li { grid-template-columns: 1fr; gap: 0.4rem; }
+  .segmented-control > button { padding-inline: 0.5rem; }
+}
+
+@media (max-width: 1023px) {
+  .auth-rideau::before { display: none; }
 }
 
 @media (min-width: 768px) {
