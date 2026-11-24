@@ -74,11 +74,11 @@ export function Equipment() {
         description={`${equipmentList.length} équipements référencés`}
         actions={
           <>
+            <Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>
             <Button variant="secondary" onClick={exportEquipment} disabled={!equipmentList.length}>
               <Download size={15} aria-hidden="true" />
               Exporter CSV
             </Button>
-            <Button onClick={() => setShowAddModal(true)}>Ajouter un équipement</Button>
           </>
         }
       />
@@ -212,17 +212,17 @@ export function Equipment() {
                 onClick={() => setSelectedEquipment(equipment)}
                 className="panel p-4 text-left transition-colors hover:border-theme-border-hover"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-content-primary">
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-semibold text-content-primary">
                       {equipment.name}
                     </p>
-                    <p className="mt-1 text-xs text-content-subtle">
+                    <p className="mt-1 text-sm text-content-subtle">
                       {equipment.location}
                       {equipment.zone ? ` · ${equipment.zone}` : ''}
                     </p>
                   </div>
-                  <Badge status={equipment.status} size="sm" />
+                  <Badge status={equipment.status} />
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 border-t border-theme-border pt-3">
                   <CategoryChip
@@ -230,7 +230,7 @@ export function Equipment() {
                     label={getCategoryLabel(equipment.category)}
                     icon={<CategoryIcon category={equipment.category} />}
                   />
-                  <code className="text-xs text-[var(--brand-violet-hover)]">
+                  <code className="text-sm text-[var(--brand-violet-hover)]">
                     {equipment.qrCode}
                   </code>
                 </div>

@@ -655,6 +655,7 @@
 
 @media (max-width: 480px) {
   .dashboard-program li { grid-template-columns: 1fr; gap: 0.4rem; }
+  .segmented-control > button { padding-inline: 0.5rem; }
 }
 
 @media (min-width: 768px) {

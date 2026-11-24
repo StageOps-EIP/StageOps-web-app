@@ -41,11 +41,6 @@ export function Dashboard() {
         </Link>
       </header>
 
-      <p className="dashboard-demo-note">
-        <strong>Scénario d’exemple</strong>
-        <span>Le programme est fictif. Vos changements de matériel et d’incidents restent dans ce navigateur.</span>
-      </p>
-
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.8fr)]">
         <section aria-labelledby="priority-title" className="dashboard-section min-w-0">
           <div className="dashboard-section-header">
@@ -53,9 +48,6 @@ export function Dashboard() {
               <TriangleAlert size={22} className="text-[var(--status-danger)]" aria-hidden="true" />
               <h2 id="priority-title">À traiter maintenant</h2>
             </div>
-            <Link to="/incidents" className="dashboard-text-link">
-              Tous les incidents <ArrowRight size={16} aria-hidden="true" />
-            </Link>
           </div>
           {urgent ? (
             <>
@@ -94,6 +86,9 @@ export function Dashboard() {
               <p className="mt-2 text-sm text-content-muted">Le registre ne contient rien à traiter pour le moment.</p>
             </div>
           )}
+          <Link to="/incidents" className="dashboard-section-footer">
+            Tous les incidents <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </section>
 
         <section aria-labelledby="equipment-title" className="dashboard-section">
@@ -125,6 +120,11 @@ export function Dashboard() {
           </Link>
         </section>
       </div>
+
+      <p className="dashboard-demo-note">
+        <strong>Scénario d’exemple</strong>
+        <span>Programme fictif. Matériel et incidents conservés dans ce navigateur.</span>
+      </p>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
         <section aria-labelledby="program-title" className="dashboard-section">

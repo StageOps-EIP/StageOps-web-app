@@ -83,6 +83,10 @@ export function Incidents() {
         }
         actions={
           <>
+            <Button variant="primary" onClick={() => setShowNewForm(true)}>
+              Signaler un incident
+            </Button>
+
             <div className="segmented-control">
               <button onClick={() => setViewMode('kanban')} aria-pressed={viewMode === 'kanban'}>
                 Kanban
@@ -97,9 +101,6 @@ export function Incidents() {
               Exporter CSV
             </Button>
 
-            <Button variant="primary" onClick={() => setShowNewForm(true)}>
-              Signaler un incident
-            </Button>
           </>
         }
       />
@@ -173,9 +174,9 @@ export function Incidents() {
                   <button
                     key={inc.id}
                     onClick={() => setSelectedIncident(inc)}
-                    className="work-row flex w-full flex-wrap items-center gap-3 p-4 text-left transition-colors hover:bg-theme-elevated sm:flex-nowrap"
+                    className="work-row flex w-full flex-col items-stretch gap-3 p-4 text-left transition-colors hover:bg-theme-elevated lg:flex-row lg:items-center"
                   >
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 lg:flex-1">
                       <span className="block text-base font-semibold text-content-primary">
                         {inc.title}
                       </span>
@@ -185,25 +186,27 @@ export function Incidents() {
                         <span>Par {inc.reportedBy}</span>
                       </div>
                     </div>
-                    <span
-                      className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
-                      style={{
-                        backgroundColor: `${sevColor}15`,
-                        color: sevColor,
-                      }}
-                    >
-                      {getSeverityLabel(inc.severity)}
-                    </span>
-                    <span
-                      className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
-                      style={{
-                        backgroundColor: `${statusCol?.color}15`,
-                        color: statusCol?.color,
-                      }}
-                    >
-                      {statusCol?.label}
-                    </span>
-                    <span className="shrink-0 text-sm font-semibold text-[var(--brand-violet-hover)]" aria-hidden="true">Voir</span>
+                    <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                      <span
+                        className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
+                        style={{
+                          backgroundColor: `${sevColor}15`,
+                          color: sevColor,
+                        }}
+                      >
+                        {getSeverityLabel(inc.severity)}
+                      </span>
+                      <span
+                        className="shrink-0 rounded-md px-2.5 py-1.5 text-sm font-semibold"
+                        style={{
+                          backgroundColor: `${statusCol?.color}15`,
+                          color: statusCol?.color,
+                        }}
+                      >
+                        {statusCol?.label}
+                      </span>
+                      <span className="ml-auto shrink-0 text-sm font-semibold text-[var(--brand-violet-hover)]" aria-hidden="true">Voir</span>
+                    </div>
                   </button>
                 )
               })}
