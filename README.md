@@ -38,6 +38,7 @@ Stack réelle : React 18, TypeScript, React Router 7, Vite 7, Tailwind CSS et Th
 
 - [Incidents et cohérence matériel/dashboard](PARCOURS_INCIDENT.md).
 - [Exports CSV](EXPORT_CSV.md).
+- Tests utilisateurs : [scénarios](docs/ux/scenarios.md), [parcours prioritaire](docs/ux/parcours-prioritaire.md), [protocole du round 1](docs/ux/protocole-round1.md), [fiche de test](docs/ux/fiche-test-template.md), [versions V0 → V3](docs/ux/versions.md).
 - [Wiki Architecture Web](https://github.com/StageOps-EIP/StageOps/wiki/Architecture-Web).
 
 ## État du produit
