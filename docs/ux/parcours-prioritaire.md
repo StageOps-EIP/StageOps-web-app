@@ -71,7 +71,7 @@ Le test garde ces étapes volontairement : on mesure ce que la personne attend d
 | Vue générale | 6 incidents actifs listés, indicateurs en bandeau | 3 incidents « À traiter maintenant », bloc Matériel avec premier équipement à contrôler |
 | 3D, fiche matériel, détail incident | Même logique, mêmes manques | Même logique, mêmes manques |
 
-Captures V0 : [v0/](v0/README.md).
+Captures, mêmes noms de fichiers pour comparer : V0 [v0/](v0/README.md) · V1 [v1/](v1/README.md).
 
 ## Chemin idéal visé (à valider par les tests)
 
