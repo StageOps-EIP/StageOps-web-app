@@ -64,12 +64,16 @@ Le test garde ces étapes volontairement : on mesure ce que la personne attend d
 
 ## Différences avec la V0
 
-| Point | V0 (`0d70257`) | V1 (`main`) |
+| Point | V0 (`b8ae18f`, prototype de septembre) | V1 (`main`) |
 | --- | --- | --- |
-| Thème | Sombre par défaut, bascule clair/sombre | Clair uniquement |
-| Signaler un incident | Seulement depuis la page Incidents | Bouton permanent dans la barre du haut (grand écran) |
-| Vue générale | 6 incidents actifs listés, indicateurs en bandeau | 3 incidents « À traiter maintenant », bloc Matériel avec premier équipement à contrôler |
-| 3D, fiche matériel, détail incident | Même logique, mêmes manques | Même logique, mêmes manques |
+| Accès | Connexion obligatoire via l'API Go | Espace local sans compte |
+| Téléphone | Aucune mise en page mobile | Barre d'onglets en bas, écrans adaptés |
+| Thème et libellés | Sombre, cyan ; *Tableau de bord*, *Vue Scène*, *Inventaire*, *Événements* | Clair Rideau ; *Vue générale*, *Plateau 3D*, *Parc matériel*, *Conducteur* |
+| Étape 1 (ouvrir la 3D) | Bouton **Ouvrir Vue Scène** dans la carte de la représentation | Lien **Ouvrir le plateau 3D** et bloc *Plateau 3D* |
+| Étape 2 (repérer le HS) | 3D vide. Le tableau de bord a un bloc *Équipements HS* qui nomme le BMFL | 3D vide (« 0 objets »). Le bloc *Matériel* donne les compteurs et le premier équipement à contrôler |
+| Étape 3 (ouvrir l'incident) | Fiche matériel sans lien vers l'incident ; incident trouvé dans *Incidents récents* ou le Kanban | Même manque sur la fiche ; incident dans « À traiter maintenant », trié par gravité |
+| Étape 4 (assigner) | Pas d'assignation ; bouton **Escalader** sans effet | Pas d'assignation ; **Escalader** retiré |
+| Cohérence des données | Chaque page a ses propres données ; rien n'est enregistré | Matériel et incidents partagés et enregistrés dans le navigateur |
 
 Captures, mêmes noms de fichiers pour comparer : V0 [v0/](v0/README.md) · V1 [v1/](v1/README.md).
 
